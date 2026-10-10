@@ -266,9 +266,15 @@ function App() {
     loadJson(STORAGE_SAVED, []),
   )
   const [knownIds, setKnownIds] = useState(() => new Set(loadJson(STORAGE_KNOWN, [])))
+  const [activeStoryId, setActiveStoryId] = useState(null)
   const [toast, setToast] = useState('')
   const cardRefs = useRef({})
   const toastTimer = useRef(null)
+
+  const activeStory = useMemo(
+    () => HISTORY_CARDS.find((c) => c.id === activeStoryId) ?? null,
+    [activeStoryId],
+  )
 
   const savedIds = useMemo(
     () => new Set(savedCards.map((c) => c.id)),
@@ -411,115 +417,213 @@ function App() {
     [showToast],
   )
 
+  const openStory = useCallback((id) => {
+    setActiveStoryId(id)
+    setFilterListOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  const closeStory = useCallback(() => {
+    setActiveStoryId(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   const handleSurprise = useCallback(() => {
     const pool = filteredCards
     if (pool.length === 0) return
     const unknown = pool.filter((c) => !knownIds.has(c.id))
     const pickFrom = unknown.length > 0 ? unknown : pool
     const card = pickFrom[Math.floor(Math.random() * pickFrom.length)]
-    const el = cardRefs.current[card.id]
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+    openStory(card.id)
     showToast(`Surprise: ${card.title}`)
-  }, [filteredCards, knownIds, showToast])
+  }, [filteredCards, knownIds, showToast, openStory])
+
+  const inDetail = activeStoryId !== null
 
   return (
-    <div className="app">
+    <div className={`app${inDetail ? ' app--detail' : ''}`}>
       <header className="top-bar">
         <div className="brand">
-          <h1>{showSavedOnly ? 'Saved' : 'History Feed'}</h1>
-          <button
-            type="button"
-            className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
-            onClick={toggleSavedView}
-            aria-pressed={showSavedOnly}
-            aria-label={
-              showSavedOnly
-                ? 'Leave saved view'
-                : `View ${savedCards.length} saved stories`
-            }
-          >
-            Saved · {savedCards.length}
-          </button>
+          {inDetail ? (
+            <button type="button" className="back-btn" onClick={closeStory}>
+              ← Back
+            </button>
+          ) : null}
+          <h1 className={inDetail ? 'brand-title--detail' : ''}>
+            {inDetail
+              ? (activeStory?.title ?? 'Story')
+              : showSavedOnly
+                ? 'Saved'
+                : 'History Feed'}
+          </h1>
+          {!inDetail && (
+            <button
+              type="button"
+              className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
+              onClick={toggleSavedView}
+              aria-pressed={showSavedOnly}
+              aria-label={
+                showSavedOnly
+                  ? 'Leave saved view'
+                  : `View ${savedCards.length} saved stories`
+              }
+            >
+              Saved · {savedCards.length}
+            </button>
+          )}
         </div>
 
-        <div className="filter-toolbar">
-          <div className="filters-scroll" aria-label="Category filters">
-            <nav className="filters">
+        {!inDetail && (
+          <>
+            <div className="filter-toolbar">
+              <div className="filters-scroll" aria-label="Category filters">
+                <nav className="filters">
+                  <button
+                    type="button"
+                    className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
+                    onClick={selectAllCategories}
+                  >
+                    All
+                  </button>
+                  {CATEGORY_LIST.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
+                      onClick={() => toggleCategory(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </nav>
+              </div>
               <button
                 type="button"
-                className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
-                onClick={selectAllCategories}
+                className={`filter-list-toggle${filterListOpen ? ' active' : ''}`}
+                onClick={() => setFilterListOpen((o) => !o)}
+                aria-expanded={filterListOpen}
+                aria-controls="category-filter-list"
               >
-                All
+                List
               </button>
-              {CATEGORY_LIST.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
-                  onClick={() => toggleCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </nav>
-          </div>
-          <button
-            type="button"
-            className={`filter-list-toggle${filterListOpen ? ' active' : ''}`}
-            onClick={() => setFilterListOpen((o) => !o)}
-            aria-expanded={filterListOpen}
-            aria-controls="category-filter-list"
-          >
-            List
-          </button>
-        </div>
-
-        {filterListOpen && (
-          <div
-            id="category-filter-list"
-            className="filter-list-panel"
-            role="group"
-            aria-label="Multi-select categories"
-          >
-            <div className="filter-list-head">
-              <span className="filter-list-title">Categories</span>
-              {selectedCategories.size > 0 && (
-                <button
-                  type="button"
-                  className="filter-list-clear"
-                  onClick={clearCategoryFilters}
-                >
-                  Clear
-                </button>
-              )}
             </div>
-            <ul className="filter-list">
-              {CATEGORY_LIST.map((cat) => (
-                <li key={cat}>
-                  <label className="filter-list-item">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.has(cat)}
-                      onChange={() => toggleCategory(cat)}
-                    />
-                    <span>{cat}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
+
+            {filterListOpen && (
+              <div
+                id="category-filter-list"
+                className="filter-list-panel"
+                role="group"
+                aria-label="Multi-select categories"
+              >
+                <div className="filter-list-head">
+                  <span className="filter-list-title">Categories</span>
+                  {selectedCategories.size > 0 && (
+                    <button
+                      type="button"
+                      className="filter-list-clear"
+                      onClick={clearCategoryFilters}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <ul className="filter-list">
+                  {CATEGORY_LIST.map((cat) => (
+                    <li key={cat}>
+                      <label className="filter-list-item">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.has(cat)}
+                          onChange={() => toggleCategory(cat)}
+                        />
+                        <span>{cat}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
         )}
       </header>
 
-      <p className="feed-status" aria-live="polite">
-        {feedStatus}
-      </p>
+      {!inDetail && (
+        <div className="feed-toolbar">
+          <p className="feed-status" aria-live="polite">
+            {feedStatus}
+          </p>
+          <button
+            type="button"
+            className="surprise-link"
+            onClick={handleSurprise}
+          >
+            Surprise me
+          </button>
+        </div>
+      )}
 
       <main className="feed">
-        {filteredCards.length === 0 ? (
+        {inDetail && !activeStory ? (
+          <div className="empty-state">
+            <h2 className="empty-state-title">Story not found</h2>
+            <p className="empty-state-body">It may have been removed from the catalog.</p>
+            <button type="button" className="empty-state-action" onClick={closeStory}>
+              Back to feed
+            </button>
+          </div>
+        ) : inDetail && activeStory ? (
+          <article className="card card--detail">
+            <div className="card-inner">
+              <div className="card-meta">
+                <span className="category">{activeStory.category}</span>
+                <div className="card-meta-badges">
+                  {savedIds.has(activeStory.id) && (
+                    <span className="meta-badge meta-badge--saved">Saved</span>
+                  )}
+                  {knownIds.has(activeStory.id) && (
+                    <span className="known-badge">Known</span>
+                  )}
+                </div>
+              </div>
+              <p className="hook hook--detail">{activeStory.hook}</p>
+              <p className="story">{activeStory.story}</p>
+              <div className="card-asides">
+                <div className="aside">
+                  <span className="aside-label">Why it matters today</span>
+                  <p className="aside-text">{activeStory.relevance}</p>
+                </div>
+                <div className="aside">
+                  <span className="aside-label">Rabbit hole</span>
+                  <p className="aside-text">{activeStory.rabbitHole}</p>
+                </div>
+              </div>
+            </div>
+            <div className="card-actions">
+              <button
+                type="button"
+                className={`action-btn action-btn--known${knownIds.has(activeStory.id) ? ' known-active' : ''}`}
+                onClick={() => handleKnown(activeStory)}
+              >
+                I knew this
+              </button>
+              <button
+                type="button"
+                className={`action-btn action-btn--save${savedIds.has(activeStory.id) ? ' saved' : ''}`}
+                onClick={() => handleSave(activeStory)}
+                aria-pressed={savedIds.has(activeStory.id)}
+              >
+                {savedIds.has(activeStory.id) ? 'Saved ✓' : 'Save'}
+              </button>
+              <button
+                type="button"
+                className="action-btn action-btn--surprise"
+                onClick={handleSurprise}
+              >
+                Surprise me
+              </button>
+            </div>
+          </article>
+        ) : filteredCards.length === 0 ? (
           <div className="empty-state">
             <h2 className="empty-state-title">{emptyState.title}</h2>
             <p className="empty-state-body">{emptyState.body}</p>
@@ -535,60 +639,35 @@ function App() {
           </div>
         ) : (
           filteredCards.map((card) => (
-            <article
+            <button
               key={card.id}
+              type="button"
               id={`card-${card.id}`}
               ref={(node) => {
                 if (node) cardRefs.current[card.id] = node
               }}
-              className={`card${knownIds.has(card.id) ? ' known' : ''}`}
+              className={`story-card${knownIds.has(card.id) ? ' known' : ''}`}
+              onClick={() => openStory(card.id)}
             >
-              <div className="card-inner">
-                <div className="card-meta">
-                  <span className="category">{card.category}</span>
+              <div className="story-card-top">
+                <span className="category">{card.category}</span>
+                <span className="story-card-chevron" aria-hidden="true">
+                  →
+                </span>
+              </div>
+              <h2 className="story-card-title">{card.title}</h2>
+              <p className="story-card-hook">{card.hook}</p>
+              {(savedIds.has(card.id) || knownIds.has(card.id)) && (
+                <div className="story-card-tags">
+                  {savedIds.has(card.id) && (
+                    <span className="meta-badge meta-badge--saved">Saved</span>
+                  )}
                   {knownIds.has(card.id) && (
-                    <span className="known-badge">Known</span>
+                    <span className="meta-badge">Known</span>
                   )}
                 </div>
-                <h2 className="card-title">{card.title}</h2>
-                <p className="hook">{card.hook}</p>
-                <p className="story">{card.story}</p>
-                <div className="card-asides">
-                  <div className="aside">
-                    <span className="aside-label">Why it matters today</span>
-                    <p className="aside-text">{card.relevance}</p>
-                  </div>
-                  <div className="aside">
-                    <span className="aside-label">Rabbit hole</span>
-                    <p className="aside-text">{card.rabbitHole}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="card-actions">
-                <button
-                  type="button"
-                  className={`action-btn action-btn--known${knownIds.has(card.id) ? ' known-active' : ''}`}
-                  onClick={() => handleKnown(card)}
-                >
-                  I knew this
-                </button>
-                <button
-                  type="button"
-                  className={`action-btn action-btn--save${savedIds.has(card.id) ? ' saved' : ''}`}
-                  onClick={() => handleSave(card)}
-                  aria-pressed={savedIds.has(card.id)}
-                >
-                  {savedIds.has(card.id) ? 'Saved ✓' : 'Save'}
-                </button>
-                <button
-                  type="button"
-                  className="action-btn action-btn--surprise"
-                  onClick={handleSurprise}
-                >
-                  Surprise me
-                </button>
-              </div>
-            </article>
+              )}
+            </button>
           ))
         )}
       </main>
