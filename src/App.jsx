@@ -247,7 +247,7 @@ const HISTORY_CARDS = [
   },
 ]
 
-const CATEGORIES = ['All', ...new Set(HISTORY_CARDS.map((c) => c.category))]
+const CATEGORY_LIST = [...new Set(HISTORY_CARDS.map((c) => c.category))]
 
 function loadJson(key, fallback) {
   try {
@@ -259,7 +259,9 @@ function loadJson(key, fallback) {
 }
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [selectedCategories, setSelectedCategories] = useState(() => new Set())
+  const [showSavedOnly, setShowSavedOnly] = useState(false)
+  const [filterListOpen, setFilterListOpen] = useState(false)
   const [savedCards, setSavedCards] = useState(() =>
     loadJson(STORAGE_SAVED, []),
   )
@@ -273,10 +275,48 @@ function App() {
     [savedCards],
   )
 
+  const savedCardsLive = useMemo(() => {
+    const byId = new Map(HISTORY_CARDS.map((c) => [c.id, c]))
+    return savedCards.map((s) => byId.get(s.id) ?? s)
+  }, [savedCards])
+
   const filteredCards = useMemo(() => {
-    if (activeCategory === 'All') return HISTORY_CARDS
-    return HISTORY_CARDS.filter((c) => c.category === activeCategory)
-  }, [activeCategory])
+    let pool = showSavedOnly ? savedCardsLive : HISTORY_CARDS
+    if (selectedCategories.size > 0) {
+      pool = pool.filter((c) => selectedCategories.has(c.category))
+    }
+    return pool
+  }, [showSavedOnly, savedCardsLive, selectedCategories])
+
+  const allCategoriesSelected = selectedCategories.size === 0
+
+  const toggleSavedView = useCallback(() => {
+    setShowSavedOnly((on) => !on)
+    setFilterListOpen(false)
+  }, [])
+
+  const selectAllCategories = useCallback(() => {
+    setSelectedCategories(new Set())
+    setShowSavedOnly(false)
+  }, [])
+
+  const toggleCategory = useCallback((category) => {
+    setShowSavedOnly(false)
+    setSelectedCategories((prev) => {
+      const next = new Set(prev)
+      if (next.has(category)) next.delete(category)
+      else next.add(category)
+      return next
+    })
+  }, [])
+
+  const toggleCategoryFromList = useCallback((category) => {
+    toggleCategory(category)
+  }, [toggleCategory])
+
+  const clearCategoryFilters = useCallback(() => {
+    setSelectedCategories(new Set())
+  }, [])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_SAVED, JSON.stringify(savedCards))
@@ -324,10 +364,7 @@ function App() {
   )
 
   const handleSurprise = useCallback(() => {
-    const pool =
-      activeCategory === 'All'
-        ? HISTORY_CARDS
-        : HISTORY_CARDS.filter((c) => c.category === activeCategory)
+    const pool = filteredCards
     if (pool.length === 0) return
     const unknown = pool.filter((c) => !knownIds.has(c.id))
     const pickFrom = unknown.length > 0 ? unknown : pool
@@ -337,34 +374,104 @@ function App() {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
     showToast(`Surprise: ${card.title}`)
-  }, [activeCategory, knownIds, showToast])
+  }, [filteredCards, knownIds, showToast])
 
   return (
     <div className="app">
       <header className="top-bar">
         <div className="brand">
-          <h1>History Feed</h1>
-          {savedCards.length > 0 && (
-            <span className="saved-count">{savedCards.length} saved</span>
-          )}
+          <h1>{showSavedOnly ? 'Saved' : 'History Feed'}</h1>
+          <button
+            type="button"
+            className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
+            onClick={toggleSavedView}
+            aria-pressed={showSavedOnly}
+          >
+            {savedCards.length} saved
+          </button>
         </div>
-        <nav className="filters" aria-label="Category filters">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`filter-chip${activeCategory === cat ? ' active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </nav>
+
+        <div className="filter-toolbar">
+          <div className="filters-scroll" aria-label="Category filters">
+            <nav className="filters">
+              <button
+                type="button"
+                className={`filter-chip${!showSavedOnly && allCategoriesSelected ? ' active' : ''}`}
+                onClick={selectAllCategories}
+              >
+                All
+              </button>
+              {CATEGORY_LIST.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
+                  onClick={() => toggleCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <button
+            type="button"
+            className={`filter-list-toggle${filterListOpen ? ' active' : ''}`}
+            onClick={() => setFilterListOpen((o) => !o)}
+            aria-expanded={filterListOpen}
+            aria-controls="category-filter-list"
+          >
+            List
+          </button>
+        </div>
+
+        {filterListOpen && (
+          <div
+            id="category-filter-list"
+            className="filter-list-panel"
+            role="group"
+            aria-label="Multi-select categories"
+          >
+            <div className="filter-list-head">
+              <span className="filter-list-title">Categories</span>
+              {selectedCategories.size > 0 && (
+                <button
+                  type="button"
+                  className="filter-list-clear"
+                  onClick={clearCategoryFilters}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <ul className="filter-list">
+              {CATEGORY_LIST.map((cat) => (
+                <li key={cat}>
+                  <label className="filter-list-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.has(cat)}
+                      onChange={() => toggleCategoryFromList(cat)}
+                    />
+                    <span>{cat}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </header>
 
       <main className="feed">
         {filteredCards.length === 0 ? (
-          <p className="empty-state">No stories in this category yet.</p>
+          <p className="empty-state">
+            {showSavedOnly
+              ? savedCards.length === 0
+                ? 'Nothing saved yet. Tap Save on a story to collect it here.'
+                : 'No saved stories match these filters.'
+              : selectedCategories.size > 0
+                ? 'No stories match the selected categories.'
+                : 'No stories to show.'}
+          </p>
         ) : (
           filteredCards.map((card) => (
             <article
