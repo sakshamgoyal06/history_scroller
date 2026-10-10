@@ -4,6 +4,25 @@ import './App.css'
 const STORAGE_SAVED = 'history-feed-saved'
 const STORAGE_KNOWN = 'history-feed-known'
 
+const FEED_HISTORY_STATE = { view: 'feed' }
+
+function storyHistoryState(id) {
+  return { view: 'story', id }
+}
+
+function storyUrl(id) {
+  return `${window.location.pathname}${window.location.search}#story/${id}`
+}
+
+function feedUrl() {
+  return `${window.location.pathname}${window.location.search}`
+}
+
+function storyIdFromLocation() {
+  const match = /^#story\/([^/#?]+)/.exec(window.location.hash)
+  return match?.[1] ?? null
+}
+
 const HISTORY_CARDS = [
   {
     id: 'alexandria',
@@ -330,6 +349,40 @@ function App() {
     localStorage.setItem(STORAGE_KNOWN, JSON.stringify([...knownIds]))
   }, [knownIds])
 
+  useEffect(() => {
+    const applyHistoryState = (state) => {
+      if (state?.view === 'story' && state.id) {
+        setActiveStoryId(state.id)
+      } else {
+        setActiveStoryId(null)
+      }
+    }
+
+    const deepLinkId = storyIdFromLocation()
+    const deepLinkCard = deepLinkId
+      ? HISTORY_CARDS.find((c) => c.id === deepLinkId)
+      : null
+
+    if (deepLinkCard) {
+      window.history.replaceState(
+        storyHistoryState(deepLinkCard.id),
+        '',
+        storyUrl(deepLinkCard.id),
+      )
+      setActiveStoryId(deepLinkCard.id)
+    } else {
+      window.history.replaceState(FEED_HISTORY_STATE, '', feedUrl())
+    }
+
+    const onPopState = (event) => {
+      applyHistoryState(event.state)
+      window.scrollTo(0, 0)
+    }
+
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
   const showToast = useCallback((message) => {
     setToast(message)
     if (toastTimer.current) clearTimeout(toastTimer.current)
@@ -418,12 +471,20 @@ function App() {
   )
 
   const openStory = useCallback((id) => {
-    setActiveStoryId(id)
     setFilterListOpen(false)
+    setActiveStoryId(id)
+    const current = window.history.state
+    if (current?.view !== 'story' || current?.id !== id) {
+      window.history.pushState(storyHistoryState(id), '', storyUrl(id))
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
   const closeStory = useCallback(() => {
+    if (window.history.state?.view === 'story') {
+      window.history.back()
+      return
+    }
     setActiveStoryId(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
