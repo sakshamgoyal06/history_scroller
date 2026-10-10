@@ -312,6 +312,10 @@ function App() {
     setSelectedCategories(new Set())
   }, [])
 
+  const leaveSavedView = useCallback(() => {
+    setShowSavedOnly(false)
+  }, [])
+
   useEffect(() => {
     localStorage.setItem(STORAGE_SAVED, JSON.stringify(savedCards))
   }, [savedCards])
@@ -359,7 +363,7 @@ function App() {
       return {
         title: 'No saved stories yet',
         body: 'Tap Save on any story in the feed to keep it here for later.',
-        action: { label: 'Browse feed', onClick: () => setShowSavedOnly(false) },
+        action: { label: 'Browse feed', onClick: leaveSavedView },
       }
     }
     if (showSavedOnly && selectedCategories.size > 0) {
@@ -387,6 +391,7 @@ function App() {
     selectedCategories.size,
     clearCategoryFilters,
     selectAllCategories,
+    leaveSavedView,
   ])
 
   const handleKnown = useCallback(

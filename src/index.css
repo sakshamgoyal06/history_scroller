@@ -35,12 +35,6 @@ html {
   scroll-behavior: smooth;
 }
 
-@supports (scroll-snap-type: y proximity) {
-  html {
-    scroll-snap-type: y proximity;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

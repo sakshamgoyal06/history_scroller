@@ -220,7 +220,6 @@
   box-shadow: var(--shadow-card);
   overflow: hidden;
   scroll-margin-top: var(--header-offset);
-  scroll-snap-align: start;
   transition:
     opacity 0.4s var(--ease-out),
     transform 0.4s var(--ease-out);
