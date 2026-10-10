@@ -297,11 +297,9 @@ function App() {
 
   const selectAllCategories = useCallback(() => {
     setSelectedCategories(new Set())
-    setShowSavedOnly(false)
   }, [])
 
   const toggleCategory = useCallback((category) => {
-    setShowSavedOnly(false)
     setSelectedCategories((prev) => {
       const next = new Set(prev)
       if (next.has(category)) next.delete(category)
@@ -309,10 +307,6 @@ function App() {
       return next
     })
   }, [])
-
-  const toggleCategoryFromList = useCallback((category) => {
-    toggleCategory(category)
-  }, [toggleCategory])
 
   const clearCategoryFilters = useCallback(() => {
     setSelectedCategories(new Set())
@@ -336,8 +330,8 @@ function App() {
     (card) => {
       setSavedCards((prev) => {
         if (prev.some((c) => c.id === card.id)) {
-          showToast('Already in your saved stack')
-          return prev
+          showToast('Removed from saved')
+          return prev.filter((c) => c.id !== card.id)
         }
         showToast('Saved for later')
         return [...prev, card]
@@ -345,6 +339,55 @@ function App() {
     },
     [showToast],
   )
+
+  const feedStatus = useMemo(() => {
+    const parts = []
+    if (showSavedOnly) parts.push('Saved')
+    parts.push(
+      `${filteredCards.length} ${filteredCards.length === 1 ? 'story' : 'stories'}`,
+    )
+    if (selectedCategories.size > 0) {
+      parts.push(
+        `${selectedCategories.size} ${selectedCategories.size === 1 ? 'filter' : 'filters'}`,
+      )
+    }
+    return parts.join(' · ')
+  }, [showSavedOnly, filteredCards.length, selectedCategories.size])
+
+  const emptyState = useMemo(() => {
+    if (showSavedOnly && savedCards.length === 0) {
+      return {
+        title: 'No saved stories yet',
+        body: 'Tap Save on any story in the feed to keep it here for later.',
+        action: { label: 'Browse feed', onClick: () => setShowSavedOnly(false) },
+      }
+    }
+    if (showSavedOnly && selectedCategories.size > 0) {
+      return {
+        title: 'No matches in saved',
+        body: 'None of your saved stories use the categories you picked.',
+        action: { label: 'Clear filters', onClick: clearCategoryFilters },
+      }
+    }
+    if (selectedCategories.size > 0) {
+      return {
+        title: 'No stories for these filters',
+        body: 'Try fewer categories or reset to see the full feed.',
+        action: { label: 'Show all categories', onClick: selectAllCategories },
+      }
+    }
+    return {
+      title: 'Nothing to show',
+      body: 'Check back soon for new stories.',
+      action: null,
+    }
+  }, [
+    showSavedOnly,
+    savedCards.length,
+    selectedCategories.size,
+    clearCategoryFilters,
+    selectAllCategories,
+  ])
 
   const handleKnown = useCallback(
     (card) => {
@@ -386,8 +429,13 @@ function App() {
             className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
             onClick={toggleSavedView}
             aria-pressed={showSavedOnly}
+            aria-label={
+              showSavedOnly
+                ? 'Leave saved view'
+                : `View ${savedCards.length} saved stories`
+            }
           >
-            {savedCards.length} saved
+            Saved · {savedCards.length}
           </button>
         </div>
 
@@ -396,7 +444,7 @@ function App() {
             <nav className="filters">
               <button
                 type="button"
-                className={`filter-chip${!showSavedOnly && allCategoriesSelected ? ' active' : ''}`}
+                className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
                 onClick={selectAllCategories}
               >
                 All
@@ -450,7 +498,7 @@ function App() {
                     <input
                       type="checkbox"
                       checked={selectedCategories.has(cat)}
-                      onChange={() => toggleCategoryFromList(cat)}
+                      onChange={() => toggleCategory(cat)}
                     />
                     <span>{cat}</span>
                   </label>
@@ -461,17 +509,25 @@ function App() {
         )}
       </header>
 
+      <p className="feed-status" aria-live="polite">
+        {feedStatus}
+      </p>
+
       <main className="feed">
         {filteredCards.length === 0 ? (
-          <p className="empty-state">
-            {showSavedOnly
-              ? savedCards.length === 0
-                ? 'Nothing saved yet. Tap Save on a story to collect it here.'
-                : 'No saved stories match these filters.'
-              : selectedCategories.size > 0
-                ? 'No stories match the selected categories.'
-                : 'No stories to show.'}
-          </p>
+          <div className="empty-state">
+            <h2 className="empty-state-title">{emptyState.title}</h2>
+            <p className="empty-state-body">{emptyState.body}</p>
+            {emptyState.action && (
+              <button
+                type="button"
+                className="empty-state-action"
+                onClick={emptyState.action.onClick}
+              >
+                {emptyState.action.label}
+              </button>
+            )}
+          </div>
         ) : (
           filteredCards.map((card) => (
             <article
@@ -515,8 +571,9 @@ function App() {
                   type="button"
                   className={`action-btn action-btn--save${savedIds.has(card.id) ? ' saved' : ''}`}
                   onClick={() => handleSave(card)}
+                  aria-pressed={savedIds.has(card.id)}
                 >
-                  {savedIds.has(card.id) ? 'Saved' : 'Save'}
+                  {savedIds.has(card.id) ? 'Saved ✓' : 'Save'}
                 </button>
                 <button
                   type="button"

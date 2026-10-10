@@ -199,11 +199,19 @@
     0 1px 2px rgba(44, 40, 37, 0.04);
 }
 
+.feed-status {
+  margin: 0;
+  padding: 10px var(--feed-pad) 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
 .feed {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 12px var(--feed-pad) max(24px, env(safe-area-inset-bottom));
+  padding: 10px var(--feed-pad) max(28px, env(safe-area-inset-bottom));
 }
 
 .card {
@@ -271,8 +279,9 @@
   margin: 0 0 20px;
   font-family: var(--font-display);
   font-size: 1.0625rem;
-  line-height: 1.68;
+  line-height: 1.72;
   color: var(--ink);
+  text-wrap: pretty;
 }
 
 .card-asides {
@@ -356,9 +365,38 @@
 
 .empty-state {
   text-align: center;
-  padding: 56px 24px;
+  padding: 40px 20px 48px;
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.empty-state-title {
+  margin: 0 0 8px;
+  font-family: var(--font-ui);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.empty-state-body {
+  margin: 0 auto 20px;
+  max-width: 28ch;
   font-size: 0.9375rem;
-  color: var(--ink-soft);
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.empty-state-action {
+  border: none;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  min-height: 44px;
 }
 
 .toast {
@@ -388,6 +426,30 @@
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    --feed-pad: 14px;
+  }
+
+  .card-inner {
+    padding: 18px 16px 0;
+  }
+
+  .card-title {
+    font-size: 1.35rem;
+  }
+
+  .card-actions {
+    padding-inline: 12px;
+    gap: 6px;
+  }
+
+  .action-btn {
+    font-size: 0.75rem;
+    padding-inline: 4px;
   }
 }
 
