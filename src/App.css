@@ -259,15 +259,19 @@
   padding: 10px var(--feed-pad) max(28px, env(safe-area-inset-bottom));
 }
 
-.story-card {
+.story-preview {
   display: block;
   width: 100%;
   text-align: left;
-  border: none;
   background: var(--surface);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 16px 18px;
+  overflow: hidden;
+}
+
+.story-preview--interactive {
+  border: none;
+  padding: 0;
   cursor: pointer;
   transition:
     transform 0.15s var(--ease-out),
@@ -275,12 +279,55 @@
     opacity 0.4s var(--ease-out);
 }
 
-.story-card:active {
+.story-preview--interactive:active {
   transform: scale(0.985);
 }
 
-.story-card.known {
-  opacity: 0.82;
+.story-preview--interactive.known {
+  opacity: 0.86;
+}
+
+.story-preview--static,
+.story-preview--in-detail {
+  border-bottom: 1px solid var(--line);
+}
+
+.story-art {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-deep);
+}
+
+.story-art--feed {
+  aspect-ratio: 2.2 / 1;
+}
+
+.story-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  filter: saturate(0.75) contrast(0.92);
+}
+
+.story-art-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(247, 245, 241, 0.08) 0%,
+    rgba(247, 245, 241, 0.55) 58%,
+    rgba(255, 252, 248, 0.96) 100%
+  );
+  pointer-events: none;
+}
+
+.story-preview-body {
+  padding: 14px 18px 16px;
+  margin-top: -28px;
+  position: relative;
+  z-index: 1;
 }
 
 .story-card-top {
@@ -318,6 +365,37 @@
   overflow: hidden;
 }
 
+.story-card-hook--detail {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.card-inner--detail {
+  padding-top: 18px;
+}
+
+.story-video {
+  margin-top: 14px;
+}
+
+.story-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-deep);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.story-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .story-card-tags {
   display: flex;
   flex-wrap: wrap;
@@ -350,18 +428,6 @@
 
 .card--detail {
   scroll-margin-top: var(--header-offset);
-}
-
-.card-meta-badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.hook--detail {
-  margin-bottom: 16px;
-  font-size: 1.0625rem;
 }
 
 .card-inner {

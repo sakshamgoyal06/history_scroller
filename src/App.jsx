@@ -266,7 +266,113 @@ const HISTORY_CARDS = [
   },
 ]
 
+const STORY_YOUTUBE = {
+  alexandria: 'jvWncVbXfJ0',
+  'roman-concrete': 'qL0BB2PRY7k',
+  'silk-road': 'vn3e37VWc0k',
+  'black-death': 'ySClB6-OH-Q',
+  'magna-carta': '7xo4tUMdAMw',
+  'gothic-cathedral': 'kh1qfPWsrJ8',
+  'printing-press': '_YqYtdPUis4',
+  'constantinople-1453': 'BnOS90_cwQA',
+  'da-vinci-notebooks': 'aMsaFP3kgqQ',
+  'scientific-revolution': 'vzo8vnxSARg',
+  'enlightenment-salons': '0af00UcTO-c',
+  'haitian-revolution': '5A_o-nU5s2U',
+  'industrial-mills': 'zhL5DCizj5c',
+  'ww1-telegraph': 'KGlmlSTn-eM',
+  'berlin-wall': 'A9fQPzZ1-hg',
+  'germ-theory': '8HLtFv_KqoE',
+  'ada-lovelace': 'FlfChYGv3Z4',
+  'green-revolution': 'b51G5sB2_hM',
+  'jazz-migration': 'vKaegbtcE00',
+  'un-declaration': 'nDgIVseTkuE',
+}
+
+for (const card of HISTORY_CARDS) {
+  card.image = `/stories/${card.id}.svg`
+  card.youtubeId = STORY_YOUTUBE[card.id] ?? null
+}
+
 const CATEGORY_LIST = [...new Set(HISTORY_CARDS.map((c) => c.category))]
+
+function StoryArt({ image, title, variant = 'feed' }) {
+  return (
+    <div className={`story-art story-art--${variant}`}>
+      <img src={image} alt="" className="story-art-img" loading="lazy" decoding="async" />
+      <div className="story-art-scrim" aria-hidden="true" />
+      <span className="visually-hidden">{title}</span>
+    </div>
+  )
+}
+
+function StoryPreviewCard({
+  card,
+  badges = null,
+  interactive = false,
+  onOpen,
+  className = '',
+  id,
+  innerRef,
+}) {
+  const body = (
+    <>
+      <StoryArt image={card.image} title={card.title} variant={interactive ? 'feed' : 'detail'} />
+      <div className="story-preview-body">
+        <div className="story-card-top">
+          <span className="category">{card.category}</span>
+          {interactive ? (
+            <span className="story-card-chevron" aria-hidden="true">
+              →
+            </span>
+          ) : null}
+        </div>
+        <h2 className="story-card-title">{card.title}</h2>
+        <p className={`story-card-hook${interactive ? '' : ' story-card-hook--detail'}`}>
+          {card.hook}
+        </p>
+        {badges}
+      </div>
+    </>
+  )
+
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        id={id}
+        ref={innerRef}
+        className={`story-preview story-preview--interactive${className ? ` ${className}` : ''}`}
+        onClick={onOpen}
+      >
+        {body}
+      </button>
+    )
+  }
+
+  return (
+    <div className={`story-preview story-preview--static${className ? ` ${className}` : ''}`}>
+      {body}
+    </div>
+  )
+}
+
+function StoryVideo({ youtubeId, title }) {
+  if (!youtubeId) return null
+  return (
+    <div className="story-video">
+      <div className="story-video-frame">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+          title={`Video: ${title}`}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </div>
+    </div>
+  )
+}
 
 function loadJson(key, fallback) {
   try {
@@ -632,19 +738,23 @@ function App() {
           </div>
         ) : inDetail && activeStory ? (
           <article className="card card--detail">
-            <div className="card-inner">
-              <div className="card-meta">
-                <span className="category">{activeStory.category}</span>
-                <div className="card-meta-badges">
-                  {savedIds.has(activeStory.id) && (
-                    <span className="meta-badge meta-badge--saved">Saved</span>
-                  )}
-                  {knownIds.has(activeStory.id) && (
-                    <span className="known-badge">Known</span>
-                  )}
-                </div>
-              </div>
-              <p className="hook hook--detail">{activeStory.hook}</p>
+            <StoryPreviewCard
+              card={activeStory}
+              className="story-preview--in-detail"
+              badges={
+                (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
+                  <div className="story-card-tags">
+                    {savedIds.has(activeStory.id) && (
+                      <span className="meta-badge meta-badge--saved">Saved</span>
+                    )}
+                    {knownIds.has(activeStory.id) && (
+                      <span className="meta-badge">Known</span>
+                    )}
+                  </div>
+                )
+              }
+            />
+            <div className="card-inner card-inner--detail">
               <p className="story">{activeStory.story}</p>
               <div className="card-asides">
                 <div className="aside">
@@ -654,6 +764,7 @@ function App() {
                 <div className="aside">
                   <span className="aside-label">Rabbit hole</span>
                   <p className="aside-text">{activeStory.rabbitHole}</p>
+                  <StoryVideo youtubeId={activeStory.youtubeId} title={activeStory.title} />
                 </div>
               </div>
             </div>
@@ -698,35 +809,29 @@ function App() {
           </div>
         ) : (
           filteredCards.map((card) => (
-            <button
+            <StoryPreviewCard
               key={card.id}
-              type="button"
               id={`card-${card.id}`}
-              ref={(node) => {
+              innerRef={(node) => {
                 if (node) cardRefs.current[card.id] = node
               }}
-              className={`story-card${knownIds.has(card.id) ? ' known' : ''}`}
-              onClick={() => openStory(card.id)}
-            >
-              <div className="story-card-top">
-                <span className="category">{card.category}</span>
-                <span className="story-card-chevron" aria-hidden="true">
-                  →
-                </span>
-              </div>
-              <h2 className="story-card-title">{card.title}</h2>
-              <p className="story-card-hook">{card.hook}</p>
-              {(savedIds.has(card.id) || knownIds.has(card.id)) && (
-                <div className="story-card-tags">
-                  {savedIds.has(card.id) && (
-                    <span className="meta-badge meta-badge--saved">Saved</span>
-                  )}
-                  {knownIds.has(card.id) && (
-                    <span className="meta-badge">Known</span>
-                  )}
-                </div>
-              )}
-            </button>
+              card={card}
+              interactive
+              className={knownIds.has(card.id) ? 'known' : ''}
+              onOpen={() => openStory(card.id)}
+              badges={
+                (savedIds.has(card.id) || knownIds.has(card.id)) && (
+                  <div className="story-card-tags">
+                    {savedIds.has(card.id) && (
+                      <span className="meta-badge meta-badge--saved">Saved</span>
+                    )}
+                    {knownIds.has(card.id) && (
+                      <span className="meta-badge">Known</span>
+                    )}
+                  </div>
+                )
+              }
+            />
           ))
         )}
       </main>
