@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg-undeclaration" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f7f5f1"/>
       <stop offset="100%" stop-color="#efe8df"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#c17f59" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#c17f59" stop-opacity="0"/>
+    <linearGradient id="scrim-undeclaration" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="155" cy="126" r="118" fill="#c17f59" opacity="0.12"/>
-  <circle cx="585" cy="279" r="125" fill="#a56845" opacity="0.1"/>
-  <path d="M 116 188 Q 400 161 684 325" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-  <rect x="221" y="175" width="220" height="142" rx="24" fill="#2c2825" opacity="0.06"/>
-  <rect x="455" y="236" width="166" height="105" rx="18" fill="#c17f59" opacity="0.14"/>
-  <rect width="800" height="450" fill="url(#glow)" opacity="0.55"/>
+  <rect width="800" height="450" fill="url(#bg-undeclaration)"/>
+  <g opacity="0.95">
+    <rect x="260" y="170" width="280" height="170" rx="6" fill="#fffcf8" stroke="#c17f59" stroke-width="2" opacity="0.3"/>
+    <path d="M290 210 H510 M290 240 H480 M290 270 H500 M290 300 H430" stroke="#a56845" stroke-width="2" opacity="0.2"/>
+    <path d="M400 130 Q420 110 440 130 Q460 150 440 170 Q420 190 400 170 Q380 150 400 130" fill="#c17f59" opacity="0.18"/>
+    <circle cx="580" cy="220" r="35" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-undeclaration)"/>
 </svg>

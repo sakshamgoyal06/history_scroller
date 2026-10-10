@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg-gothiccathedral" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f7f5f1"/>
       <stop offset="100%" stop-color="#efe8df"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#c17f59" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#c17f59" stop-opacity="0"/>
+    <linearGradient id="scrim-gothiccathedral" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="154" cy="132" r="110" fill="#c17f59" opacity="0.12"/>
-  <circle cx="586" cy="272" r="113" fill="#a56845" opacity="0.1"/>
-  <path d="M 122 228 Q 400 168 678 326" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-  <rect x="228" y="174" width="232" height="152" rx="24" fill="#2c2825" opacity="0.06"/>
-  <rect x="454" y="242" width="169" height="109" rx="18" fill="#c17f59" opacity="0.14"/>
-  <rect width="800" height="450" fill="url(#glow)" opacity="0.55"/>
+  <rect width="800" height="450" fill="url(#bg-gothiccathedral)"/>
+  <g opacity="0.95">
+    <path d="M320 320 L400 120 L480 320 Z" fill="#c17f59" opacity="0.15"/>
+    <path d="M350 320 L400 160 L450 320" fill="none" stroke="#a56845" stroke-width="2" opacity="0.28"/>
+    <circle cx="400" cy="200" r="45" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
+    <path d="M260 320 H540" stroke="#2c2825" stroke-width="3" opacity="0.08"/>
+    <path d="M230 320 L250 260 L270 320 M530 320 L550 260 L570 320" fill="#c17f59" opacity="0.12"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-gothiccathedral)"/>
 </svg>

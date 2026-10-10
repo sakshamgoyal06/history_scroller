@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg-blackdeath" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f7f5f1"/>
       <stop offset="100%" stop-color="#efe8df"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#c17f59" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#c17f59" stop-opacity="0"/>
+    <linearGradient id="scrim-blackdeath" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="138" cy="128" r="117" fill="#c17f59" opacity="0.12"/>
-  <circle cx="602" cy="288" r="106" fill="#a56845" opacity="0.1"/>
-  <path d="M 118 197 Q 400 152 682 342" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-  <rect x="212" y="158" width="224" height="149" rx="24" fill="#2c2825" opacity="0.06"/>
-  <rect x="438" y="238" width="161" height="124" rx="18" fill="#c17f59" opacity="0.14"/>
-  <rect width="800" height="450" fill="url(#glow)" opacity="0.55"/>
+  <rect width="800" height="450" fill="url(#bg-blackdeath)"/>
+  <g opacity="0.95">
+    <circle cx="400" cy="230" r="90" fill="none" stroke="#a56845" stroke-width="2" opacity="0.2"/>
+    <path d="M400 140 L400 320 M340 200 L460 260 M460 200 L340 260" stroke="#c17f59" stroke-width="2" opacity="0.18"/>
+    <path d="M150 320 Q250 260 350 320" fill="none" stroke="#2c2825" stroke-width="2" opacity="0.1"/>
+    <circle cx="580" cy="280" r="8" fill="#c17f59" opacity="0.25"/>
+    <circle cx="610" cy="300" r="6" fill="#c17f59" opacity="0.2"/>
+    <circle cx="640" cy="285" r="7" fill="#c17f59" opacity="0.22"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-blackdeath)"/>
 </svg>

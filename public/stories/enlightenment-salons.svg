@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg-enlightenmentsalons" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f7f5f1"/>
       <stop offset="100%" stop-color="#efe8df"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#c17f59" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#c17f59" stop-opacity="0"/>
+    <linearGradient id="scrim-enlightenmentsalons" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="136" cy="142" r="99" fill="#c17f59" opacity="0.12"/>
-  <circle cx="604" cy="258" r="127" fill="#a56845" opacity="0.1"/>
-  <path d="M 132 211 Q 400 182 668 344" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-  <rect x="242" y="156" width="276" height="146" rx="24" fill="#2c2825" opacity="0.06"/>
-  <rect x="436" y="252" width="181" height="128" rx="18" fill="#c17f59" opacity="0.14"/>
-  <rect width="800" height="450" fill="url(#glow)" opacity="0.55"/>
+  <rect width="800" height="450" fill="url(#bg-enlightenmentsalons)"/>
+  <g opacity="0.95">
+    <ellipse cx="400" cy="280" rx="160" ry="50" fill="#c17f59" opacity="0.1"/>
+    <circle cx="320" cy="250" r="22" fill="#a56845" opacity="0.18"/>
+    <circle cx="400" cy="235" r="22" fill="#c17f59" opacity="0.2"/>
+    <circle cx="480" cy="250" r="22" fill="#a56845" opacity="0.18"/>
+    <rect x="370" y="200" width="60" height="8" rx="4" fill="#2c2825" opacity="0.08"/>
+    <path d="M350 180 Q400 150 450 180" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-enlightenmentsalons)"/>
 </svg>

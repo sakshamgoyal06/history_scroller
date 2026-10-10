@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg-silkroad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f7f5f1"/>
       <stop offset="100%" stop-color="#efe8df"/>
     </linearGradient>
-    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#c17f59" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#c17f59" stop-opacity="0"/>
+    <linearGradient id="scrim-silkroad" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="450" fill="url(#bg)"/>
-  <circle cx="143" cy="137" r="93" fill="#c17f59" opacity="0.12"/>
-  <circle cx="597" cy="241" r="128" fill="#a56845" opacity="0.1"/>
-  <path d="M 127 201 Q 400 199 673 337" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-  <rect x="259" y="163" width="250" height="160" rx="24" fill="#2c2825" opacity="0.06"/>
-  <rect x="443" y="247" width="196" height="108" rx="18" fill="#c17f59" opacity="0.14"/>
-  <rect width="800" height="450" fill="url(#glow)" opacity="0.55"/>
+  <rect width="800" height="450" fill="url(#bg-silkroad)"/>
+  <g opacity="0.95">
+    <path d="M80 300 Q200 220 320 280 T560 260 T720 300" fill="none" stroke="#c17f59" stroke-width="3" opacity="0.28"/>
+    <path d="M180 300 L200 270 L220 300 Z" fill="#a56845" opacity="0.22"/>
+    <circle cx="360" cy="275" r="14" fill="#c17f59" opacity="0.2"/>
+    <path d="M500 285 L530 265 L560 285 L530 305 Z" fill="#c17f59" opacity="0.16"/>
+    <path d="M620 295 Q640 270 660 295" fill="none" stroke="#a56845" stroke-width="2" opacity="0.25"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-silkroad)"/>
 </svg>
