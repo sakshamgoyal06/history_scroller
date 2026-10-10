@@ -285,7 +285,10 @@ function App() {
     loadJson(STORAGE_SAVED, []),
   )
   const [knownIds, setKnownIds] = useState(() => new Set(loadJson(STORAGE_KNOWN, [])))
-  const [activeStoryId, setActiveStoryId] = useState(null)
+  const [activeStoryId, setActiveStoryId] = useState(() => {
+    const id = storyIdFromLocation()
+    return id && HISTORY_CARDS.some((c) => c.id === id) ? id : null
+  })
   const [toast, setToast] = useState('')
   const cardRefs = useRef({})
   const toastTimer = useRef(null)
@@ -359,17 +362,12 @@ function App() {
     }
 
     const deepLinkId = storyIdFromLocation()
-    const deepLinkCard = deepLinkId
-      ? HISTORY_CARDS.find((c) => c.id === deepLinkId)
-      : null
-
-    if (deepLinkCard) {
+    if (deepLinkId && HISTORY_CARDS.some((c) => c.id === deepLinkId)) {
       window.history.replaceState(
-        storyHistoryState(deepLinkCard.id),
+        storyHistoryState(deepLinkId),
         '',
-        storyUrl(deepLinkCard.id),
+        storyUrl(deepLinkId),
       )
-      setActiveStoryId(deepLinkCard.id)
     } else {
       window.history.replaceState(FEED_HISTORY_STATE, '', feedUrl())
     }
