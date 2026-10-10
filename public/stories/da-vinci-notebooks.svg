@@ -7,17 +7,17 @@
     </linearGradient>
     <linearGradient id="scrim-davincinotebooks" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-davincinotebooks)"/>
-  <g opacity="0.95">
-    <circle cx="400" cy="240" r="100" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
-    <rect x="340" y="180" width="120" height="120" fill="none" stroke="#a56845" stroke-width="2" opacity="0.2"/>
-    <path d="M400 180 L400 300 M340 240 L460 240" stroke="#2c2825" stroke-width="1" opacity="0.12"/>
-    <path d="M520 200 L560 220 L540 260 L500 240 Z" fill="#c17f59" opacity="0.15"/>
-    <path d="M250 280 L290 260 L310 300 L270 320 Z" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
+  <g>
+    <circle cx="400" cy="240" r="100" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.57"/>
+    <rect x="340" y="180" width="120" height="120" fill="none" stroke="#a56845" stroke-width="2" opacity="0.52"/>
+    <path d="M400 180 L400 300 M340 240 L460 240" stroke="#2c2825" stroke-width="1" opacity="0.31"/>
+    <path d="M520 200 L560 220 L540 260 L500 240 Z" fill="#c17f59" opacity="0.39"/>
+    <path d="M250 280 L290 260 L310 300 L270 320 Z" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.52"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-davincinotebooks)"/>
 </svg>

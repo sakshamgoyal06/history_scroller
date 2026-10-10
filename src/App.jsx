@@ -645,7 +645,7 @@ function App() {
                     d="M4 6h16M7 12h10M10 18h4"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.35"
                     strokeLinecap="round"
                   />
                 </svg>

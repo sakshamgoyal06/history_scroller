@@ -7,18 +7,18 @@
     </linearGradient>
     <linearGradient id="scrim-germtheory" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-germtheory)"/>
-  <g opacity="0.95">
-    <path d="M480 180 L520 280 L440 280 Z" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.25"/>
-    <rect x="455" y="280" width="50" height="40" fill="#a56845" opacity="0.15"/>
-    <circle cx="320" cy="250" r="40" fill="#c17f59" opacity="0.12"/>
-    <circle cx="350" cy="230" r="15" fill="#a56845" opacity="0.18"/>
-    <circle cx="300" cy="270" r="12" fill="#a56845" opacity="0.16"/>
-    <path d="M250 300 H380" stroke="#2c2825" stroke-width="2" opacity="0.08"/>
+  <g>
+    <path d="M480 180 L520 280 L440 280 Z" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.65"/>
+    <rect x="455" y="280" width="50" height="40" fill="#a56845" opacity="0.39"/>
+    <circle cx="320" cy="250" r="40" fill="#c17f59" opacity="0.31"/>
+    <circle cx="350" cy="230" r="15" fill="#a56845" opacity="0.47"/>
+    <circle cx="300" cy="270" r="12" fill="#a56845" opacity="0.42"/>
+    <path d="M250 300 H380" stroke="#2c2825" stroke-width="2" opacity="0.26"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-germtheory)"/>
 </svg>

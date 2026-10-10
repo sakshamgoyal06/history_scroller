@@ -7,16 +7,16 @@
     </linearGradient>
     <linearGradient id="scrim-magnacarta" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-magnacarta)"/>
-  <g opacity="0.95">
-    <rect x="280" y="160" width="240" height="180" rx="8" fill="#fffcf8" stroke="#c17f59" stroke-width="2" opacity="0.35"/>
-    <path d="M310 200 H490 M310 230 H460 M310 260 H480 M310 290 H420" stroke="#a56845" stroke-width="2" opacity="0.22"/>
-    <circle cx="400" cy="320" r="28" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.3"/>
-    <path d="M385 320 L395 330 L420 305" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.35"/>
+  <g>
+    <rect x="280" y="160" width="240" height="180" rx="8" fill="#fffcf8" stroke="#c17f59" stroke-width="2" opacity="0.78"/>
+    <path d="M310 200 H490 M310 230 H460 M310 260 H480 M310 290 H420" stroke="#a56845" stroke-width="2" opacity="0.57"/>
+    <circle cx="400" cy="320" r="28" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.78"/>
+    <path d="M385 320 L395 330 L420 305" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.78"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-magnacarta)"/>
 </svg>

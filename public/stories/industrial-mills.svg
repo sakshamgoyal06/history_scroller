@@ -7,17 +7,17 @@
     </linearGradient>
     <linearGradient id="scrim-industrialmills" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-industrialmills)"/>
-  <g opacity="0.95">
-    <rect x="300" y="180" width="200" height="140" fill="#2c2825" opacity="0.07"/>
-    <rect x="380" y="120" width="40" height="60" fill="#a56845" opacity="0.15"/>
-    <circle cx="400" cy="250" r="35" fill="none" stroke="#c17f59" stroke-width="3" opacity="0.25"/>
-    <path d="M400 215 L400 285 M365 250 L435 250" stroke="#c17f59" stroke-width="2" opacity="0.2"/>
-    <path d="M520 200 Q540 160 560 200" fill="none" stroke="#2c2825" stroke-width="2" opacity="0.12"/>
+  <g>
+    <rect x="300" y="180" width="200" height="140" fill="#2c2825" opacity="0.26"/>
+    <rect x="380" y="120" width="40" height="60" fill="#a56845" opacity="0.39"/>
+    <circle cx="400" cy="250" r="35" fill="none" stroke="#c17f59" stroke-width="3" opacity="0.65"/>
+    <path d="M400 215 L400 285 M365 250 L435 250" stroke="#c17f59" stroke-width="2" opacity="0.52"/>
+    <path d="M520 200 Q540 160 560 200" fill="none" stroke="#2c2825" stroke-width="2" opacity="0.31"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-industrialmills)"/>
 </svg>

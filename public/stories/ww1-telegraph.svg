@@ -7,18 +7,18 @@
     </linearGradient>
     <linearGradient id="scrim-ww1telegraph" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-ww1telegraph)"/>
-  <g opacity="0.95">
-    <path d="M120 300 H680" stroke="#a56845" stroke-width="2" opacity="0.15"/>
-    <path d="M200 300 L220 260 L240 300 Z" fill="#c17f59" opacity="0.12"/>
-    <path d="M400 300 L420 250 L440 300 Z" fill="#c17f59" opacity="0.14"/>
-    <path d="M560 300 L580 255 L600 300 Z" fill="#c17f59" opacity="0.12"/>
-    <path d="M640 180 L640 280 M620 200 L660 200" stroke="#2c2825" stroke-width="2" opacity="0.15"/>
-    <path d="M620 180 Q640 160 660 180" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
+  <g>
+    <path d="M120 300 H680" stroke="#a56845" stroke-width="2" opacity="0.39"/>
+    <path d="M200 300 L220 260 L240 300 Z" fill="#c17f59" opacity="0.31"/>
+    <path d="M400 300 L420 250 L440 300 Z" fill="#c17f59" opacity="0.36"/>
+    <path d="M560 300 L580 255 L600 300 Z" fill="#c17f59" opacity="0.31"/>
+    <path d="M640 180 L640 280 M620 200 L660 200" stroke="#2c2825" stroke-width="2" opacity="0.39"/>
+    <path d="M620 180 Q640 160 660 180" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.57"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-ww1telegraph)"/>
 </svg>
