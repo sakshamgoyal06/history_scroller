@@ -622,55 +622,76 @@ function App() {
                 : 'History Feed'}
           </h1>
           {!inDetail && (
-            <button
-              type="button"
-              className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
-              onClick={toggleSavedView}
-              aria-pressed={showSavedOnly}
-              aria-label={
-                showSavedOnly
-                  ? 'Leave saved view'
-                  : `View ${savedCards.length} saved stories`
-              }
-            >
-              Saved · {savedCards.length}
-            </button>
+            <div className="header-actions">
+              <button
+                type="button"
+                className={`filter-icon-btn${filterListOpen ? ' active' : ''}${selectedCategories.size > 0 ? ' has-filters' : ''}`}
+                onClick={() => setFilterListOpen((o) => !o)}
+                aria-expanded={filterListOpen}
+                aria-controls="category-filter-list"
+                aria-label={
+                  selectedCategories.size > 0
+                    ? `Filter categories, ${selectedCategories.size} selected`
+                    : 'Filter categories'
+                }
+              >
+                <svg
+                  className="filter-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M4 6h16M7 12h10M10 18h4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {selectedCategories.size > 0 && (
+                  <span className="filter-icon-badge">{selectedCategories.size}</span>
+                )}
+              </button>
+              <button
+                type="button"
+                className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
+                onClick={toggleSavedView}
+                aria-pressed={showSavedOnly}
+                aria-label={
+                  showSavedOnly
+                    ? 'Leave saved view'
+                    : `View ${savedCards.length} saved stories`
+                }
+              >
+                Saved · {savedCards.length}
+              </button>
+            </div>
           )}
         </div>
 
         {!inDetail && (
           <>
-            <div className="filter-toolbar">
-              <div className="filters-scroll" aria-label="Category filters">
-                <nav className="filters">
+            <div className="filters-scroll" aria-label="Category filters">
+              <nav className="filters">
+                <button
+                  type="button"
+                  className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
+                  onClick={selectAllCategories}
+                >
+                  All
+                </button>
+                {CATEGORY_LIST.map((cat) => (
                   <button
+                    key={cat}
                     type="button"
-                    className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
-                    onClick={selectAllCategories}
+                    className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
+                    onClick={() => toggleCategory(cat)}
                   >
-                    All
+                    {cat}
                   </button>
-                  {CATEGORY_LIST.map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
-                      onClick={() => toggleCategory(cat)}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-              <button
-                type="button"
-                className={`filter-list-toggle${filterListOpen ? ' active' : ''}`}
-                onClick={() => setFilterListOpen((o) => !o)}
-                aria-expanded={filterListOpen}
-                aria-controls="category-filter-list"
-              >
-                List
-              </button>
+                ))}
+              </nav>
             </div>
 
             {filterListOpen && (
