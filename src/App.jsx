@@ -343,10 +343,7 @@ function App() {
     <div className="app">
       <header className="top-bar">
         <div className="brand">
-          <div>
-            <p className="tagline">Scroll the past</p>
-            <h1>History Feed</h1>
-          </div>
+          <h1>History Feed</h1>
           {savedCards.length > 0 && (
             <span className="saved-count">{savedCards.length} saved</span>
           )}
@@ -378,40 +375,45 @@ function App() {
               }}
               className={`card${knownIds.has(card.id) ? ' known' : ''}`}
             >
-              <div className="card-header">
-                <span className="category">{card.category}</span>
+              <div className="card-inner">
+                <div className="card-meta">
+                  <span className="category">{card.category}</span>
+                  {knownIds.has(card.id) && (
+                    <span className="known-badge">Known</span>
+                  )}
+                </div>
                 <h2 className="card-title">{card.title}</h2>
                 <p className="hook">{card.hook}</p>
-              </div>
-              <div className="card-body">
                 <p className="story">{card.story}</p>
-                <div className="insight-block">
-                  <h3>Why it matters today</h3>
-                  <p>{card.relevance}</p>
+                <div className="card-asides">
+                  <div className="aside">
+                    <span className="aside-label">Why it matters today</span>
+                    <p className="aside-text">{card.relevance}</p>
+                  </div>
+                  <div className="aside">
+                    <span className="aside-label">Rabbit hole</span>
+                    <p className="aside-text">{card.rabbitHole}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="rabbit-block">
-                <h3>Rabbit hole</h3>
-                <p>{card.rabbitHole}</p>
               </div>
               <div className="card-actions">
                 <button
                   type="button"
-                  className={`action-btn${knownIds.has(card.id) ? ' known-active' : ''}`}
+                  className={`action-btn action-btn--known${knownIds.has(card.id) ? ' known-active' : ''}`}
                   onClick={() => handleKnown(card)}
                 >
                   I knew this
                 </button>
                 <button
                   type="button"
-                  className={`action-btn${savedIds.has(card.id) ? ' saved' : ''}`}
+                  className={`action-btn action-btn--save${savedIds.has(card.id) ? ' saved' : ''}`}
                   onClick={() => handleSave(card)}
                 >
                   {savedIds.has(card.id) ? 'Saved' : 'Save'}
                 </button>
                 <button
                   type="button"
-                  className="action-btn primary"
+                  className="action-btn action-btn--surprise"
                   onClick={handleSurprise}
                 >
                   Surprise me
