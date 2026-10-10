@@ -7,18 +7,18 @@
     </linearGradient>
     <linearGradient id="scrim-adalovelace" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-adalovelace)"/>
-  <g opacity="0.95">
-    <rect x="280" y="200" width="80" height="100" rx="4" fill="#c17f59" opacity="0.14"/>
-    <rect x="300" y="220" width="40" height="8" fill="#a56845" opacity="0.25"/>
-    <rect x="300" y="240" width="40" height="8" fill="#a56845" opacity="0.2"/>
-    <circle cx="480" cy="250" r="55" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
-    <path d="M480 195 L480 305 M425 250 L535 250" stroke="#c17f59" stroke-width="2" opacity="0.18"/>
-    <rect x="520" y="210" width="60" height="80" fill="#2c2825" opacity="0.06"/>
+  <g>
+    <rect x="280" y="200" width="80" height="100" rx="4" fill="#c17f59" opacity="0.36"/>
+    <rect x="300" y="220" width="40" height="8" fill="#a56845" opacity="0.65"/>
+    <rect x="300" y="240" width="40" height="8" fill="#a56845" opacity="0.52"/>
+    <circle cx="480" cy="250" r="55" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.57"/>
+    <path d="M480 195 L480 305 M425 250 L535 250" stroke="#c17f59" stroke-width="2" opacity="0.47"/>
+    <rect x="520" y="210" width="60" height="80" fill="#2c2825" opacity="0.26"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-adalovelace)"/>
 </svg>

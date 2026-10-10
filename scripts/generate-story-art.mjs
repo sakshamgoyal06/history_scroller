@@ -148,8 +148,19 @@ const THEME_ART = {
   `,
 }
 
+function boostVisibility(svgFragment) {
+  return svgFragment.replace(/opacity="(0\.\d+)"/g, (_, value) => {
+    const original = Number.parseFloat(value)
+    let boosted = original * 2.6
+    if (original <= 0.12) boosted = Math.max(boosted, 0.26)
+    boosted = Math.min(boosted, 0.78)
+    return `opacity="${boosted.toFixed(2)}"`
+  })
+}
+
 function wrap(id, inner) {
   const uid = id.replace(/[^a-z0-9]/gi, '')
+  const art = boostVisibility(inner)
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
   <defs>
@@ -159,12 +170,12 @@ function wrap(id, inner) {
     </linearGradient>
     <linearGradient id="scrim-${uid}" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-${uid})"/>
-  <g opacity="0.95">${inner}</g>
+  <g>${art}</g>
   <rect width="800" height="450" fill="url(#scrim-${uid})"/>
 </svg>
 `

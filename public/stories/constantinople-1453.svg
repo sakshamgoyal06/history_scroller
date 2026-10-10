@@ -7,17 +7,17 @@
     </linearGradient>
     <linearGradient id="scrim-constantinople1453" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-constantinople1453)"/>
-  <g opacity="0.95">
-    <path d="M180 320 H620" stroke="#2c2825" stroke-width="4" opacity="0.1"/>
-    <rect x="220" y="220" width="360" height="100" fill="#c17f59" opacity="0.12"/>
-    <path d="M220 220 L400 140 L580 220" fill="#a56845" opacity="0.14"/>
-    <circle cx="400" cy="175" r="20" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.25"/>
-    <path d="M640 250 L680 230 L720 250 L680 270 Z" fill="#2c2825" opacity="0.1"/>
+  <g>
+    <path d="M180 320 H620" stroke="#2c2825" stroke-width="4" opacity="0.26"/>
+    <rect x="220" y="220" width="360" height="100" fill="#c17f59" opacity="0.31"/>
+    <path d="M220 220 L400 140 L580 220" fill="#a56845" opacity="0.36"/>
+    <circle cx="400" cy="175" r="20" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.65"/>
+    <path d="M640 250 L680 230 L720 250 L680 270 Z" fill="#2c2825" opacity="0.26"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-constantinople1453)"/>
 </svg>

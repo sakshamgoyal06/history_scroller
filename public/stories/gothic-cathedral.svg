@@ -7,17 +7,17 @@
     </linearGradient>
     <linearGradient id="scrim-gothiccathedral" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
-      <stop offset="72%" stop-color="#f7f5f1" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
     </linearGradient>
   </defs>
   <rect width="800" height="450" fill="url(#bg-gothiccathedral)"/>
-  <g opacity="0.95">
-    <path d="M320 320 L400 120 L480 320 Z" fill="#c17f59" opacity="0.15"/>
-    <path d="M350 320 L400 160 L450 320" fill="none" stroke="#a56845" stroke-width="2" opacity="0.28"/>
-    <circle cx="400" cy="200" r="45" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
-    <path d="M260 320 H540" stroke="#2c2825" stroke-width="3" opacity="0.08"/>
-    <path d="M230 320 L250 260 L270 320 M530 320 L550 260 L570 320" fill="#c17f59" opacity="0.12"/>
+  <g>
+    <path d="M320 320 L400 120 L480 320 Z" fill="#c17f59" opacity="0.39"/>
+    <path d="M350 320 L400 160 L450 320" fill="none" stroke="#a56845" stroke-width="2" opacity="0.73"/>
+    <circle cx="400" cy="200" r="45" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.57"/>
+    <path d="M260 320 H540" stroke="#2c2825" stroke-width="3" opacity="0.26"/>
+    <path d="M230 320 L250 260 L270 320 M530 320 L550 260 L570 320" fill="#c17f59" opacity="0.31"/>
   </g>
   <rect width="800" height="450" fill="url(#scrim-gothiccathedral)"/>
 </svg>
