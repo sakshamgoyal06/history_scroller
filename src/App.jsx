@@ -320,6 +320,31 @@ const STORY_YOUTUBE = {
   'green-revolution': 'b51G5sB2_hM',
   'jazz-migration': 'vKaegbtcE00',
   'un-declaration': 'nDgIVseTkuE',
+  'opportunity-cost': '3ez10ADR_gM',
+  'inflation-basket': '0jJKjgE3qfE',
+  'comparative-advantage': 'NI9TLDIPVcs',
+  'money-multiplier': 'gd8B-zrMSYk',
+  'rain-shadow': 'DoKTTHd-XEQ',
+  'plate-boundaries': 'fXb02MQ78yQ',
+  'monsoon-pattern': 'CR7KL6KSlx4',
+  'exclusive-economic-zone': 'EVzS3x_LYKM',
+  'separation-of-powers': 'HuFR5XBYLfU',
+  'jury-system': 'z8aJKtcGUpE',
+  'census-count': '1g1qK4LprJ0',
+  'public-records-laws': 'Lp7E967ZukI',
+  'how-wifi-works': 'kxFT2W82aQs',
+  'qr-code-basics': 'wR0jg0eQsZA',
+  'gps-satellite-timing': 'mB_g1vadS5w',
+  'encryption-at-rest': 'AQDCe585gDU',
+  'supply-chain-safety-stock': '5LiG5R5TAYc',
+  'renewable-intermittency': '1AElONvi9lk',
+  'misinformation-correction': 'eR88QfuzTPI',
+  'photosynthesis-equation': 'eo5XndJaz-Y',
+  'herd-immunity-threshold': '8BUCi5Tuzms',
+  'crispr-gene-edit': 'jAhjPd4uNFY',
+  'metric-prefixes': 'Fzi24aKuFb8',
+  'leap-year-rule': 'xX96xng7sAE',
+  'time-zones-offset': 'ws2jFvOsZ10',
 }
 
 const LEARNING_DOMAINS = [
@@ -583,6 +608,25 @@ function zoneSummary(zone) {
   }
 }
 
+function recommendNextCard(currentId, knownIds) {
+  const idx = HISTORY_CARDS.findIndex((c) => c.id === currentId)
+  if (idx < 0) return null
+  const current = HISTORY_CARDS[idx]
+  const domain = current.domain
+
+  for (let step = 1; step <= HISTORY_CARDS.length; step += 1) {
+    const candidate = HISTORY_CARDS[(idx + step) % HISTORY_CARDS.length]
+    if (candidate.domain === domain && !knownIds.has(candidate.id)) {
+      return candidate
+    }
+  }
+  for (let step = 1; step <= HISTORY_CARDS.length; step += 1) {
+    const candidate = HISTORY_CARDS[(idx + step) % HISTORY_CARDS.length]
+    if (candidate.id !== currentId) return candidate
+  }
+  return null
+}
+
 function LearningZoneCard({ zone, onBrowse }) {
   const { storyCount, domainCount, domains } = zoneSummary(zone)
   return (
@@ -694,7 +738,7 @@ function loadJson(key, fallback) {
 }
 
 function App() {
-  const [selectedDomains, setSelectedDomains] = useState(() => new Set())
+  const [selectedDomain, setSelectedDomain] = useState(null)
   const [selectedTopics, setSelectedTopics] = useState(() => new Set())
   const [showSavedOnly, setShowSavedOnly] = useState(false)
   const [filterListOpen, setFilterListOpen] = useState(false)
@@ -715,6 +759,11 @@ function App() {
     () => HISTORY_CARDS.find((c) => c.id === activeStoryId) ?? null,
     [activeStoryId],
   )
+
+  const recommendedNext = useMemo(() => {
+    if (!activeStoryId) return null
+    return recommendNextCard(activeStoryId, knownIds)
+  }, [activeStoryId, knownIds])
 
   const savedIds = useMemo(
     () => new Set(savedCards.map((c) => c.id)),
@@ -737,17 +786,17 @@ function App() {
       const allowed = new Set(activeZone.cardIds)
       pool = pool.filter((c) => allowed.has(c.id))
     }
-    if (selectedDomains.size > 0) {
-      pool = pool.filter((c) => selectedDomains.has(c.domain))
+    if (selectedDomain) {
+      pool = pool.filter((c) => c.domain === selectedDomain)
     }
     if (selectedTopics.size > 0) {
       pool = pool.filter((c) => c.category && selectedTopics.has(c.category))
     }
     return pool
-  }, [showSavedOnly, savedCardsLive, selectedDomains, selectedTopics, activeZone])
+  }, [showSavedOnly, savedCardsLive, selectedDomain, selectedTopics, activeZone])
 
-  const allDomainsSelected = selectedDomains.size === 0
-  const activeFilterCount = selectedDomains.size + selectedTopics.size
+  const allDomainsSelected = selectedDomain === null
+  const activeFilterCount = (selectedDomain ? 1 : 0) + selectedTopics.size
 
   const toggleSavedView = useCallback(() => {
     setShowSavedOnly((on) => !on)
@@ -755,7 +804,7 @@ function App() {
   }, [])
 
   const selectAllDomains = useCallback(() => {
-    setSelectedDomains(new Set())
+    setSelectedDomain(null)
     setActiveZoneId(null)
   }, [])
 
@@ -767,19 +816,14 @@ function App() {
     setActiveZoneId(zoneId)
     setHomePanel('feed')
     setShowSavedOnly(false)
-    setSelectedDomains(new Set())
+    setSelectedDomain(null)
     setSelectedTopics(new Set())
     setFilterListOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const toggleDomain = useCallback((domain) => {
-    setSelectedDomains((prev) => {
-      const next = new Set(prev)
-      if (next.has(domain)) next.delete(domain)
-      else next.add(domain)
-      return next
-    })
+  const pickDomain = useCallback((domain) => {
+    setSelectedDomain((prev) => (prev === domain ? null : domain))
   }, [])
 
   const toggleTopic = useCallback((topic) => {
@@ -796,7 +840,7 @@ function App() {
   }, [])
 
   const clearAllFilters = useCallback(() => {
-    setSelectedDomains(new Set())
+    setSelectedDomain(null)
     setSelectedTopics(new Set())
   }, [])
 
@@ -1070,8 +1114,8 @@ function App() {
                       <button
                         key={domain}
                         type="button"
-                        className={`filter-chip${selectedDomains.has(domain) ? ' active' : ''}`}
-                        onClick={() => toggleDomain(domain)}
+                        className={`filter-chip${selectedDomain === domain ? ' active' : ''}`}
+                        onClick={() => pickDomain(domain)}
                       >
                         {domain}
                       </button>
@@ -1099,7 +1143,8 @@ function App() {
                       )}
                     </div>
                     <p className="filter-list-hint">
-                      Narrow history-era stories; domain chips above apply first.
+                      Pick one domain above, then multi-select era topics here to narrow
+                      further.
                     </p>
                     <ul className="filter-list">
                       {TOPIC_LIST.map((topic) => (
@@ -1184,6 +1229,22 @@ function App() {
             <div className="card-inner card-inner--detail">
               <StoryDetailSections card={activeStory} />
             </div>
+            {recommendedNext ? (
+              <div className="story-next">
+                <h3 className="story-section-label">Continue learning</h3>
+                <button
+                  type="button"
+                  className="story-next-card"
+                  onClick={() => openStory(recommendedNext.id)}
+                >
+                  <span className="story-next-title">{recommendedNext.title}</span>
+                  <span className="story-next-meta">
+                    {recommendedNext.domain}
+                    {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
+                  </span>
+                </button>
+              </div>
+            ) : null}
             <div className="card-actions">
               <button
                 type="button"
