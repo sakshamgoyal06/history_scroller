@@ -495,6 +495,114 @@ const TOPIC_LIST = [
   ),
 ].sort((a, b) => a.localeCompare(b))
 
+/** Placeholder paths — each zone maps to existing catalog card ids. */
+const LEARNING_ZONES = [
+  {
+    id: 'indian-economy-basics',
+    title: 'Indian Economy Basics',
+    description:
+      'Prices, trade, farming revolutions, and credit—entry points tied to how India’s economy shows up in the catalog today.',
+    cardIds: [
+      'green-revolution',
+      'inflation-basket',
+      'opportunity-cost',
+      'comparative-advantage',
+      'money-multiplier',
+      'supply-chain-safety-stock',
+    ],
+  },
+  {
+    id: 'roman-empire',
+    title: 'Roman Empire',
+    description:
+      'Engineering, cities, and frontiers—stories from Rome’s world and its long afterlife in memory.',
+    cardIds: [
+      'roman-concrete',
+      'alexandria',
+      'constantinople-1453',
+      'silk-road',
+      'gothic-cathedral',
+    ],
+  },
+  {
+    id: 'how-governments-work',
+    title: 'How Governments Work',
+    description:
+      'Institutions, rights language, courts, and counting citizens—how modern states organize power on paper and in practice.',
+    cardIds: [
+      'separation-of-powers',
+      'jury-system',
+      'census-count',
+      'public-records-laws',
+      'un-declaration',
+      'magna-carta',
+    ],
+  },
+  {
+    id: 'world-geography-essentials',
+    title: 'World Geography Essentials',
+    description:
+      'Climate patterns, plates, oceans, and routes—physical and political geography in bite-sized stories.',
+    cardIds: [
+      'rain-shadow',
+      'plate-boundaries',
+      'monsoon-pattern',
+      'exclusive-economic-zone',
+      'silk-road',
+    ],
+  },
+  {
+    id: 'technology-basics',
+    title: 'Technology Basics',
+    description:
+      'Networks, codes, clocks in orbit, and encryption—how everyday tech actually works under the hood.',
+    cardIds: [
+      'how-wifi-works',
+      'qr-code-basics',
+      'gps-satellite-timing',
+      'encryption-at-rest',
+      'ada-lovelace',
+      'printing-press',
+    ],
+  },
+]
+
+const CARD_BY_ID = new Map(HISTORY_CARDS.map((c) => [c.id, c]))
+
+function cardsForZone(zone) {
+  return zone.cardIds.map((id) => CARD_BY_ID.get(id)).filter(Boolean)
+}
+
+function zoneSummary(zone) {
+  const cards = cardsForZone(zone)
+  const domains = [...new Set(cards.map((c) => c.domain))]
+  return {
+    storyCount: cards.length,
+    domainCount: domains.length,
+    domains,
+  }
+}
+
+function LearningZoneCard({ zone, onBrowse }) {
+  const { storyCount, domainCount, domains } = zoneSummary(zone)
+  return (
+    <article className="zone-card">
+      <h2 className="zone-card-title">{zone.title}</h2>
+      <p className="zone-card-desc">{zone.description}</p>
+      <p className="zone-card-meta">
+        {storyCount} {storyCount === 1 ? 'story' : 'stories'} · {domainCount}{' '}
+        {domainCount === 1 ? 'domain' : 'domains'}
+      </p>
+      {domains.length > 0 ? (
+        <p className="zone-card-domains">{domains.join(' · ')}</p>
+      ) : null}
+      <button type="button" className="zone-card-action" onClick={() => onBrowse(zone.id)}>
+        Browse stories
+      </button>
+    </article>
+  )
+}
+
 function StoryArt({ image, title, variant = 'feed' }) {
   return (
     <div className={`story-art story-art--${variant}`}>
@@ -590,6 +698,8 @@ function App() {
   const [selectedTopics, setSelectedTopics] = useState(() => new Set())
   const [showSavedOnly, setShowSavedOnly] = useState(false)
   const [filterListOpen, setFilterListOpen] = useState(false)
+  const [homePanel, setHomePanel] = useState('feed')
+  const [activeZoneId, setActiveZoneId] = useState(null)
   const [savedCards, setSavedCards] = useState(() =>
     loadJson(STORAGE_SAVED, []),
   )
@@ -616,8 +726,17 @@ function App() {
     return savedCards.map((s) => normalizeCard(byId.get(s.id) ?? s))
   }, [savedCards])
 
+  const activeZone = useMemo(
+    () => LEARNING_ZONES.find((z) => z.id === activeZoneId) ?? null,
+    [activeZoneId],
+  )
+
   const filteredCards = useMemo(() => {
     let pool = showSavedOnly ? savedCardsLive : HISTORY_CARDS
+    if (activeZone) {
+      const allowed = new Set(activeZone.cardIds)
+      pool = pool.filter((c) => allowed.has(c.id))
+    }
     if (selectedDomains.size > 0) {
       pool = pool.filter((c) => selectedDomains.has(c.domain))
     }
@@ -625,7 +744,7 @@ function App() {
       pool = pool.filter((c) => c.category && selectedTopics.has(c.category))
     }
     return pool
-  }, [showSavedOnly, savedCardsLive, selectedDomains, selectedTopics])
+  }, [showSavedOnly, savedCardsLive, selectedDomains, selectedTopics, activeZone])
 
   const allDomainsSelected = selectedDomains.size === 0
   const activeFilterCount = selectedDomains.size + selectedTopics.size
@@ -637,6 +756,21 @@ function App() {
 
   const selectAllDomains = useCallback(() => {
     setSelectedDomains(new Set())
+    setActiveZoneId(null)
+  }, [])
+
+  const clearActiveZone = useCallback(() => {
+    setActiveZoneId(null)
+  }, [])
+
+  const browseZone = useCallback((zoneId) => {
+    setActiveZoneId(zoneId)
+    setHomePanel('feed')
+    setShowSavedOnly(false)
+    setSelectedDomains(new Set())
+    setSelectedTopics(new Set())
+    setFilterListOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
   const toggleDomain = useCallback((domain) => {
@@ -730,6 +864,7 @@ function App() {
   const feedStatus = useMemo(() => {
     const parts = []
     if (showSavedOnly) parts.push('Saved')
+    if (activeZone) parts.push(`Zone: ${activeZone.title}`)
     parts.push(
       `${filteredCards.length} ${filteredCards.length === 1 ? 'story' : 'stories'}`,
     )
@@ -739,7 +874,7 @@ function App() {
       )
     }
     return parts.join(' · ')
-  }, [showSavedOnly, filteredCards.length, activeFilterCount])
+  }, [showSavedOnly, activeZone, filteredCards.length, activeFilterCount])
 
   const emptyState = useMemo(() => {
     if (showSavedOnly && savedCards.length === 0) {
@@ -838,7 +973,11 @@ function App() {
               ? (activeStory?.title ?? 'Story')
               : showSavedOnly
                 ? 'Saved'
-                : 'Curiosity Feed'}
+                : activeZone && homePanel === 'feed'
+                  ? activeZone.title
+                  : homePanel === 'zones'
+                    ? 'Learning Zones'
+                    : 'Curiosity Feed'}
           </h1>
           {!inDetail && (
             <div className="header-actions">
@@ -891,87 +1030,133 @@ function App() {
 
         {!inDetail && (
           <>
-            <div className="filters-scroll" aria-label="Domain filters">
-              <nav className="filters">
-                <button
-                  type="button"
-                  className={`filter-chip${allDomainsSelected ? ' active' : ''}`}
-                  onClick={selectAllDomains}
-                >
-                  All
-                </button>
-                {LEARNING_DOMAINS.map((domain) => (
-                  <button
-                    key={domain}
-                    type="button"
-                    className={`filter-chip${selectedDomains.has(domain) ? ' active' : ''}`}
-                    onClick={() => toggleDomain(domain)}
-                  >
-                    {domain}
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            {filterListOpen && (
-              <div
-                id="category-filter-list"
-                className="filter-list-panel"
-                role="group"
-                aria-label="Multi-select topics"
+            <nav className="home-tabs" aria-label="Feed or learning zones">
+              <button
+                type="button"
+                className={`home-tab${homePanel === 'feed' ? ' active' : ''}`}
+                aria-current={homePanel === 'feed' ? 'page' : undefined}
+                onClick={() => {
+                  setHomePanel('feed')
+                  setFilterListOpen(false)
+                }}
               >
-                <div className="filter-list-head">
-                  <span className="filter-list-title">Topics</span>
-                  {selectedTopics.size > 0 && (
+                Feed
+              </button>
+              <button
+                type="button"
+                className={`home-tab${homePanel === 'zones' ? ' active' : ''}`}
+                aria-current={homePanel === 'zones' ? 'page' : undefined}
+                onClick={() => {
+                  setHomePanel('zones')
+                  setFilterListOpen(false)
+                }}
+              >
+                Learning Zones
+              </button>
+            </nav>
+
+            {homePanel === 'feed' ? (
+              <>
+                <div className="filters-scroll" aria-label="Domain filters">
+                  <nav className="filters">
                     <button
                       type="button"
-                      className="filter-list-clear"
-                      onClick={clearTopicFilters}
+                      className={`filter-chip${allDomainsSelected ? ' active' : ''}`}
+                      onClick={selectAllDomains}
                     >
-                      Clear
+                      All
                     </button>
-                  )}
+                    {LEARNING_DOMAINS.map((domain) => (
+                      <button
+                        key={domain}
+                        type="button"
+                        className={`filter-chip${selectedDomains.has(domain) ? ' active' : ''}`}
+                        onClick={() => toggleDomain(domain)}
+                      >
+                        {domain}
+                      </button>
+                    ))}
+                  </nav>
                 </div>
-                <p className="filter-list-hint">
-                  Narrow history-era stories; domain chips above apply first.
-                </p>
-                <ul className="filter-list">
-                  {TOPIC_LIST.map((topic) => (
-                    <li key={topic}>
-                      <label className="filter-list-item">
-                        <input
-                          type="checkbox"
-                          checked={selectedTopics.has(topic)}
-                          onChange={() => toggleTopic(topic)}
-                        />
-                        <span>{topic}</span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+
+                {filterListOpen && (
+                  <div
+                    id="category-filter-list"
+                    className="filter-list-panel"
+                    role="group"
+                    aria-label="Multi-select topics"
+                  >
+                    <div className="filter-list-head">
+                      <span className="filter-list-title">Topics</span>
+                      {selectedTopics.size > 0 && (
+                        <button
+                          type="button"
+                          className="filter-list-clear"
+                          onClick={clearTopicFilters}
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <p className="filter-list-hint">
+                      Narrow history-era stories; domain chips above apply first.
+                    </p>
+                    <ul className="filter-list">
+                      {TOPIC_LIST.map((topic) => (
+                        <li key={topic}>
+                          <label className="filter-list-item">
+                            <input
+                              type="checkbox"
+                              checked={selectedTopics.has(topic)}
+                              onChange={() => toggleTopic(topic)}
+                            />
+                            <span>{topic}</span>
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            ) : null}
           </>
         )}
       </header>
 
-      {!inDetail && (
+      {!inDetail && homePanel === 'feed' && (
         <div className="feed-toolbar">
           <p className="feed-status" aria-live="polite">
             {feedStatus}
           </p>
-          <button
-            type="button"
-            className="surprise-link"
-            onClick={handleSurprise}
-          >
-            Surprise me
-          </button>
+          <div className="feed-toolbar-actions">
+            {activeZone ? (
+              <button type="button" className="zone-clear-link" onClick={clearActiveZone}>
+                Leave zone
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="surprise-link"
+              onClick={handleSurprise}
+            >
+              Surprise me
+            </button>
+          </div>
         </div>
       )}
 
-      <main className="feed">
-        {inDetail && !activeStory ? (
+      <main className={`feed${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}`}>
+        {!inDetail && homePanel === 'zones' ? (
+          <div className="zones-panel">
+            <p className="zones-intro">
+              Structured paths are coming soon. For now, browse a zone to filter the feed to
+              related stories.
+            </p>
+            {LEARNING_ZONES.map((zone) => (
+              <LearningZoneCard key={zone.id} zone={zone} onBrowse={browseZone} />
+            ))}
+          </div>
+        ) : inDetail && !activeStory ? (
           <div className="empty-state">
             <h2 className="empty-state-title">Story not found</h2>
             <p className="empty-state-body">It may have been removed from the catalog.</p>
