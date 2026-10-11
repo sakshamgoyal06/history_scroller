@@ -372,11 +372,12 @@ for (const card of HISTORY_CARDS) {
   Object.assign(card, normalizeCard(card))
 }
 
-const DOMAIN_LIST = [...new Set(HISTORY_CARDS.map((c) => c.domain))].sort(
-  (a, b) =>
-    LEARNING_DOMAINS.indexOf(a) - LEARNING_DOMAINS.indexOf(b) ||
-    String(a).localeCompare(String(b)),
-)
+/** Legacy era/topic labels on original catalog cards (list-panel filter). */
+const TOPIC_LIST = [
+  ...new Set(
+    HISTORY_CARDS.map((c) => c.category).filter((topic) => typeof topic === 'string' && topic),
+  ),
+].sort((a, b) => a.localeCompare(b))
 
 function StoryArt({ image, title, variant = 'feed' }) {
   return (
@@ -469,7 +470,8 @@ function loadJson(key, fallback) {
 }
 
 function App() {
-  const [selectedCategories, setSelectedCategories] = useState(() => new Set())
+  const [selectedDomains, setSelectedDomains] = useState(() => new Set())
+  const [selectedTopics, setSelectedTopics] = useState(() => new Set())
   const [showSavedOnly, setShowSavedOnly] = useState(false)
   const [filterListOpen, setFilterListOpen] = useState(false)
   const [savedCards, setSavedCards] = useState(() =>
@@ -500,34 +502,52 @@ function App() {
 
   const filteredCards = useMemo(() => {
     let pool = showSavedOnly ? savedCardsLive : HISTORY_CARDS
-    if (selectedCategories.size > 0) {
-      pool = pool.filter((c) => selectedCategories.has(c.domain))
+    if (selectedDomains.size > 0) {
+      pool = pool.filter((c) => selectedDomains.has(c.domain))
+    }
+    if (selectedTopics.size > 0) {
+      pool = pool.filter((c) => c.category && selectedTopics.has(c.category))
     }
     return pool
-  }, [showSavedOnly, savedCardsLive, selectedCategories])
+  }, [showSavedOnly, savedCardsLive, selectedDomains, selectedTopics])
 
-  const allCategoriesSelected = selectedCategories.size === 0
+  const allDomainsSelected = selectedDomains.size === 0
+  const activeFilterCount = selectedDomains.size + selectedTopics.size
 
   const toggleSavedView = useCallback(() => {
     setShowSavedOnly((on) => !on)
     setFilterListOpen(false)
   }, [])
 
-  const selectAllCategories = useCallback(() => {
-    setSelectedCategories(new Set())
+  const selectAllDomains = useCallback(() => {
+    setSelectedDomains(new Set())
   }, [])
 
-  const toggleCategory = useCallback((category) => {
-    setSelectedCategories((prev) => {
+  const toggleDomain = useCallback((domain) => {
+    setSelectedDomains((prev) => {
       const next = new Set(prev)
-      if (next.has(category)) next.delete(category)
-      else next.add(category)
+      if (next.has(domain)) next.delete(domain)
+      else next.add(domain)
       return next
     })
   }, [])
 
-  const clearCategoryFilters = useCallback(() => {
-    setSelectedCategories(new Set())
+  const toggleTopic = useCallback((topic) => {
+    setSelectedTopics((prev) => {
+      const next = new Set(prev)
+      if (next.has(topic)) next.delete(topic)
+      else next.add(topic)
+      return next
+    })
+  }, [])
+
+  const clearTopicFilters = useCallback(() => {
+    setSelectedTopics(new Set())
+  }, [])
+
+  const clearAllFilters = useCallback(() => {
+    setSelectedDomains(new Set())
+    setSelectedTopics(new Set())
   }, [])
 
   const leaveSavedView = useCallback(() => {
@@ -597,13 +617,13 @@ function App() {
     parts.push(
       `${filteredCards.length} ${filteredCards.length === 1 ? 'story' : 'stories'}`,
     )
-    if (selectedCategories.size > 0) {
+    if (activeFilterCount > 0) {
       parts.push(
-        `${selectedCategories.size} ${selectedCategories.size === 1 ? 'filter' : 'filters'}`,
+        `${activeFilterCount} ${activeFilterCount === 1 ? 'filter' : 'filters'}`,
       )
     }
     return parts.join(' · ')
-  }, [showSavedOnly, filteredCards.length, selectedCategories.size])
+  }, [showSavedOnly, filteredCards.length, activeFilterCount])
 
   const emptyState = useMemo(() => {
     if (showSavedOnly && savedCards.length === 0) {
@@ -613,18 +633,18 @@ function App() {
         action: { label: 'Browse feed', onClick: leaveSavedView },
       }
     }
-    if (showSavedOnly && selectedCategories.size > 0) {
+    if (showSavedOnly && activeFilterCount > 0) {
       return {
         title: 'No matches in saved',
-        body: 'None of your saved stories use the domains you picked.',
-        action: { label: 'Clear filters', onClick: clearCategoryFilters },
+        body: 'None of your saved stories match the domains or topics you picked.',
+        action: { label: 'Clear filters', onClick: clearAllFilters },
       }
     }
-    if (selectedCategories.size > 0) {
+    if (activeFilterCount > 0) {
       return {
         title: 'No stories for these filters',
-        body: 'Try fewer domains or reset to see the full feed.',
-        action: { label: 'Show all domains', onClick: selectAllCategories },
+        body: 'Try fewer domains or topics, or reset to see the full feed.',
+        action: { label: 'Show all', onClick: clearAllFilters },
       }
     }
     return {
@@ -635,9 +655,8 @@ function App() {
   }, [
     showSavedOnly,
     savedCards.length,
-    selectedCategories.size,
-    clearCategoryFilters,
-    selectAllCategories,
+    activeFilterCount,
+    clearAllFilters,
     leaveSavedView,
   ])
 
@@ -709,14 +728,14 @@ function App() {
             <div className="header-actions">
               <button
                 type="button"
-                className={`filter-icon-btn${filterListOpen ? ' active' : ''}${selectedCategories.size > 0 ? ' has-filters' : ''}`}
+                className={`filter-icon-btn${filterListOpen ? ' active' : ''}${selectedTopics.size > 0 ? ' has-filters' : ''}`}
                 onClick={() => setFilterListOpen((o) => !o)}
                 aria-expanded={filterListOpen}
                 aria-controls="category-filter-list"
                 aria-label={
-                  selectedCategories.size > 0
-                    ? `Filter domains, ${selectedCategories.size} selected`
-                    : 'Filter domains'
+                  selectedTopics.size > 0
+                    ? `Filter topics, ${selectedTopics.size} selected`
+                    : 'Filter topics'
                 }
               >
                 <svg
@@ -733,8 +752,8 @@ function App() {
                     strokeLinecap="round"
                   />
                 </svg>
-                {selectedCategories.size > 0 && (
-                  <span className="filter-icon-badge">{selectedCategories.size}</span>
+                {selectedTopics.size > 0 && (
+                  <span className="filter-icon-badge">{selectedTopics.size}</span>
                 )}
               </button>
               <button
@@ -760,17 +779,17 @@ function App() {
               <nav className="filters">
                 <button
                   type="button"
-                  className={`filter-chip${allCategoriesSelected ? ' active' : ''}`}
-                  onClick={selectAllCategories}
+                  className={`filter-chip${allDomainsSelected ? ' active' : ''}`}
+                  onClick={selectAllDomains}
                 >
                   All
                 </button>
-                {DOMAIN_LIST.map((domain) => (
+                {LEARNING_DOMAINS.map((domain) => (
                   <button
                     key={domain}
                     type="button"
-                    className={`filter-chip${selectedCategories.has(domain) ? ' active' : ''}`}
-                    onClick={() => toggleCategory(domain)}
+                    className={`filter-chip${selectedDomains.has(domain) ? ' active' : ''}`}
+                    onClick={() => toggleDomain(domain)}
                   >
                     {domain}
                   </button>
@@ -783,30 +802,33 @@ function App() {
                 id="category-filter-list"
                 className="filter-list-panel"
                 role="group"
-                aria-label="Multi-select domains"
+                aria-label="Multi-select topics"
               >
                 <div className="filter-list-head">
-                  <span className="filter-list-title">Domains</span>
-                  {selectedCategories.size > 0 && (
+                  <span className="filter-list-title">Topics</span>
+                  {selectedTopics.size > 0 && (
                     <button
                       type="button"
                       className="filter-list-clear"
-                      onClick={clearCategoryFilters}
+                      onClick={clearTopicFilters}
                     >
                       Clear
                     </button>
                   )}
                 </div>
+                <p className="filter-list-hint">
+                  Narrow history-era stories; domain chips above apply first.
+                </p>
                 <ul className="filter-list">
-                  {DOMAIN_LIST.map((domain) => (
-                    <li key={domain}>
+                  {TOPIC_LIST.map((topic) => (
+                    <li key={topic}>
                       <label className="filter-list-item">
                         <input
                           type="checkbox"
-                          checked={selectedCategories.has(domain)}
-                          onChange={() => toggleCategory(domain)}
+                          checked={selectedTopics.has(topic)}
+                          onChange={() => toggleTopic(topic)}
                         />
-                        <span>{domain}</span>
+                        <span>{topic}</span>
                       </label>
                     </li>
                   ))}

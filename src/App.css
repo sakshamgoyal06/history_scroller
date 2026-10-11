@@ -211,6 +211,13 @@
   margin-bottom: 10px;
 }
 
+.filter-list-hint {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
 .filter-list-title {
   font-size: 0.8125rem;
   font-weight: 650;
