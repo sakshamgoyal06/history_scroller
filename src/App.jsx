@@ -313,7 +313,6 @@ function StoryPreviewCard({
   onOpen,
   className = '',
   id,
-  innerRef,
 }) {
   const body = (
     <>
@@ -341,7 +340,6 @@ function StoryPreviewCard({
       <button
         type="button"
         id={id}
-        ref={innerRef}
         className={`story-preview story-preview--interactive${className ? ` ${className}` : ''}`}
         onClick={onOpen}
       >
@@ -396,7 +394,6 @@ function App() {
     return id && HISTORY_CARDS.some((c) => c.id === id) ? id : null
   })
   const [toast, setToast] = useState('')
-  const cardRefs = useRef({})
   const toastTimer = useRef(null)
 
   const activeStory = useMemo(
@@ -619,7 +616,7 @@ function App() {
               ? (activeStory?.title ?? 'Story')
               : showSavedOnly
                 ? 'Saved'
-                : 'History Feed'}
+                : 'Curiosity Feed'}
           </h1>
           {!inDetail && (
             <div className="header-actions">
@@ -833,9 +830,6 @@ function App() {
             <StoryPreviewCard
               key={card.id}
               id={`card-${card.id}`}
-              innerRef={(node) => {
-                if (node) cardRefs.current[card.id] = node
-              }}
               card={card}
               interactive
               className={knownIds.has(card.id) ? 'known' : ''}

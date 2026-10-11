@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'History Feed',
-        short_name: 'History',
+        name: 'Curiosity Feed',
+        short_name: 'Curiosity',
         description: 'A calm mobile feed for learning history, one story at a time.',
         theme_color: '#f7f5f1',
         background_color: '#f7f5f1',
