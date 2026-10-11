@@ -23,6 +23,7 @@ function storyIdFromLocation() {
   return match?.[1] ?? null
 }
 
+/** Catalog cards: legacy `category`, `story`, `relevance` plus normalized learning fields. */
 const HISTORY_CARDS = [
   {
     id: 'alexandria',
@@ -289,12 +290,91 @@ const STORY_YOUTUBE = {
   'un-declaration': 'nDgIVseTkuE',
 }
 
+const LEARNING_DOMAINS = [
+  'History',
+  'Economics',
+  'Geography',
+  'Civics',
+  'Technology',
+  'Current Affairs',
+  'Science',
+  'General Knowledge',
+]
+
+const CATEGORY_TO_DOMAIN = {
+  'Ancient World': 'History',
+  Medieval: 'History',
+  Renaissance: 'History',
+  Enlightenment: 'History',
+  'Modern Era': 'History',
+  'Science & Invention': 'Science',
+  'Culture & Society': 'Civics',
+}
+
+const CARD_DOMAIN_BY_ID = {
+  'silk-road': 'Geography',
+  'roman-concrete': 'Technology',
+  'industrial-mills': 'Economics',
+  'green-revolution': 'Economics',
+  'ada-lovelace': 'Technology',
+  'jazz-migration': 'General Knowledge',
+  'un-declaration': 'Civics',
+}
+
+const CARD_FORMAT_BY_ID = {
+  'silk-road': 'Map',
+  'magna-carta': 'Institution',
+  'gothic-cathedral': 'Institution',
+  'un-declaration': 'Institution',
+  'constantinople-1453': 'Timeline',
+}
+
+function firstSentence(text) {
+  const trimmed = String(text ?? '').trim()
+  if (!trimmed) return ''
+  const match = /^([\s\S]+?[.!?])(?:\s|$)/u.exec(trimmed)
+  return match ? match[1] : trimmed.slice(0, 220)
+}
+
+/** @param {Record<string, unknown>} card */
+function normalizeCard(card) {
+  const domain =
+    card.domain ??
+    CARD_DOMAIN_BY_ID[card.id] ??
+    CATEGORY_TO_DOMAIN[card.category] ??
+    'History'
+  const format = card.format ?? CARD_FORMAT_BY_ID[card.id] ?? 'Story'
+  const coreFact = card.coreFact ?? card.story ?? ''
+  const whyItMatters = card.whyItMatters ?? card.relevance ?? ''
+  const hook = card.hook ?? ''
+  const scene = card.scene ?? firstSentence(coreFact)
+  const sources = Array.isArray(card.sources) ? card.sources : []
+
+  return {
+    ...card,
+    domain,
+    format,
+    hook,
+    scene,
+    coreFact,
+    whyItMatters,
+    sources,
+    story: coreFact,
+    relevance: whyItMatters,
+  }
+}
+
 for (const card of HISTORY_CARDS) {
   card.image = `/stories/${card.id}.svg`
   card.youtubeId = STORY_YOUTUBE[card.id] ?? null
+  Object.assign(card, normalizeCard(card))
 }
 
-const CATEGORY_LIST = [...new Set(HISTORY_CARDS.map((c) => c.category))]
+const DOMAIN_LIST = [...new Set(HISTORY_CARDS.map((c) => c.domain))].sort(
+  (a, b) =>
+    LEARNING_DOMAINS.indexOf(a) - LEARNING_DOMAINS.indexOf(b) ||
+    String(a).localeCompare(String(b)),
+)
 
 function StoryArt({ image, title, variant = 'feed' }) {
   return (
@@ -319,7 +399,12 @@ function StoryPreviewCard({
       <StoryArt image={card.image} title={card.title} variant={interactive ? 'feed' : 'detail'} />
       <div className="story-preview-body">
         <div className="story-card-top">
-          <span className="category">{card.category}</span>
+          <div className="story-card-labels">
+            <span className="category">{card.domain ?? card.category}</span>
+            {card.format ? (
+              <span className="format-label">{card.format}</span>
+            ) : null}
+          </div>
           {interactive ? (
             <span className="story-card-chevron" aria-hidden="true">
               →
@@ -408,13 +493,13 @@ function App() {
 
   const savedCardsLive = useMemo(() => {
     const byId = new Map(HISTORY_CARDS.map((c) => [c.id, c]))
-    return savedCards.map((s) => byId.get(s.id) ?? s)
+    return savedCards.map((s) => normalizeCard(byId.get(s.id) ?? s))
   }, [savedCards])
 
   const filteredCards = useMemo(() => {
     let pool = showSavedOnly ? savedCardsLive : HISTORY_CARDS
     if (selectedCategories.size > 0) {
-      pool = pool.filter((c) => selectedCategories.has(c.category))
+      pool = pool.filter((c) => selectedCategories.has(c.domain))
     }
     return pool
   }, [showSavedOnly, savedCardsLive, selectedCategories])
@@ -529,15 +614,15 @@ function App() {
     if (showSavedOnly && selectedCategories.size > 0) {
       return {
         title: 'No matches in saved',
-        body: 'None of your saved stories use the categories you picked.',
+        body: 'None of your saved stories use the domains you picked.',
         action: { label: 'Clear filters', onClick: clearCategoryFilters },
       }
     }
     if (selectedCategories.size > 0) {
       return {
         title: 'No stories for these filters',
-        body: 'Try fewer categories or reset to see the full feed.',
-        action: { label: 'Show all categories', onClick: selectAllCategories },
+        body: 'Try fewer domains or reset to see the full feed.',
+        action: { label: 'Show all domains', onClick: selectAllCategories },
       }
     }
     return {
@@ -628,8 +713,8 @@ function App() {
                 aria-controls="category-filter-list"
                 aria-label={
                   selectedCategories.size > 0
-                    ? `Filter categories, ${selectedCategories.size} selected`
-                    : 'Filter categories'
+                    ? `Filter domains, ${selectedCategories.size} selected`
+                    : 'Filter domains'
                 }
               >
                 <svg
@@ -669,7 +754,7 @@ function App() {
 
         {!inDetail && (
           <>
-            <div className="filters-scroll" aria-label="Category filters">
+            <div className="filters-scroll" aria-label="Domain filters">
               <nav className="filters">
                 <button
                   type="button"
@@ -678,14 +763,14 @@ function App() {
                 >
                   All
                 </button>
-                {CATEGORY_LIST.map((cat) => (
+                {DOMAIN_LIST.map((domain) => (
                   <button
-                    key={cat}
+                    key={domain}
                     type="button"
-                    className={`filter-chip${selectedCategories.has(cat) ? ' active' : ''}`}
-                    onClick={() => toggleCategory(cat)}
+                    className={`filter-chip${selectedCategories.has(domain) ? ' active' : ''}`}
+                    onClick={() => toggleCategory(domain)}
                   >
-                    {cat}
+                    {domain}
                   </button>
                 ))}
               </nav>
@@ -696,10 +781,10 @@ function App() {
                 id="category-filter-list"
                 className="filter-list-panel"
                 role="group"
-                aria-label="Multi-select categories"
+                aria-label="Multi-select domains"
               >
                 <div className="filter-list-head">
-                  <span className="filter-list-title">Categories</span>
+                  <span className="filter-list-title">Domains</span>
                   {selectedCategories.size > 0 && (
                     <button
                       type="button"
@@ -711,15 +796,15 @@ function App() {
                   )}
                 </div>
                 <ul className="filter-list">
-                  {CATEGORY_LIST.map((cat) => (
-                    <li key={cat}>
+                  {DOMAIN_LIST.map((domain) => (
+                    <li key={domain}>
                       <label className="filter-list-item">
                         <input
                           type="checkbox"
-                          checked={selectedCategories.has(cat)}
-                          onChange={() => toggleCategory(cat)}
+                          checked={selectedCategories.has(domain)}
+                          onChange={() => toggleCategory(domain)}
                         />
-                        <span>{cat}</span>
+                        <span>{domain}</span>
                       </label>
                     </li>
                   ))}
@@ -773,11 +858,18 @@ function App() {
               }
             />
             <div className="card-inner card-inner--detail">
-              <p className="story">{activeStory.story}</p>
+              {activeStory.scene ? (
+                <p className="story-scene">{activeStory.scene}</p>
+              ) : null}
+              <p className="story">
+                {activeStory.coreFact ?? activeStory.story}
+              </p>
               <div className="card-asides">
                 <div className="aside">
                   <span className="aside-label">Why it matters today</span>
-                  <p className="aside-text">{activeStory.relevance}</p>
+                  <p className="aside-text">
+                    {activeStory.whyItMatters ?? activeStory.relevance}
+                  </p>
                 </div>
                 <div className="aside">
                   <span className="aside-label">Rabbit hole</span>

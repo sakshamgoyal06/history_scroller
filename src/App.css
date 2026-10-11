@@ -376,6 +376,21 @@
   margin-bottom: 8px;
 }
 
+.story-card-labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.format-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
 .story-card-chevron {
   color: var(--ink-soft);
   font-size: 1rem;
@@ -501,6 +516,13 @@
   font-weight: 400;
   color: var(--ink-muted);
   line-height: 1.5;
+}
+
+.story-scene {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
 }
 
 .story {
