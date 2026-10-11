@@ -1,6 +1,6 @@
 # Curiosity Feed
 
-A calm mobile PWA for learning history, one story at a time (React + Vite).
+A calm mobile PWA for general learning, one story at a time (React + Vite).
 
 ## Scripts
 

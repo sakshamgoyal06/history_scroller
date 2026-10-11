@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: 'Curiosity Feed',
         short_name: 'Curiosity',
-        description: 'A calm mobile feed for learning history, one story at a time.',
+        description: 'A calm mobile feed for learning, one story at a time.',
         theme_color: '#f7f5f1',
         background_color: '#f7f5f1',
         display: 'standalone',
