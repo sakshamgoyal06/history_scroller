@@ -181,11 +181,52 @@ function wrap(id, inner) {
 `
 }
 
+const GENERIC_LEARNING_ART = `
+  <circle cx="400" cy="215" r="72" fill="none" stroke="#c17f59" stroke-width="2" opacity="0.22"/>
+  <path d="M160 310 Q400 250 640 310" fill="none" stroke="#a56845" stroke-width="3" opacity="0.2"/>
+  <rect x="340" y="170" width="120" height="90" rx="8" fill="#c17f59" opacity="0.12"/>
+  <path d="M360 200 H480 M360 225 H450 M360 250 H470" stroke="#2c2825" stroke-width="2" opacity="0.1"/>
+`
+
+const ADDITIONAL_CARD_IDS = [
+  'opportunity-cost',
+  'inflation-basket',
+  'comparative-advantage',
+  'money-multiplier',
+  'rain-shadow',
+  'plate-boundaries',
+  'monsoon-pattern',
+  'exclusive-economic-zone',
+  'separation-of-powers',
+  'jury-system',
+  'census-count',
+  'public-records-laws',
+  'how-wifi-works',
+  'qr-code-basics',
+  'gps-satellite-timing',
+  'encryption-at-rest',
+  'supply-chain-safety-stock',
+  'renewable-intermittency',
+  'misinformation-correction',
+  'photosynthesis-equation',
+  'herd-immunity-threshold',
+  'crispr-gene-edit',
+  'metric-prefixes',
+  'leap-year-rule',
+  'time-zones-offset',
+]
+
 const outDir = join(process.cwd(), 'public', 'stories')
 mkdirSync(outDir, { recursive: true })
 
+let written = 0
 for (const [id, art] of Object.entries(THEME_ART)) {
   writeFileSync(join(outDir, `${id}.svg`), wrap(id, art))
+  written += 1
+}
+for (const id of ADDITIONAL_CARD_IDS) {
+  writeFileSync(join(outDir, `${id}.svg`), wrap(id, GENERIC_LEARNING_ART))
+  written += 1
 }
 
-console.log(`Wrote ${Object.keys(THEME_ART).length} topic-specific story art files.`)
+console.log(`Wrote ${written} story art files.`)

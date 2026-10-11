@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ADDITIONAL_LEARNING_CARDS } from './additionalLearningCards.js'
 import './App.css'
 
 const STORAGE_SAVED = 'history-feed-saved'
@@ -265,6 +266,7 @@ const HISTORY_CARDS = [
     rabbitHole:
       'Which UDHR article provoked the most delegate walkouts during drafting—and what compromise survived?',
   },
+  ...ADDITIONAL_LEARNING_CARDS,
 ]
 
 const STORY_YOUTUBE = {
