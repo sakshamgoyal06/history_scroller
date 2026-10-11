@@ -31,12 +31,22 @@ const HISTORY_CARDS = [
     title: 'The Library of Alexandria',
     category: 'Ancient World',
     hook: 'A legend of lost knowledge that still shapes how we fund science today.',
+    scene:
+      'For centuries, Alexandria was a port where scholars copied scrolls and argued over astronomy, medicine, and philosophy.',
+    factBullets: [
+      'The library was an institution tied to royal patronage—not one building we can fully reconstruct from digs.',
+      'Scrolls came from Greek, Hebrew, Persian, and Indian traditions through translation and trade.',
+      'Ancient sources disagree on fires and wars that damaged collections; archaeology gives only fragments.',
+      'The myth survived the ruins and helped later cultures treat shared knowledge as a public good.',
+    ],
+    whyItMatters:
+      'Open-access archives and digital backups still ask who pays so one disaster cannot erase collective memory.',
+    rabbitHole:
+      'Which surviving ancient library—not Alexandria—actually left the largest trace on texts you can read today?',
     story:
       'The Library of Alexandria was less a single building than a evolving institution tied to Ptolemaic Egypt and later Roman rule. Scholars copied scrolls, debated astronomy, and translated texts from Hebrew, Persian, and Indian traditions. Ancient writers disagree on when fires and conflict destroyed collections—Caesar’s siege, Aurelian’s revolts, and later religious transitions all appear in the record. Archaeology offers only fragments, yet the library’s myth shaped how later cultures imagined knowledge as a public good worth protecting. Medieval monasteries, Islamic houses of wisdom, and modern universities all echo that ideal. The story persists because it names a fear we still feel: that one accident can erase centuries of collective memory and leave humanity starting over in the dark.',
     relevance:
       'Debates over open access, climate archives, and digital preservation replay the same question: who pays to keep humanity’s memory safe?',
-    rabbitHole:
-      'Which surviving ancient library—not Alexandria—actually left the largest trace on texts you can read today?',
   },
   {
     id: 'roman-concrete',
@@ -67,12 +77,22 @@ const HISTORY_CARDS = [
     title: 'When the Black Death Rewired Europe',
     category: 'Medieval',
     hook: 'A pandemic did not just kill—it reshaped wages, faith, and the map of power.',
+    scene:
+      'In the mid-1300s, plague moved along trade routes and hit crowded towns and farms across Eurasia within a few years.',
+    factBullets: [
+      'Estimates suggest roughly a third of Europe’s people died in the first wave; regions varied widely.',
+      'Fewer workers meant higher wages and weaker serf obligations in many places.',
+      'Cities saw guilds and councils gain leverage as elites competed for mobile taxpayers.',
+      'Art, sermons, and riots reflected both fear and anger at institutions that could not stop the dying.',
+    ],
+    whyItMatters:
+      'Sudden death still reshapes labor markets and trust in institutions—historians call it shock that accelerates trends already underway.',
+    rabbitHole:
+      'Did plague-driven wage gains in England truly begin the long decline of serfdom, or did law change first?',
     story:
       'The plague that swept Eurasia in the mid-fourteenth century killed perhaps a third of Europe’s population within a few years. Labor scarcity suddenly gave surviving peasants leverage: wages rose, serfdom weakened, and landlords struggled to enforce old dues. In cities, guilds and councils gained voice as elites competed for taxpayers who could flee. Religious fervor spiked—flagellants, scapegoating of minorities, and vivid art of death—yet institutional Christianity also faced awkward questions about why prayers failed. The demographic shock accelerated shifts already underway, including the spread of gunpowder weapons and the appeal of printed texts after Gutenberg. Historians debate how much the plague “caused” versus “accelerated,” but the pattern is familiar: mass mortality rearranges who must be paid, who can organize, and which stories societies tell to make sense of sudden loss.',
     relevance:
       'Post-COVID labor shortages and housing debates echo medieval negotiations over who owes whom a living.',
-    rabbitHole:
-      'Did plague-driven wage gains in England truly begin the long decline of serfdom, or did law change first?',
   },
   {
     id: 'magna-carta',
@@ -103,12 +123,22 @@ const HISTORY_CARDS = [
     title: 'Gutenberg’s Press and the Info Explosion',
     category: 'Renaissance',
     hook: 'Movable type did not create literacy overnight, but it changed who could argue in public.',
+    scene:
+      'Around 1450 in Mainz, craftsmen combined metal type, oil ink, and a screw press to print pages in quantity.',
+    factBullets: [
+      'Early profits came from Bibles and indulgence forms, then pamphlets and maps spread in weeks, not months.',
+      'Rulers and churches used print for propaganda—and quickly added censorship and licensing.',
+      'Literacy rose slowly; the bigger shift was many competing voices entering public debate.',
+      'Historians compare print to the internet because copying got cheap and elites lost control of the narrative.',
+    ],
+    whyItMatters:
+      'Every cheap-copy medium since—from radio to social feeds—reopens fights over rumor, authorship, and amplification.',
+    rabbitHole:
+      'Which technology—print or postal networks—spread Reformation ideas faster across Germany?',
     story:
       'Johannes Gutenberg’s mid-fifteenth-century press combined oil-based ink, adjustable metal type, and a modified wine press to reproduce texts faster than scribes could copy them. Bibles and indulgence forms paid early bills, yet the real shift was pamphlets, maps, and scientific diagrams reaching merchants, students, and reformers within weeks. Catholic and Protestant leaders alike harnessed print for propaganda while censorship and licensing followed almost immediately—every information revolution triggers a counter-revolution in control. Literacy rates climbed slowly; the deeper change was the volume of competing voices. Empires used printed atlases to claim territory; alchemists shared recipes; women readers entered new literary markets. Historians compare the press to the internet not because effects were identical, but because both collapsed copying costs and forced elites to share narrative power with strangers they could not fully monitor or silence.',
     relevance:
       'Social feeds and AI-generated text replay Gutenberg-era fights over authorship, rumor, and who gets amplified.',
-    rabbitHole:
-      'Which technology—print or postal networks—spread Reformation ideas faster across Germany?',
   },
   {
     id: 'constantinople-1453',
@@ -346,7 +376,12 @@ function normalizeCard(card) {
     CATEGORY_TO_DOMAIN[card.category] ??
     'History'
   const format = card.format ?? CARD_FORMAT_BY_ID[card.id] ?? 'Story'
-  const coreFact = card.coreFact ?? card.story ?? ''
+  const factBullets = Array.isArray(card.factBullets)
+    ? card.factBullets.filter((line) => typeof line === 'string' && line.trim())
+    : []
+  const coreFact =
+    card.coreFact ??
+    (factBullets.length > 0 ? factBullets.join(' ') : (card.story ?? ''))
   const whyItMatters = card.whyItMatters ?? card.relevance ?? ''
   const hook = card.hook ?? ''
   const scene = card.scene ?? firstSentence(coreFact)
@@ -359,11 +394,92 @@ function normalizeCard(card) {
     hook,
     scene,
     coreFact,
+    factBullets,
     whyItMatters,
     sources,
     story: coreFact,
     relevance: whyItMatters,
   }
+}
+
+function detailFactBullets(card) {
+  if (card.factBullets?.length) return card.factBullets
+  const text = (card.coreFact ?? card.story ?? '').trim()
+  if (!text) return []
+  if (text.length <= 260) return [text]
+  const sentences =
+    text.match(/[^.!?]+[.!?]+(?:\s|$)/gu)?.map((s) => s.trim()).filter(Boolean) ??
+    []
+  if (sentences.length > 1) return sentences.slice(0, 6)
+  return [text]
+}
+
+function StoryDetailHero({ card, badges }) {
+  return (
+    <div className="story-detail-hero">
+      <StoryArt image={card.image} title={card.title} variant="detail" />
+      <div className="story-detail-hero-body">
+        <div className="story-card-labels">
+          <span className="category">{card.domain ?? card.category}</span>
+          {card.format ? <span className="format-label">{card.format}</span> : null}
+        </div>
+        <h2 className="story-detail-title">{card.title}</h2>
+        {badges}
+      </div>
+    </div>
+  )
+}
+
+function StoryDetailSections({ card }) {
+  const facts = detailFactBullets(card)
+  const setup = card.scene?.trim()
+  const hook = card.hook?.trim()
+  const why = (card.whyItMatters ?? card.relevance)?.trim()
+  const rabbit = card.rabbitHole?.trim()
+
+  return (
+    <div className="story-detail-sections">
+      {hook ? (
+        <section className="story-section">
+          <h3 className="story-section-label">Hook</h3>
+          <p className="story-section-body story-section-body--hook">{hook}</p>
+        </section>
+      ) : null}
+      {setup ? (
+        <section className="story-section">
+          <h3 className="story-section-label">The setup</h3>
+          <p className="story-section-body">{setup}</p>
+        </section>
+      ) : null}
+      {facts.length > 0 ? (
+        <section className="story-section">
+          <h3 className="story-section-label">The fact</h3>
+          {facts.length === 1 ? (
+            <p className="story-section-body">{facts[0]}</p>
+          ) : (
+            <ul className="story-fact-list">
+              {facts.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : null}
+      {why ? (
+        <section className="story-section story-section--matters">
+          <h3 className="story-section-label">Why it matters</h3>
+          <p className="story-section-body">{why}</p>
+        </section>
+      ) : null}
+      {rabbit ? (
+        <section className="story-section story-section--rabbit">
+          <h3 className="story-section-label">Rabbit hole</h3>
+          <p className="story-section-body story-section-body--rabbit">{rabbit}</p>
+          <StoryVideo youtubeId={card.youtubeId} title={card.title} />
+        </section>
+      ) : null}
+    </div>
+  )
 }
 
 for (const card of HISTORY_CARDS) {
@@ -865,9 +981,8 @@ function App() {
           </div>
         ) : inDetail && activeStory ? (
           <article className="card card--detail">
-            <StoryPreviewCard
+            <StoryDetailHero
               card={activeStory}
-              className="story-preview--in-detail"
               badges={
                 (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
                   <div className="story-card-tags">
@@ -882,25 +997,7 @@ function App() {
               }
             />
             <div className="card-inner card-inner--detail">
-              {activeStory.scene ? (
-                <p className="story-scene">{activeStory.scene}</p>
-              ) : null}
-              <p className="story">
-                {activeStory.coreFact ?? activeStory.story}
-              </p>
-              <div className="card-asides">
-                <div className="aside">
-                  <span className="aside-label">Why it matters today</span>
-                  <p className="aside-text">
-                    {activeStory.whyItMatters ?? activeStory.relevance}
-                  </p>
-                </div>
-                <div className="aside">
-                  <span className="aside-label">Rabbit hole</span>
-                  <p className="aside-text">{activeStory.rabbitHole}</p>
-                  <StoryVideo youtubeId={activeStory.youtubeId} title={activeStory.title} />
-                </div>
-              </div>
+              <StoryDetailSections card={activeStory} />
             </div>
             <div className="card-actions">
               <button
