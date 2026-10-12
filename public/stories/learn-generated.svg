@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d5a80"/>
+      <stop offset="100%" stop-color="#98c1d9"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#g)"/>
+  <circle cx="320" cy="60" r="48" fill="#ee6c4d" opacity="0.35"/>
+  <path d="M40 180 L120 120 L200 160 L280 90 L360 140" fill="none" stroke="#e0fbfc" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <text x="40" y="52" fill="#e0fbfc" font-family="system-ui,sans-serif" font-size="22" font-weight="600">Learning path</text>
+</svg>

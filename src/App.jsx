@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ADDITIONAL_LEARNING_CARDS } from './additionalLearningCards.js'
+import { generateMockLearningPath, LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
+import { LearnTopicPanel } from './LearnTopicPanel.jsx'
 import './App.css'
+
+const GENERATED_CARD_IMAGE = '/stories/learn-generated.svg'
 
 const STORAGE_SAVED = 'history-feed-saved'
 const STORAGE_KNOWN = 'history-feed-known'
@@ -513,6 +517,12 @@ for (const card of HISTORY_CARDS) {
   Object.assign(card, normalizeCard(card))
 }
 
+function cardByIdFromPools(id, generatedPath) {
+  const catalog = HISTORY_CARDS.find((c) => c.id === id)
+  if (catalog) return catalog
+  return generatedPath?.find((c) => c.id === id) ?? null
+}
+
 /** Legacy era/topic labels on original catalog cards (list-panel filter). */
 const TOPIC_LIST = [
   ...new Set(
@@ -743,6 +753,13 @@ function App() {
   const [showSavedOnly, setShowSavedOnly] = useState(false)
   const [filterListOpen, setFilterListOpen] = useState(false)
   const [homePanel, setHomePanel] = useState('feed')
+  const [learnTopic, setLearnTopic] = useState('')
+  const [learnLevel, setLearnLevel] = useState('curious')
+  const [learnScope, setLearnScope] = useState('both')
+  const [learnLength, setLearnLength] = useState(5)
+  const [learnFocus, setLearnFocus] = useState('')
+  const [learnStep, setLearnStep] = useState('start')
+  const [generatedPath, setGeneratedPath] = useState(null)
   const [activeZoneId, setActiveZoneId] = useState(null)
   const [savedCards, setSavedCards] = useState(() =>
     loadJson(STORAGE_SAVED, []),
@@ -752,18 +769,32 @@ function App() {
     const id = storyIdFromLocation()
     return id && HISTORY_CARDS.some((c) => c.id === id) ? id : null
   })
+
+  const generatedPathCards = useMemo(() => {
+    if (!generatedPath?.cards?.length) return []
+    return generatedPath.cards
+  }, [generatedPath])
   const [toast, setToast] = useState('')
   const toastTimer = useRef(null)
 
   const activeStory = useMemo(
-    () => HISTORY_CARDS.find((c) => c.id === activeStoryId) ?? null,
-    [activeStoryId],
+    () => cardByIdFromPools(activeStoryId, generatedPathCards),
+    [activeStoryId, generatedPathCards],
   )
 
   const recommendedNext = useMemo(() => {
     if (!activeStoryId) return null
+    const pathIdx = generatedPathCards.findIndex((c) => c.id === activeStoryId)
+    if (pathIdx >= 0) {
+      return generatedPathCards[pathIdx + 1] ?? null
+    }
     return recommendNextCard(activeStoryId, knownIds)
-  }, [activeStoryId, knownIds])
+  }, [activeStoryId, knownIds, generatedPathCards])
+
+  const isGeneratedStory = useMemo(() => {
+    if (!activeStoryId) return false
+    return generatedPathCards.some((c) => c.id === activeStoryId)
+  }, [activeStoryId, generatedPathCards])
 
   const savedIds = useMemo(
     () => new Set(savedCards.map((c) => c.id)),
@@ -1001,6 +1032,69 @@ function App() {
     showToast(`Surprise: ${card.title}`)
   }, [filteredCards, knownIds, showToast, openStory])
 
+  const resetLearnFlow = useCallback(() => {
+    setLearnStep('start')
+    setGeneratedPath(null)
+    setLearnTopic('')
+    setLearnFocus('')
+    setLearnLevel('curious')
+    setLearnScope('both')
+    setLearnLength(5)
+  }, [])
+
+  const continueLearnTopic = useCallback(() => {
+    if (!learnTopic.trim()) return
+    setLearnStep('confirm')
+  }, [learnTopic])
+
+  const handleGenerateLearningPath = useCallback(() => {
+    const topic = learnTopic.trim()
+    if (!topic) return
+    const rawCards = generateMockLearningPath({
+      topic,
+      level: learnLevel,
+      scope: learnScope,
+      length: learnLength,
+      focus: learnFocus,
+    })
+    const pathId = `learn-${Date.now()}`
+    const cards = rawCards.map((raw) =>
+      normalizeCard({
+        ...raw,
+        id: `${pathId}-step-${raw.order}`,
+        category: raw.domain,
+        image: GENERATED_CARD_IMAGE,
+        youtubeId: raw.youtubeId ?? null,
+        pathOrder: raw.order,
+        pathTopic: topic,
+      }),
+    )
+    setGeneratedPath({
+      topic,
+      level: learnLevel,
+      scope: learnScope,
+      cards,
+    })
+    setLearnStep('path')
+    setHomePanel('learn')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    showToast(`Learning path ready · ${cards.length} cards`)
+  }, [learnTopic, learnLevel, learnScope, learnLength, learnFocus, showToast])
+
+  const learnGeneratedMeta = useMemo(() => {
+    if (!generatedPath) return null
+    const levelLabel =
+      LEARN_LEVELS.find((l) => l.id === generatedPath.level)?.label ?? generatedPath.level
+    const scopeLabel =
+      LEARN_SCOPES.find((s) => s.id === generatedPath.scope)?.label ?? generatedPath.scope
+    return {
+      topic: generatedPath.topic,
+      levelLabel,
+      scopeLabel,
+      cardCount: generatedPath.cards.length,
+    }
+  }, [generatedPath])
+
   const inDetail = activeStoryId !== null
 
   return (
@@ -1021,9 +1115,11 @@ function App() {
                   ? activeZone.title
                   : homePanel === 'zones'
                     ? 'Learning Zones'
-                    : 'Curiosity Feed'}
+                    : homePanel === 'learn'
+                      ? 'Learn a Topic'
+                      : 'Curiosity Feed'}
           </h1>
-          {!inDetail && (
+          {!inDetail && homePanel !== 'learn' && (
             <div className="header-actions">
               <button
                 type="button"
@@ -1074,7 +1170,7 @@ function App() {
 
         {!inDetail && (
           <>
-            <nav className="home-tabs" aria-label="Feed or learning zones">
+            <nav className="home-tabs home-tabs--triple" aria-label="Feed, zones, or learn">
               <button
                 type="button"
                 className={`home-tab${homePanel === 'feed' ? ' active' : ''}`}
@@ -1095,7 +1191,18 @@ function App() {
                   setFilterListOpen(false)
                 }}
               >
-                Learning Zones
+                Zones
+              </button>
+              <button
+                type="button"
+                className={`home-tab${homePanel === 'learn' ? ' active' : ''}`}
+                aria-current={homePanel === 'learn' ? 'page' : undefined}
+                onClick={() => {
+                  setHomePanel('learn')
+                  setFilterListOpen(false)
+                }}
+              >
+                Learn
               </button>
             </nav>
 
@@ -1190,8 +1297,54 @@ function App() {
         </div>
       )}
 
-      <main className={`feed${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}`}>
-        {!inDetail && homePanel === 'zones' ? (
+      <main
+        className={`feed${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}${homePanel === 'learn' && !inDetail ? ' feed--learn' : ''}`}
+      >
+        {!inDetail && homePanel === 'learn' ? (
+          <>
+            <LearnTopicPanel
+              topic={learnTopic}
+              onTopicChange={setLearnTopic}
+              level={learnLevel}
+              onLevelChange={setLearnLevel}
+              scope={learnScope}
+              onScopeChange={setLearnScope}
+              length={learnLength}
+              onLengthChange={setLearnLength}
+              focus={learnFocus}
+              onFocusChange={setLearnFocus}
+              step={learnStep}
+              onContinue={continueLearnTopic}
+              onGenerate={handleGenerateLearningPath}
+              onEditTopic={() => setLearnStep('start')}
+              onStartOver={resetLearnFlow}
+              generatedMeta={learnGeneratedMeta}
+            />
+            {learnStep === 'path' && generatedPathCards.length > 0 ? (
+              <div className="learn-path-cards">
+                <p className="learn-path-order-hint">Reading order · step 1 first</p>
+                {generatedPathCards.map((card) => (
+                  <StoryPreviewCard
+                    key={card.id}
+                    id={`card-${card.id}`}
+                    card={card}
+                    interactive
+                    onOpen={() => openStory(card.id)}
+                    badges={
+                      card.pathOrder ? (
+                        <div className="story-card-tags">
+                          <span className="meta-badge meta-badge--path">
+                            Step {card.pathOrder} of {generatedPathCards.length}
+                          </span>
+                        </div>
+                      ) : null
+                    }
+                  />
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : !inDetail && homePanel === 'zones' ? (
           <div className="zones-panel">
             <p className="zones-intro">
               Structured paths are coming soon. For now, browse a zone to filter the feed to
@@ -1246,28 +1399,40 @@ function App() {
               </div>
             ) : null}
             <div className="card-actions">
-              <button
-                type="button"
-                className={`action-btn action-btn--known${knownIds.has(activeStory.id) ? ' known-active' : ''}`}
-                onClick={() => handleKnown(activeStory)}
-              >
-                I knew this
-              </button>
-              <button
-                type="button"
-                className={`action-btn action-btn--save${savedIds.has(activeStory.id) ? ' saved' : ''}`}
-                onClick={() => handleSave(activeStory)}
-                aria-pressed={savedIds.has(activeStory.id)}
-              >
-                {savedIds.has(activeStory.id) ? 'Saved ✓' : 'Save'}
-              </button>
-              <button
-                type="button"
-                className="action-btn action-btn--surprise"
-                onClick={handleSurprise}
-              >
-                Surprise me
-              </button>
+              {!isGeneratedStory ? (
+                <>
+                  <button
+                    type="button"
+                    className={`action-btn action-btn--known${knownIds.has(activeStory.id) ? ' known-active' : ''}`}
+                    onClick={() => handleKnown(activeStory)}
+                  >
+                    I knew this
+                  </button>
+                  <button
+                    type="button"
+                    className={`action-btn action-btn--save${savedIds.has(activeStory.id) ? ' saved' : ''}`}
+                    onClick={() => handleSave(activeStory)}
+                    aria-pressed={savedIds.has(activeStory.id)}
+                  >
+                    {savedIds.has(activeStory.id) ? 'Saved ✓' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    className="action-btn action-btn--surprise"
+                    onClick={handleSurprise}
+                  >
+                    Surprise me
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="action-btn action-btn--save"
+                  onClick={closeStory}
+                >
+                  Back to path
+                </button>
+              )}
             </div>
           </article>
         ) : filteredCards.length === 0 ? (
