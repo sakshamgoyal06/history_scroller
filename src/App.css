@@ -674,6 +674,152 @@
   color: var(--ink-soft);
 }
 
+.decade-tag {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.timeline-filter {
+  margin: 4px var(--feed-pad) 10px;
+  padding: 12px 14px 10px;
+  border-radius: var(--radius-card);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--accent-soft) 55%, var(--surface)),
+    var(--surface)
+  );
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 8px 24px rgba(44, 40, 37, 0.06);
+}
+
+.timeline-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.timeline-filter-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.timeline-filter-clear {
+  border: none;
+  background: none;
+  color: var(--accent-deep);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.timeline-track-wrap {
+  position: relative;
+}
+
+.timeline-track {
+  position: relative;
+  height: 6px;
+  margin: 0 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent-deep) 25%, transparent) 0%,
+    var(--accent) 45%,
+    color-mix(in srgb, var(--accent) 70%, #c4a882) 100%
+  );
+  overflow: visible;
+}
+
+.timeline-track-glow {
+  position: absolute;
+  inset: -4px 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 35%, transparent));
+  filter: blur(6px);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.timeline-track-tick {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 12px;
+  margin-left: -1.5px;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--surface) 40%, var(--ink));
+  opacity: 0.55;
+}
+
+.timeline-decades-scroll {
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 0 4px 2px;
+  scrollbar-width: none;
+}
+
+.timeline-decades-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline-decades {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-width: min-content;
+  padding-bottom: 2px;
+}
+
+.timeline-decade-chip {
+  flex-shrink: 0;
+  border: 1px solid var(--line-strong);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    transform 0.15s var(--ease-out),
+    border-color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out),
+    box-shadow 0.2s var(--ease-out);
+}
+
+.timeline-decade-chip:active {
+  transform: scale(0.97);
+}
+
+.timeline-decade-chip.active {
+  border-color: var(--accent-deep);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.timeline-filter-hint {
+  margin: 8px 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
 .story-card-chevron {
   color: var(--ink-soft);
   font-size: 1rem;

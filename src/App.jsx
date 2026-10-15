@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ADDITIONAL_LEARNING_CARDS } from './additionalLearningCards.js'
+import {
+  decadeTimelinePercent,
+  formatDecadeKeyLabel,
+  timelineFieldsForCard,
+  uniqueDecadeKeysFromCards,
+} from './cardTimeline.js'
 import { generateMockLearningPath, LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
 import { LearnTopicPanel } from './LearnTopicPanel.jsx'
 import './App.css'
@@ -416,6 +422,8 @@ function normalizeCard(card) {
   const scene = card.scene ?? firstSentence(coreFact)
   const sources = Array.isArray(card.sources) ? card.sources : []
 
+  const timeline = timelineFieldsForCard(card)
+
   return {
     ...card,
     domain,
@@ -428,6 +436,7 @@ function normalizeCard(card) {
     sources,
     story: coreFact,
     relevance: whyItMatters,
+    ...(timeline ?? {}),
   }
 }
 
@@ -450,6 +459,9 @@ function StoryDetailHero({ card, badges }) {
       <div className="story-detail-hero-body">
         <div className="story-card-labels">
           <span className="category">{card.domain ?? card.category}</span>
+          {card.decadeLabel ? (
+            <span className="decade-tag">{card.decadeLabel}</span>
+          ) : null}
           {card.format ? <span className="format-label">{card.format}</span> : null}
         </div>
         <h2 className="story-detail-title">{card.title}</h2>
@@ -637,6 +649,64 @@ function recommendNextCard(currentId, knownIds) {
   return null
 }
 
+function TimelineFilter({ decades, selectedDecades, onToggleDecade, onClear }) {
+  if (decades.length === 0) return null
+
+  return (
+    <div className="timeline-filter" aria-label="Filter by decade">
+      <div className="timeline-filter-head">
+        <span className="timeline-filter-title">Timeline</span>
+        {selectedDecades.size > 0 ? (
+          <button type="button" className="timeline-filter-clear" onClick={onClear}>
+            Clear
+          </button>
+        ) : null}
+      </div>
+      <div className="timeline-track-wrap">
+        <div className="timeline-track" aria-hidden="true">
+          <div className="timeline-track-glow" />
+          {decades.map((key) => (
+            <span
+              key={`tick-${key}`}
+              className="timeline-track-tick"
+              style={{ left: `${decadeTimelinePercent(key)}%` }}
+            />
+          ))}
+        </div>
+        <div className="timeline-decades-scroll">
+          <nav className="timeline-decades">
+            <button
+              type="button"
+              className={`timeline-decade-chip${selectedDecades.size === 0 ? ' active' : ''}`}
+              onClick={onClear}
+            >
+              All eras
+            </button>
+            {decades.map((key) => {
+              const active = selectedDecades.has(key)
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={`timeline-decade-chip${active ? ' active' : ''}`}
+                  style={{ '--timeline-pos': `${decadeTimelinePercent(key)}%` }}
+                  onClick={() => onToggleDecade(key)}
+                  aria-pressed={active}
+                >
+                  {formatDecadeKeyLabel(key)}
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+      </div>
+      <p className="timeline-filter-hint">
+        Tap a decade to filter the feed—science cards use discovery or invention dates.
+      </p>
+    </div>
+  )
+}
+
 function LearningZoneCard({ zone, onBrowse }) {
   const { storyCount, domainCount, domains } = zoneSummary(zone)
   return (
@@ -682,6 +752,9 @@ function StoryPreviewCard({
         <div className="story-card-top">
           <div className="story-card-labels">
             <span className="category">{card.domain ?? card.category}</span>
+            {card.decadeLabel ? (
+              <span className="decade-tag">{card.decadeLabel}</span>
+            ) : null}
             {card.format ? (
               <span className="format-label">{card.format}</span>
             ) : null}
@@ -750,6 +823,7 @@ function loadJson(key, fallback) {
 function App() {
   const [selectedDomain, setSelectedDomain] = useState(null)
   const [selectedTopics, setSelectedTopics] = useState(() => new Set())
+  const [selectedDecades, setSelectedDecades] = useState(() => new Set())
   const [showSavedOnly, setShowSavedOnly] = useState(false)
   const [filterListOpen, setFilterListOpen] = useState(false)
   const [homePanel, setHomePanel] = useState('feed')
@@ -823,11 +897,20 @@ function App() {
     if (selectedTopics.size > 0) {
       pool = pool.filter((c) => c.category && selectedTopics.has(c.category))
     }
+    if (selectedDecades.size > 0) {
+      pool = pool.filter((c) => c.decadeKey && selectedDecades.has(c.decadeKey))
+    }
     return pool
-  }, [showSavedOnly, savedCardsLive, selectedDomain, selectedTopics, activeZone])
+  }, [showSavedOnly, savedCardsLive, selectedDomain, selectedTopics, selectedDecades, activeZone])
+
+  const catalogDecades = useMemo(
+    () => uniqueDecadeKeysFromCards(HISTORY_CARDS),
+    [],
+  )
 
   const allDomainsSelected = selectedDomain === null
-  const activeFilterCount = (selectedDomain ? 1 : 0) + selectedTopics.size
+  const activeFilterCount =
+    (selectedDomain ? 1 : 0) + selectedTopics.size + selectedDecades.size
 
   const toggleSavedView = useCallback(() => {
     setShowSavedOnly((on) => !on)
@@ -849,6 +932,7 @@ function App() {
     setShowSavedOnly(false)
     setSelectedDomain(null)
     setSelectedTopics(new Set())
+    setSelectedDecades(new Set())
     setFilterListOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
@@ -870,9 +954,23 @@ function App() {
     setSelectedTopics(new Set())
   }, [])
 
+  const clearDecadeFilters = useCallback(() => {
+    setSelectedDecades(new Set())
+  }, [])
+
+  const toggleDecade = useCallback((decadeKey) => {
+    setSelectedDecades((prev) => {
+      const next = new Set(prev)
+      if (next.has(decadeKey)) next.delete(decadeKey)
+      else next.add(decadeKey)
+      return next
+    })
+  }, [])
+
   const clearAllFilters = useCallback(() => {
     setSelectedDomain(null)
     setSelectedTopics(new Set())
+    setSelectedDecades(new Set())
   }, [])
 
   const leaveSavedView = useCallback(() => {
@@ -969,7 +1067,7 @@ function App() {
     if (activeFilterCount > 0) {
       return {
         title: 'No stories for these filters',
-        body: 'Try fewer domains or topics, or reset to see the full feed.',
+        body: 'Try fewer domains, topics, or timeline decades—or reset to see the full feed.',
         action: { label: 'Show all', onClick: clearAllFilters },
       }
     }
@@ -1229,6 +1327,13 @@ function App() {
                     ))}
                   </nav>
                 </div>
+
+                <TimelineFilter
+                  decades={catalogDecades}
+                  selectedDecades={selectedDecades}
+                  onToggleDecade={toggleDecade}
+                  onClear={clearDecadeFilters}
+                />
 
                 {filterListOpen && (
                   <div
