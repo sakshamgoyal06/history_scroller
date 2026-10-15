@@ -103,6 +103,7 @@ function rbiMonetaryPolicyCards({ level, scope, focus }) {
         'Vegetable prices and fuel bills feed the same index that can trigger rate decisions.',
       rabbitHole: 'How do core vs headline inflation debates show up in MPC minutes?',
       youtubeQuery: 'India Monetary Policy Committee inflation targeting',
+      youtubeId: 'IVfjJia42gI',
     },
     {
       order: 4,
@@ -118,6 +119,7 @@ function rbiMonetaryPolicyCards({ level, scope, focus }) {
         'Small businesses feel liquidity crunches before policy statements change wording.',
       rabbitHole: 'Why did durable liquidity surpluses appear in Indian banking after 2020?',
       youtubeQuery: 'RBI liquidity management open market operations',
+      youtubeId: 'gd8B-zrMSYk',
     },
     {
       order: 5,
@@ -133,6 +135,7 @@ function rbiMonetaryPolicyCards({ level, scope, focus }) {
         'Studying abroad, imported gadgets, and inflation all connect to the same balance-of-payments story.',
       rabbitHole: 'When does RBI use forex reserves aggressively vs letting the rupee adjust?',
       youtubeQuery: 'RBI forex intervention rupee volatility',
+      youtubeId: '75zwHAzz_f8',
     },
   ]
   return all
@@ -175,6 +178,7 @@ function riversCivilizationsCards({ level, scope, focus }) {
         'Urban planning and sanitation standards are older than classical Greece in South Asia.',
       rabbitHole: 'What evidence links Ghaggar-Hakra channel changes to site abandonment?',
       youtubeQuery: 'Indus Valley Civilization urban planning',
+      youtubeId: 'mi9sMazNPxM',
     },
     {
       order: 3,
@@ -190,6 +194,7 @@ function riversCivilizationsCards({ level, scope, focus }) {
         'Food storage and prediction still underpin state capacity during climate shocks.',
       rabbitHole: 'How did the Aswan High Dam change the old flood-agriculture social contract?',
       youtubeQuery: 'Nile flood ancient Egypt agriculture',
+      youtubeId: 'Z3Wvw6BivVI',
     },
     {
       order: 4,
@@ -205,6 +210,7 @@ function riversCivilizationsCards({ level, scope, focus }) {
         'International water treaties today echo intra-basin fights over canal maintenance.',
       rabbitHole: 'Why did Babylon’s power shift when upstream deforestation altered silt loads?',
       youtubeQuery: 'Mesopotamia irrigation civilization',
+      youtubeId: 'sohXPx_XZ6Y',
     },
     {
       order: 5,
@@ -247,7 +253,7 @@ function parliamentBillCards({ level, scope, focus }) {
         'Policy fights often end before debate if drafting or cabinet clearance stalls.',
       rabbitHole: 'What is the difference between a bill and an act in everyday news language?',
       youtubeQuery: 'how a bill becomes law India Parliament',
-      youtubeId: 'HuFR5XBYLfU',
+      youtubeId: '66f4-NKEYz4',
     },
     {
       order: 2,
@@ -263,6 +269,7 @@ function parliamentBillCards({ level, scope, focus }) {
         'State interests and federal balance show up in Rajya Sabha numbers and committee work.',
       rabbitHole: 'Which types of bills require both houses to pass identical text?',
       youtubeQuery: 'Lok Sabha Rajya Sabha lawmaking India',
+      youtubeId: 'HuFR5XBYLfU',
     },
     {
       order: 3,
@@ -278,6 +285,7 @@ function parliamentBillCards({ level, scope, focus }) {
         'Better laws often come from boring markup sessions you never see trending.',
       rabbitHole: 'How do select committees differ from joint committees on specific bills?',
       youtubeQuery: 'Parliament standing committee bill scrutiny India',
+      youtubeId: 'oySykZoKBqs',
     },
     {
       order: 4,
@@ -293,6 +301,7 @@ function parliamentBillCards({ level, scope, focus }) {
         'Whip notices and pairing arrangements explain sudden walkouts or unanimous shows.',
       rabbitHole: 'When can the President withhold assent or return a bill for reconsideration?',
       youtubeQuery: 'Indian Parliament voting process bill passage',
+      youtubeId: 'oySykZoKBqs',
     },
     {
       order: 5,
@@ -308,7 +317,7 @@ function parliamentBillCards({ level, scope, focus }) {
         'A passed bill still fails if enforcement machinery or federal coordination is missing.',
       rabbitHole: 'What is judicial review’s timeline for testing a fresh act’s constitutionality?',
       youtubeQuery: 'Indian act implementation delegated legislation',
-      youtubeId: 'Lp7E967ZukI',
+      youtubeId: '66f4-NKEYz4',
     },
   ]
   return all
@@ -323,11 +332,11 @@ function genericPathCards({ topic, level, scope, length, focus }) {
       title: `The Big Picture on ${label}`,
       domain: 'General Knowledge',
       format: 'Explainer',
-      hook: withFocus(`Start with why "${label}" shows up in news, exams, and dinner-table debates.`, focus),
-      scene: `Imagine explaining ${label} to a friend who has ten minutes—not ten years.`,
-      coreFact: `${levelHint(level)} ${scopeHint(scope)} At the widest zoom, ${label} connects facts, incentives, and institutions. This card orients vocabulary and stakes before details. (${LEVEL_LABEL[level] ?? 'Curious'} path.)`,
-      whyItMatters: 'Orientation prevents mistaking one hot take for the whole system.',
-      rabbitHole: `What is the single misunderstanding beginners have about ${label}?`,
+      hook: withFocus(`Most arguments about ${label} start mid-sentence—this card names the whole board first.`, focus),
+      scene: `${label} sits at the intersection of facts people repeat, incentives that reward certain behavior, and institutions that set the rules.`,
+      coreFact: `${levelHint(level)} ${scopeHint(scope)} At the widest zoom, ${label} is not one headline or one hero figure—it is a network of actors, constraints, and measurable outcomes. Beginners often hunt for a single definition; practitioners watch how the pieces reinforce or fight each other. (${LEVEL_LABEL[level] ?? 'Curious'} path.)`,
+      whyItMatters: 'Without the wide view, every later detail feels like a surprise instead of a pattern.',
+      rabbitHole: `What is the most common “too simple” story people tell about ${label}?`,
       youtubeQuery: `${label} explained`,
     },
     {
@@ -335,11 +344,11 @@ function genericPathCards({ topic, level, scope, length, focus }) {
       title: `Core Concepts Behind ${label}`,
       domain: 'General Knowledge',
       format: 'Explainer',
-      hook: 'Names and definitions are the handles you need to grab deeper ideas.',
-      scene: 'List the 3–4 ideas experts assume you already know.',
-      coreFact: `Build a mini-glossary: actors, metrics, and boundaries of ${label}. Mock path—swap this block with model-generated prose tied to sources later.`,
-      whyItMatters: 'Shared terms keep arguments about evidence instead of talking past each other.',
-      rabbitHole: `Which textbook or official document defines ${label} most cleanly for your scope?`,
+      hook: 'Shared vocabulary is what turns shouting into diagnosis.',
+      scene: `Experts discussing ${label} usually assume you know a handful of nouns—who decides, what gets counted, and where the system’s edges are.`,
+      coreFact: `A workable starter map for ${label} includes three layers: the main actors (people, firms, agencies, communities), the metrics they optimize (prices, votes, error rates, growth), and the boundaries of the system (laws, geography, technology limits). ${scopeHint(scope)} When two people disagree about ${label}, the argument is often really about which layer they are staring at.`,
+      whyItMatters: 'Once terms align, you can compare evidence instead of talking past each other.',
+      rabbitHole: `Which official report or textbook chapter defines ${label} most clearly for your scope?`,
       youtubeQuery: `${label} basics`,
     },
     {
@@ -347,11 +356,11 @@ function genericPathCards({ topic, level, scope, length, focus }) {
       title: `How ${label} Works in Practice`,
       domain: 'General Knowledge',
       format: 'Story',
-      hook: 'Mechanisms beat slogans—walk one example end to end.',
-      scene: 'Pick a concrete episode: a decision, discovery, or daily routine.',
-      coreFact: `Trace inputs → process → outputs for ${label}. ${scopeHint(scope)} Highlight feedback loops and delays—where effects show up months later.`,
-      whyItMatters: 'Policy and technology failures often come from skipping this step.',
-      rabbitHole: 'Where would you spot measurable indicators that the mechanism is working?',
+      hook: 'Mechanisms beat slogans—follow one decision all the way through.',
+      scene: `Picture one concrete moment: a budget line item, a lab result, a court filing, or a product launch tied to ${label}.`,
+      coreFact: `Walk the chain: inputs (information, money, materials, authority) → process (rules, habits, technology, negotiation) → outputs (prices, permissions, published results, visible behavior). ${scopeHint(scope)} Delays are normal—effects of ${label} often show up weeks or years after the triggering choice, which is why early indicators matter.`,
+      whyItMatters: 'Failures in policy and engineering usually trace to a broken link in this chain, not to “bad intentions” alone.',
+      rabbitHole: 'Which measurable indicator would convince you the mechanism is working—not merely being talked about?',
       youtubeQuery: `${label} how it works`,
     },
     {
@@ -359,11 +368,11 @@ function genericPathCards({ topic, level, scope, length, focus }) {
       title: `Why ${label} Matters Now`,
       domain: 'Current Affairs',
       format: 'Explainer',
-      hook: 'History is optional; stakes are not.',
-      scene: 'Link the mechanism to wallets, rights, health, or environment near you.',
-      coreFact: `${level === 'deep' ? 'Name trade-offs: who wins, who pays, and which risks are exported to the future.' : 'Translate to one personal and one societal consequence.'} Mock content—AI should cite timely examples later.`,
+      hook: 'Stakes show up in paychecks, rights, health, and habitats—not only in textbooks.',
+      scene: `Today's debates about ${label} land in ordinary choices: what costs more, who gets heard, which risks get exported to the future.`,
+      coreFact: `${level === 'deep' ? `Deep view: ${label} distributes gains and pains unevenly—some groups capture upside early while others absorb delay, pollution, or debt. Institutions can amplify or dampen that skew.` : `Everyday view: ${label} connects to at least one personal tradeoff (time, money, safety) and one collective tradeoff (fairness, stability, environment).`} ${scopeHint(scope)}`,
       whyItMatters: 'Motivation carries you through harder cards later in the path.',
-      rabbitHole: `What recent headline about ${label} would you test against this model?`,
+      rabbitHole: `Which recent headline about ${label} would you test against this model?`,
       youtubeQuery: `${label} importance`,
     },
     {
@@ -371,11 +380,11 @@ function genericPathCards({ topic, level, scope, length, focus }) {
       title: `Missteps and Rabbit Holes on ${label}`,
       domain: 'General Knowledge',
       format: 'Explainer',
-      hook: 'The best learners know the tempting wrong turns.',
-      scene: 'Name a myth, a too-simple chart, and a deeper thread worth optional reading.',
-      coreFact: `Common misconception: treating ${label} as one actor or one event. Better frame: overlapping systems. Next rabbit hole: pick one primary source and compare it to a popular explainer.`,
+      hook: 'Strong learners know the shortcuts that look like mastery.',
+      scene: `Popular explainers on ${label} often shrink a messy system into one villain, one chart, or one turning point.`,
+      coreFact: `A durable frame treats ${label} as overlapping systems: multiple actors, feedback loops, and data that can lag reality. Compare one primary source (report, dataset, statute) with a polished summary—note what the summary smooths away. That gap is where misconceptions hide.`,
       whyItMatters: 'Avoiding traps saves time when you dive into specialized zones in the feed.',
-      rabbitHole: `What is the most interesting open question experts still argue about in ${label}?`,
+      rabbitHole: `What open question do specialists still argue about within ${label}?`,
       youtubeQuery: `${label} misconceptions`,
     },
   ]
