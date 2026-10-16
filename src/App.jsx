@@ -8,6 +8,16 @@ import {
 } from './cardTimeline.js'
 import { generateMockLearningPath, LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
 import { LearnTopicPanel } from './LearnTopicPanel.jsx'
+import { DailyEdition } from './DailyEdition.jsx'
+import {
+  getLocalDateKey,
+  isDailyEditionVisible,
+  markEditionCardExplored,
+  selectDailyEdition,
+} from './dailyEdition.js'
+import { allFlagshipCatalogEntries, isNarrativeCard } from './flagshipStories.js'
+import { RichStoryDetail } from './RichStoryDetail.jsx'
+import { StoryArt, StoryPreviewCard, StoryVideo } from './StoryPreviewCard.jsx'
 import './App.css'
 
 const GENERATED_CARD_IMAGE = '/stories/learn-generated.svg'
@@ -342,6 +352,7 @@ const HISTORY_CARDS = [
       'Which UDHR article provoked the most delegate walkouts during drafting—and what compromise survived?',
   },
   ...ADDITIONAL_LEARNING_CARDS,
+  ...allFlagshipCatalogEntries(),
 ]
 
 const STORY_YOUTUBE = {
@@ -390,6 +401,7 @@ const STORY_YOUTUBE = {
   'metric-prefixes': '7bUVjJWA6Vw',
   'leap-year-rule': 'xX96xng7sAE',
   'time-zones-offset': '74I0M0RKNIE',
+  'rbi-monetary-policy-narrative': '0jJKjgE3qfE',
 }
 
 const LEARNING_DOMAINS = [
@@ -452,8 +464,13 @@ function normalizeCard(card) {
     card.coreFact ??
     (factBullets.length > 0 ? factBullets.join(' ') : (card.story ?? ''))
   const whyItMatters = card.whyItMatters ?? card.relevance ?? ''
-  const hook = card.hook ?? ''
-  const scene = card.scene ?? firstSentence(coreFact)
+  const hook =
+    card.format === 'narrative' ? (card.deck ?? card.hook ?? '') : (card.hook ?? '')
+  const scene =
+    card.scene ??
+    (card.format === 'narrative' && card.coldOpen?.body
+      ? firstSentence(card.coldOpen.body)
+      : firstSentence(coreFact))
   const sources = Array.isArray(card.sources) ? card.sources : []
 
   const timeline = timelineFieldsForCard(card)
@@ -559,7 +576,7 @@ function StoryDetailSections({ card }) {
 
 for (const card of HISTORY_CARDS) {
   card.image = `/stories/${card.id}.svg`
-  card.youtubeId = STORY_YOUTUBE[card.id] ?? null
+  card.youtubeId = STORY_YOUTUBE[card.id] ?? card.youtube?.id ?? null
   Object.assign(card, normalizeCard(card))
 }
 
@@ -758,90 +775,6 @@ function LearningZoneCard({ zone, onBrowse }) {
         Browse stories
       </button>
     </article>
-  )
-}
-
-function StoryArt({ image, title, variant = 'feed' }) {
-  return (
-    <div className={`story-art story-art--${variant}`}>
-      <img src={image} alt="" className="story-art-img" loading="lazy" decoding="async" />
-      <div className="story-art-scrim" aria-hidden="true" />
-      <span className="visually-hidden">{title}</span>
-    </div>
-  )
-}
-
-function StoryPreviewCard({
-  card,
-  badges = null,
-  interactive = false,
-  onOpen,
-  className = '',
-  id,
-}) {
-  const body = (
-    <>
-      <StoryArt image={card.image} title={card.title} variant={interactive ? 'feed' : 'detail'} />
-      <div className="story-preview-body">
-        <div className="story-card-top">
-          <div className="story-card-labels">
-            <span className="category">{card.domain ?? card.category}</span>
-            {card.decadeLabel ? (
-              <span className="decade-tag">{card.decadeLabel}</span>
-            ) : null}
-            {card.format ? (
-              <span className="format-label">{card.format}</span>
-            ) : null}
-          </div>
-          {interactive ? (
-            <span className="story-card-chevron" aria-hidden="true">
-              →
-            </span>
-          ) : null}
-        </div>
-        <h2 className="story-card-title">{card.title}</h2>
-        <p className={`story-card-hook${interactive ? '' : ' story-card-hook--detail'}`}>
-          {card.hook}
-        </p>
-        {badges}
-      </div>
-    </>
-  )
-
-  if (interactive) {
-    return (
-      <button
-        type="button"
-        id={id}
-        className={`story-preview story-preview--interactive${className ? ` ${className}` : ''}`}
-        onClick={onOpen}
-      >
-        {body}
-      </button>
-    )
-  }
-
-  return (
-    <div className={`story-preview story-preview--static${className ? ` ${className}` : ''}`}>
-      {body}
-    </div>
-  )
-}
-
-function StoryVideo({ youtubeId, title }) {
-  if (!youtubeId) return null
-  return (
-    <div className="story-video">
-      <div className="story-video-frame">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
-          title={`Video: ${title}`}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      </div>
-    </div>
   )
 }
 
@@ -1138,6 +1071,17 @@ function App() {
   const openStory = useCallback((id) => {
     setFilterListOpen(false)
     setActiveStoryId(id)
+    const dateKey = getLocalDateKey()
+    const { picks } = selectDailyEdition(HISTORY_CARDS, dateKey)
+    const editionIds = new Set(
+      Object.values(picks)
+        .filter(Boolean)
+        .map((p) => p.id),
+    )
+    if (editionIds.has(id)) {
+      markEditionCardExplored(dateKey, id)
+      window.dispatchEvent(new Event('daily-edition-progress'))
+    }
     const current = window.history.state
     if (current?.view !== 'story' || current?.id !== id) {
       window.history.pushState(storyHistoryState(id), '', storyUrl(id))
@@ -1229,6 +1173,23 @@ function App() {
 
   const inDetail = activeStoryId !== null
 
+  const showDailyEdition = useMemo(
+    () =>
+      isDailyEditionVisible({
+        showSavedOnly,
+        activeZone,
+        activeFilterCount,
+        homePanel,
+      }),
+    [showSavedOnly, activeZone, activeFilterCount, homePanel],
+  )
+
+  const narrativeRelated = useMemo(() => {
+    if (!activeStory || !isNarrativeCard(activeStory)) return []
+    const ids = Array.isArray(activeStory.relatedCardIds) ? activeStory.relatedCardIds : []
+    return ids.map((id) => CARD_BY_ID.get(id)).filter(Boolean)
+  }, [activeStory])
+
   return (
     <div className={`app${inDetail ? ' app--detail' : ''}`}>
       <header className="top-bar">
@@ -1240,7 +1201,7 @@ function App() {
           ) : null}
           <h1 className={inDetail ? 'brand-title--detail' : ''}>
             {inDetail
-              ? (activeStory?.title ?? 'Story')
+              ? (activeStory?.title ?? activeStory?.curiosityQuestion ?? 'Story')
               : showSavedOnly
                 ? 'Saved'
                 : activeZone && homePanel === 'feed'
@@ -1502,26 +1463,70 @@ function App() {
             </button>
           </div>
         ) : inDetail && activeStory ? (
-          <article className="card card--detail">
-            <StoryDetailHero
-              card={activeStory}
-              badges={
-                (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
-                  <div className="story-card-tags">
-                    {savedIds.has(activeStory.id) && (
-                      <span className="meta-badge meta-badge--saved">Saved</span>
-                    )}
-                    {knownIds.has(activeStory.id) && (
-                      <span className="meta-badge">Known</span>
-                    )}
+          <article
+            className={`card card--detail${isNarrativeCard(activeStory) ? ' card--detail-narrative' : ''}`}
+          >
+            {isNarrativeCard(activeStory) ? (
+              <div className="card-inner card-inner--detail card-inner--rich">
+                <RichStoryDetail
+                  card={activeStory}
+                  badges={
+                    (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
+                      <div className="story-card-tags">
+                        {savedIds.has(activeStory.id) && (
+                          <span className="meta-badge meta-badge--saved">Saved</span>
+                        )}
+                        {knownIds.has(activeStory.id) && (
+                          <span className="meta-badge">Known</span>
+                        )}
+                      </div>
+                    )
+                  }
+                  relatedCards={
+                    narrativeRelated.length > 0 ? narrativeRelated : null
+                  }
+                  onOpenRelated={openStory}
+                />
+              </div>
+            ) : (
+              <>
+                <StoryDetailHero
+                  card={activeStory}
+                  badges={
+                    (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
+                      <div className="story-card-tags">
+                        {savedIds.has(activeStory.id) && (
+                          <span className="meta-badge meta-badge--saved">Saved</span>
+                        )}
+                        {knownIds.has(activeStory.id) && (
+                          <span className="meta-badge">Known</span>
+                        )}
+                      </div>
+                    )
+                  }
+                />
+                <div className="card-inner card-inner--detail">
+                  <StoryDetailSections card={activeStory} />
+                </div>
+                {recommendedNext ? (
+                  <div className="story-next">
+                    <h3 className="story-section-label">Continue learning</h3>
+                    <button
+                      type="button"
+                      className="story-next-card"
+                      onClick={() => openStory(recommendedNext.id)}
+                    >
+                      <span className="story-next-title">{recommendedNext.title}</span>
+                      <span className="story-next-meta">
+                        {recommendedNext.domain}
+                        {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
+                      </span>
+                    </button>
                   </div>
-                )
-              }
-            />
-            <div className="card-inner card-inner--detail">
-              <StoryDetailSections card={activeStory} />
-            </div>
-            {recommendedNext ? (
+                ) : null}
+              </>
+            )}
+            {isNarrativeCard(activeStory) && !narrativeRelated.length && recommendedNext ? (
               <div className="story-next">
                 <h3 className="story-section-label">Continue learning</h3>
                 <button
@@ -1589,28 +1594,36 @@ function App() {
             )}
           </div>
         ) : (
-          filteredCards.map((card) => (
-            <StoryPreviewCard
-              key={card.id}
-              id={`card-${card.id}`}
-              card={card}
-              interactive
-              className={knownIds.has(card.id) ? 'known' : ''}
-              onOpen={() => openStory(card.id)}
-              badges={
-                (savedIds.has(card.id) || knownIds.has(card.id)) && (
-                  <div className="story-card-tags">
-                    {savedIds.has(card.id) && (
-                      <span className="meta-badge meta-badge--saved">Saved</span>
-                    )}
-                    {knownIds.has(card.id) && (
-                      <span className="meta-badge">Known</span>
-                    )}
-                  </div>
-                )
-              }
-            />
-          ))
+          <>
+            {showDailyEdition ? (
+              <>
+                <DailyEdition catalog={HISTORY_CARDS} onOpenStory={openStory} />
+                <h2 className="explore-all-heading">Explore everything</h2>
+              </>
+            ) : null}
+            {filteredCards.map((card) => (
+              <StoryPreviewCard
+                key={card.id}
+                id={`card-${card.id}`}
+                card={card}
+                interactive
+                className={knownIds.has(card.id) ? 'known' : ''}
+                onOpen={() => openStory(card.id)}
+                badges={
+                  (savedIds.has(card.id) || knownIds.has(card.id)) && (
+                    <div className="story-card-tags">
+                      {savedIds.has(card.id) && (
+                        <span className="meta-badge meta-badge--saved">Saved</span>
+                      )}
+                      {knownIds.has(card.id) && (
+                        <span className="meta-badge">Known</span>
+                      )}
+                    </div>
+                  )
+                }
+              />
+            ))}
+          </>
         )}
       </main>
 
