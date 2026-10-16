@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { StoryVideo } from './StoryPreviewCard.jsx'
+import { StoryVideo, StoryVideoSearch } from './StoryPreviewCard.jsx'
 
 function beatClass(type) {
   if (type === 'turning-point') return 'rich-beat rich-beat--turn'
@@ -13,6 +13,8 @@ export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
 
   const youtubeId = card.youtube?.id ?? card.youtubeId ?? null
   const youtubeTitle = card.youtube?.title ?? card.title
+  const videoSearchQuery = card.videoSearchQuery ?? card.youtube?.searchQuery ?? null
+  const lessonCore = card.lessonCore ?? null
 
   const beats = useMemo(
     () => (Array.isArray(card.storyBeats) ? card.storyBeats : []),
@@ -145,6 +147,67 @@ export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
         </section>
       ) : null}
 
+      {lessonCore?.keyTerms?.length > 0 ? (
+        <section className="rich-section">
+          <h3 className="rich-section-label">Key terms</h3>
+          <ul className="rich-list rich-list--inline">
+            {lessonCore.keyTerms.map((term) => (
+              <li key={term}>{term}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {lessonCore?.examples?.length > 0 ? (
+        <section className="rich-section">
+          <h3 className="rich-section-label">Examples</h3>
+          <ul className="rich-list">
+            {lessonCore.examples.map((ex) => (
+              <li key={ex}>{ex}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {lessonCore?.verifiedClaims?.length > 0 ? (
+        <section className="rich-section rich-section--claims">
+          <h3 className="rich-section-label">Sourced facts</h3>
+          <ul className="rich-claims">
+            {lessonCore.verifiedClaims.map((claim) => (
+              <li key={claim.id} className="rich-claim">
+                <p className="rich-claim-text">{claim.text}</p>
+                {claim.sourceIds?.length > 0 ? (
+                  <ul className="rich-claim-sources">
+                    {claim.sourceIds.map((sid) => {
+                      const src = (card.sources ?? []).find((s) => s.id === sid)
+                      if (!src?.url) return null
+                      return (
+                        <li key={sid}>
+                          <a href={src.url} target="_blank" rel="noopener noreferrer">
+                            {src.title ?? src.url}
+                          </a>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {lessonCore?.uncertainties?.length > 0 ? (
+        <section className="rich-section">
+          <h3 className="rich-section-label">Still debated or uncertain</h3>
+          <ul className="rich-list">
+            {lessonCore.uncertainties.map((u) => (
+              <li key={u}>{u}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {youtubeId ? (
         <section className="rich-section rich-section--rabbit">
           <h3 className="rich-section-label">Rabbit hole</h3>
@@ -152,6 +215,11 @@ export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
             <p className="rich-youtube-meta">{card.youtube.channel}</p>
           ) : null}
           <StoryVideo youtubeId={youtubeId} title={youtubeTitle} />
+        </section>
+      ) : videoSearchQuery ? (
+        <section className="rich-section rich-section--rabbit">
+          <h3 className="rich-section-label">Go deeper on video</h3>
+          <StoryVideoSearch query={videoSearchQuery} title={card.title} />
         </section>
       ) : null}
 

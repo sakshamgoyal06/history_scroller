@@ -18,9 +18,15 @@ export function StoryPreviewCard({
   className = '',
   id,
 }) {
-  const narrative = isNarrativeCard(card)
-  const headline = narrative ? (card.curiosityQuestion ?? card.title) : card.title
-  const previewText = narrative ? (card.deck ?? card.hook) : card.hook
+  const planned = card.generationStatus === 'planned' || card.generationStatus === 'generating'
+  const narrative = !planned && isNarrativeCard(card)
+  const headline =
+    planned || narrative ? (card.curiosityQuestion ?? card.title) : card.title
+  const previewText = planned
+    ? card.hook
+    : narrative
+      ? (card.deck ?? card.hook)
+      : card.hook
   const readingMinutes = narrative ? card.readingMinutes : null
 
   const body = (
@@ -33,7 +39,11 @@ export function StoryPreviewCard({
             {card.decadeLabel ? (
               <span className="decade-tag">{card.decadeLabel}</span>
             ) : null}
-            {narrative ? (
+            {planned ? (
+              <span className="format-label format-label--planned">
+                {card.generationStatus === 'generating' ? 'Generating' : 'Planned'}
+              </span>
+            ) : narrative ? (
               <span className="format-label format-label--narrative">Story</span>
             ) : card.format ? (
               <span className="format-label">{card.format}</span>
@@ -99,6 +109,28 @@ export function StoryVideo({ youtubeId, title }) {
           allowFullScreen
         />
       </div>
+    </div>
+  )
+}
+
+export function StoryVideoSearch({ query }) {
+  const q = String(query ?? '').trim()
+  if (!q) return null
+  const href = `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+  return (
+    <div className="story-video-search">
+      <a
+        className="story-video-search-link"
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Search YouTube: {q}
+      </a>
+      <p className="story-video-search-note">
+        Curiosity Feed opens a search link—not an auto-picked video—so we never embed unverified
+        IDs.
+      </p>
     </div>
   )
 }
