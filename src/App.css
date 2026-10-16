@@ -278,6 +278,314 @@
   padding-top: 4px;
 }
 
+.learn-panel--status {
+  padding: 20px 4px;
+}
+
+.learn-status-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.learn-status-body {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.learn-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.learn-scope-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.learn-scope-explanation,
+.learn-course-overview,
+.learn-clarify-question {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.learn-course-title {
+  margin: 8px 0 4px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.learn-lesson-outline {
+  margin: 12px 0 16px;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.learn-lesson-outline li {
+  margin-bottom: 10px;
+}
+
+.learn-lesson-outline strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.learn-narrow-grid,
+.learn-track-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.learn-narrow-card,
+.learn-track-card {
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.learn-narrow-card {
+  width: 100%;
+}
+
+.learn-narrow-label,
+.learn-track-title {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.learn-narrow-desc,
+.learn-track-summary,
+.learn-track-meta {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.learn-track-card--recommended {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+.learn-track-rec {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-deep);
+  margin-bottom: 6px;
+}
+
+.learn-track-lessons {
+  margin: 8px 0 10px;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.learn-source-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  margin-bottom: 6px;
+}
+
+.learn-source-badge--demo {
+  background: #f0ebe3;
+  color: #6b5c4a;
+}
+
+.learn-section-title {
+  margin: 20px 0 8px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.learn-my-paths-empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.learn-my-paths-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.learn-my-paths-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  background: var(--surface);
+}
+
+.learn-my-paths-title {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.learn-my-paths-meta,
+.learn-my-paths-date {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.learn-my-paths-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.learn-my-paths-delete {
+  color: #8b4513;
+}
+
+.learn-track-switch {
+  margin-bottom: 8px;
+}
+
+.learn-lesson-placeholder {
+  padding: 8px 0 24px;
+}
+
+.learn-lesson-phase {
+  margin: 0 0 10px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--accent-deep);
+}
+
+.learn-lesson-title {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.learn-lesson-objective,
+.learn-lesson-why,
+.learn-lesson-place {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.learn-lesson-why-label {
+  display: block;
+  font-weight: 650;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.learn-lesson-error {
+  color: #8b4513;
+  font-size: 0.875rem;
+}
+
+.format-label--planned {
+  background: #ebe6dc;
+  color: #5c5348;
+}
+
+.story-video-search-link {
+  display: inline-block;
+  font-weight: 650;
+  color: var(--accent-deep);
+  text-decoration: none;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+}
+
+.story-video-search-note {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.rich-list--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+
+.rich-list--inline li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 0.8125rem;
+}
+
+.rich-claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rich-claim-text {
+  margin: 0 0 6px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.rich-claim-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+}
+
+.rich-claim-sources a {
+  color: var(--accent-deep);
+}
+
 .zones-panel {
   display: flex;
   flex-direction: column;

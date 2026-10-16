@@ -6,8 +6,29 @@ import {
   timelineFieldsForCard,
   uniqueDecadeKeysFromCards,
 } from './cardTimeline.js'
-import { generateMockLearningPath, LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
+import { LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
 import { LearnTopicPanel } from './LearnTopicPanel.jsx'
+import { LearningLessonPlaceholder } from './LearningLessonDetail.jsx'
+import { MyPathsSection } from './MyPathsSection.jsx'
+import { buildDemoPathRecord } from './mockLearningPathAdapter.js'
+import {
+  generateLesson,
+  isForceMockMode,
+  isMissingConfigError,
+  planLearningPath,
+} from './learningPathApi.js'
+import {
+  createPathRecordFromPlan,
+  deletePath,
+  getPathById,
+  loadActivePathId,
+  loadAllPaths,
+  mergeSourcesIntoCatalog,
+  setActivePathId,
+  updateLessonInPath,
+  upsertPath,
+} from './learningPathStorage.js'
+import { lessonToDisplayCard, plannedLessonsForActiveTrack } from './lessonToCard.js'
 import { DailyEdition } from './DailyEdition.jsx'
 import { FeaturedStoryMode } from './FeaturedStoryMode.jsx'
 import {
@@ -20,8 +41,6 @@ import { allFlagshipCatalogEntries, isNarrativeCard } from './flagshipStories.js
 import { RichStoryDetail } from './RichStoryDetail.jsx'
 import { StoryArt, StoryPreviewCard, StoryVideo } from './StoryPreviewCard.jsx'
 import './App.css'
-
-const GENERATED_CARD_IMAGE = '/stories/learn-generated.svg'
 
 const STORAGE_SAVED = 'history-feed-saved'
 const STORAGE_KNOWN = 'history-feed-known'
@@ -581,10 +600,36 @@ for (const card of HISTORY_CARDS) {
   Object.assign(card, normalizeCard(card))
 }
 
-function cardByIdFromPools(id, generatedPath) {
+function findLessonCardAcrossPaths(id, pathCards, paths) {
+  const fromActive = pathCards?.find((c) => c.id === id)
+  if (fromActive) return fromActive
+  for (const pathRecord of paths) {
+    for (const track of pathRecord.course?.tracks ?? []) {
+      const lesson = track.lessons.find((l) => l.id === id)
+      if (lesson) {
+        return lessonToDisplayCard({
+          pathRecord,
+          trackId: track.id,
+          lesson,
+          trackTitle: track.title,
+          trackLessonCount: track.lessons.length,
+        })
+      }
+    }
+  }
+  return null
+}
+
+function cardByIdFromPools(id, pathCards, paths) {
   const catalog = HISTORY_CARDS.find((c) => c.id === id)
   if (catalog) return catalog
-  return generatedPath?.find((c) => c.id === id) ?? null
+  return findLessonCardAcrossPaths(id, pathCards, paths)
+}
+
+function uiStateFromPlan(plan) {
+  if (plan.scopeDecision === 'needs_narrowing') return 'needs_clarification'
+  if (plan.scopeDecision === 'multi_track') return 'multi_track_proposed'
+  return 'single_path_proposed'
 }
 
 /** Legacy era/topic labels on original catalog cards (list-panel filter). */
@@ -801,8 +846,22 @@ function App() {
   const [learnScope, setLearnScope] = useState('both')
   const [learnLength, setLearnLength] = useState(5)
   const [learnFocus, setLearnFocus] = useState('')
-  const [learnStep, setLearnStep] = useState('start')
-  const [generatedPath, setGeneratedPath] = useState(null)
+  const [learnUiState, setLearnUiState] = useState(() => {
+    const id = loadActivePathId()
+    return id && getPathById(id) ? 'path' : 'start'
+  })
+  const [planResult, setPlanResult] = useState(null)
+  const [planError, setPlanError] = useState(null)
+  const [planningMessage, setPlanningMessage] = useState('')
+  const [pathsVersion, setPathsVersion] = useState(0)
+  const planSubmitLock = useRef(false)
+  const [planSubmitLocked, setPlanSubmitLocked] = useState(false)
+  const lessonGenLock = useRef(new Set())
+  const [activePathRecord, setActivePathRecord] = useState(() => {
+    const id = loadActivePathId()
+    return id ? getPathById(id) : null
+  })
+  const [lessonGenPhase, setLessonGenPhase] = useState(null)
   const [activeZoneId, setActiveZoneId] = useState(null)
   const [savedCards, setSavedCards] = useState(() =>
     loadJson(STORAGE_SAVED, []),
@@ -810,20 +869,26 @@ function App() {
   const [knownIds, setKnownIds] = useState(() => new Set(loadJson(STORAGE_KNOWN, [])))
   const [activeStoryId, setActiveStoryId] = useState(() => {
     const id = storyIdFromLocation()
-    return id && HISTORY_CARDS.some((c) => c.id === id) ? id : null
+    if (!id) return null
+    if (HISTORY_CARDS.some((c) => c.id === id)) return id
+    if (findLessonCardAcrossPaths(id, [], loadAllPaths())) return id
+    return null
   })
 
+  void pathsVersion
+  const storedPaths = loadAllPaths()
+
   const generatedPathCards = useMemo(() => {
-    if (!generatedPath?.cards?.length) return []
-    return generatedPath.cards
-  }, [generatedPath])
+    if (!activePathRecord) return []
+    return plannedLessonsForActiveTrack(activePathRecord)
+  }, [activePathRecord])
   const [toast, setToast] = useState('')
   const toastTimer = useRef(null)
 
-  const activeStory = useMemo(
-    () => cardByIdFromPools(activeStoryId, generatedPathCards),
-    [activeStoryId, generatedPathCards],
-  )
+  const activeStory = useMemo(() => {
+    const raw = cardByIdFromPools(activeStoryId, generatedPathCards, storedPaths)
+    return raw ? normalizeCard(raw) : null
+  }, [activeStoryId, generatedPathCards, storedPaths])
 
   const recommendedNext = useMemo(() => {
     if (!activeStoryId) return null
@@ -964,12 +1029,13 @@ function App() {
     }
 
     const deepLinkId = storyIdFromLocation()
-    if (deepLinkId && HISTORY_CARDS.some((c) => c.id === deepLinkId)) {
-      window.history.replaceState(
-        storyHistoryState(deepLinkId),
-        '',
-        storyUrl(deepLinkId),
-      )
+    const deepLinkKnown =
+      deepLinkId &&
+      (HISTORY_CARDS.some((c) => c.id === deepLinkId) ||
+        Boolean(findLessonCardAcrossPaths(deepLinkId, [], loadAllPaths())))
+    if (deepLinkKnown) {
+      window.history.replaceState(storyHistoryState(deepLinkId), '', storyUrl(deepLinkId))
+      setActiveStoryId(deepLinkId)
     } else {
       window.history.replaceState(FEED_HISTORY_STATE, '', feedUrl())
     }
@@ -1073,6 +1139,14 @@ function App() {
   const openStory = useCallback((id) => {
     setFilterListOpen(false)
     setActiveStoryId(id)
+    const pathCard = findLessonCardAcrossPaths(id, generatedPathCards, loadAllPaths())
+    if (pathCard?.pathId) {
+      const path = getPathById(pathCard.pathId)
+      if (path) {
+        setActivePathRecord(path)
+        setActivePathId(path.id)
+      }
+    }
     const dateKey = getLocalDateKey()
     const { picks } = selectDailyEdition(HISTORY_CARDS, dateKey)
     const editionIds = new Set(
@@ -1089,7 +1163,7 @@ function App() {
       window.history.pushState(storyHistoryState(id), '', storyUrl(id))
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [])
+  }, [generatedPathCards])
 
   const closeStory = useCallback(() => {
     if (window.history.state?.view === 'story') {
@@ -1110,68 +1184,383 @@ function App() {
     showToast(`Surprise: ${card.title}`)
   }, [filteredCards, knownIds, showToast, openStory])
 
+  const bumpPaths = useCallback(() => setPathsVersion((v) => v + 1), [])
+
   const resetLearnFlow = useCallback(() => {
-    setLearnStep('start')
-    setGeneratedPath(null)
+    setLearnUiState('start')
+    setPlanResult(null)
+    setPlanError(null)
     setLearnTopic('')
     setLearnFocus('')
     setLearnLevel('curious')
     setLearnScope('both')
     setLearnLength(5)
+    setActivePathRecord(null)
+    setActivePathId(null)
   }, [])
 
   const continueLearnTopic = useCallback(() => {
     if (!learnTopic.trim()) return
-    setLearnStep('confirm')
+    setLearnUiState('confirm')
   }, [learnTopic])
 
-  const handleGenerateLearningPath = useCallback(() => {
+  const runPlanRequest = useCallback(
+    async ({ topicOverride, focusOverride } = {}) => {
+      if (planSubmitLock.current) return
+      const topic = (topicOverride ?? learnTopic).trim().slice(0, 150)
+      if (!topic) return
+
+      planSubmitLock.current = true
+      setPlanSubmitLocked(true)
+      setPlanError(null)
+      setLearnUiState('planning')
+      setPlanningMessage('Assessing the scope…')
+
+      if (isForceMockMode()) {
+        setPlanningMessage('Designing the learning sequence…')
+        const demo = buildDemoPathRecord({
+          topic,
+          level: learnLevel,
+          scope: learnScope,
+          length: learnLength,
+          focus: focusOverride ?? learnFocus,
+        })
+        upsertPath(demo)
+        setActivePathId(demo.id)
+        setActivePathRecord(demo)
+        bumpPaths()
+        setLearnUiState('path')
+        setHomePanel('learn')
+        planSubmitLock.current = false
+        setPlanSubmitLocked(false)
+        showToast('Demo path ready')
+        return
+      }
+
+      setPlanningMessage('Designing the learning sequence…')
+      const result = await planLearningPath({
+        topic,
+        focus: (focusOverride ?? learnFocus).trim().slice(0, 300),
+        level: learnLevel,
+        geographicScope: learnScope,
+        requestedLength: learnLength === 3 ? 3 : 5,
+        buildMode: 'single_track',
+      })
+
+      planSubmitLock.current = false
+      setPlanSubmitLocked(false)
+
+      if (!result.ok) {
+        setPlanError({
+          message: result.error,
+          code: result.code,
+          retryable: result.retryable,
+          missingConfig: isMissingConfigError(result),
+        })
+        setLearnUiState('error')
+        return
+      }
+
+      if (result.data.inputStatus === 'unsupported') {
+        setPlanError({
+          message: result.data.scopeExplanation || 'This topic is not supported for learning paths.',
+          code: 'UNSUPPORTED',
+          retryable: false,
+        })
+        setLearnUiState('error')
+        return
+      }
+
+      setPlanResult(result.data)
+      setLearnUiState(uiStateFromPlan(result.data))
+    },
+    [learnTopic, learnLevel, learnScope, learnLength, learnFocus, bumpPaths, showToast],
+  )
+
+  const handleAssessTopic = useCallback(() => {
+    void runPlanRequest()
+  }, [runPlanRequest])
+
+  const handleRetryPlan = useCallback(() => {
+    void runPlanRequest()
+  }, [runPlanRequest])
+
+  const handleUseDemoFallback = useCallback(() => {
     const topic = learnTopic.trim()
     if (!topic) return
-    const rawCards = generateMockLearningPath({
+    setLearnUiState('saving')
+    const demo = buildDemoPathRecord({
       topic,
       level: learnLevel,
       scope: learnScope,
       length: learnLength,
       focus: learnFocus,
     })
-    const pathId = `learn-${Date.now()}`
-    const cards = rawCards.map((raw) =>
-      normalizeCard({
-        ...raw,
-        id: `${pathId}-step-${raw.order}`,
-        category: raw.domain,
-        image: GENERATED_CARD_IMAGE,
-        youtubeId: raw.youtubeId ?? null,
-        pathOrder: raw.order,
-        pathTopic: topic,
-      }),
-    )
-    setGeneratedPath({
-      topic,
-      level: learnLevel,
-      scope: learnScope,
-      cards,
-    })
-    setLearnStep('path')
-    setHomePanel('learn')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    showToast(`Learning path ready · ${cards.length} cards`)
-  }, [learnTopic, learnLevel, learnScope, learnLength, learnFocus, showToast])
+    upsertPath(demo)
+    setActivePathId(demo.id)
+    setActivePathRecord(demo)
+    bumpPaths()
+    setLearnUiState('path')
+    showToast('Demo path ready (not live AI)')
+  }, [learnTopic, learnLevel, learnScope, learnLength, learnFocus, bumpPaths, showToast])
 
-  const learnGeneratedMeta = useMemo(() => {
-    if (!generatedPath) return null
+  const persistPlanChoice = useCallback(
+    ({ buildMode, activeTrackId, sourceLabel = 'generated', isDemo = false }) => {
+      if (!planResult?.course) return
+      setLearnUiState('saving')
+      const record = createPathRecordFromPlan({
+        plan: planResult,
+        preferences: {
+          topic: learnTopic.trim(),
+          level: learnLevel,
+          scope: learnScope,
+          length: learnLength,
+          focus: learnFocus.trim(),
+        },
+        buildMode,
+        activeTrackId,
+        sourceLabel,
+        isDemo,
+      })
+      const saved = upsertPath(record)
+      setActivePathId(saved.id)
+      setActivePathRecord(saved)
+      bumpPaths()
+      setLearnUiState('path')
+      setHomePanel('learn')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      showToast('Learning path saved · generating lesson 1…')
+      const firstTrack = saved.course?.tracks?.find((t) => t.id === activeTrackId)
+      const firstLesson = firstTrack?.lessons?.slice().sort((a, b) => a.order - b.order)[0]
+      if (firstLesson && !isDemo) {
+        const card = lessonToDisplayCard({
+          pathRecord: saved,
+          trackId: firstTrack.id,
+          lesson: firstLesson,
+          trackTitle: firstTrack.title,
+          trackLessonCount: firstTrack.lessons.length,
+        })
+        queueMicrotask(() => {
+          void generateLessonForStoryRef.current?.(card, { prefetch: true })
+        })
+      }
+    },
+    [planResult, learnTopic, learnLevel, learnScope, learnLength, learnFocus, bumpPaths, showToast],
+  )
+
+  const handleConfirmSinglePath = useCallback(() => {
+    const trackId = planResult?.course?.tracks?.[0]?.id
+    if (!trackId) return
+    persistPlanChoice({ buildMode: 'single_track', activeTrackId: trackId })
+  }, [planResult, persistPlanChoice])
+
+  const handleLearnTrack = useCallback(
+    (trackId) => {
+      persistPlanChoice({ buildMode: 'single_track', activeTrackId: trackId })
+    },
+    [persistPlanChoice],
+  )
+
+  const handleBuildFullCourse = useCallback(() => {
+    const trackId =
+      planResult?.course?.recommendedTrackId ?? planResult?.course?.tracks?.[0]?.id ?? null
+    if (!trackId) return
+    persistPlanChoice({ buildMode: 'full_course', activeTrackId: trackId })
+  }, [planResult, persistPlanChoice])
+
+  const handleSelectNarrowing = useCallback(
+    (option) => {
+      setLearnTopic(option.refinedTopic)
+      setLearnFocus((prev) => {
+        const trimmed = prev.trim()
+        return trimmed ? `${trimmed}; ${option.label}` : option.label
+      })
+      void runPlanRequest({ topicOverride: option.refinedTopic })
+    },
+    [runPlanRequest],
+  )
+
+  const handleResumePath = useCallback(
+    (pathId) => {
+      const path = getPathById(pathId)
+      if (!path) return
+      setActivePathId(pathId)
+      setActivePathRecord(path)
+      setLearnUiState('path')
+      setHomePanel('learn')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [],
+  )
+
+  const handleDeletePath = useCallback(
+    (pathId, title) => {
+      const ok = window.confirm(`Delete “${title}”? This cannot be undone.`)
+      if (!ok) return
+      deletePath(pathId)
+      bumpPaths()
+      if (activePathRecord?.id === pathId) {
+        setActivePathRecord(null)
+        setLearnUiState('start')
+      }
+      showToast('Path deleted')
+    },
+    [activePathRecord, bumpPaths, showToast],
+  )
+
+  const handleSwitchTrack = useCallback(
+    (trackId) => {
+      if (!activePathRecord) return
+      const next = upsertPath({ ...activePathRecord, activeTrackId: trackId })
+      setActivePathRecord(next)
+      bumpPaths()
+    },
+    [activePathRecord, bumpPaths],
+  )
+
+  const learnActivePathMeta = useMemo(() => {
+    if (!activePathRecord?.course) return null
     const levelLabel =
-      LEARN_LEVELS.find((l) => l.id === generatedPath.level)?.label ?? generatedPath.level
+      LEARN_LEVELS.find((l) => l.id === activePathRecord.preferences?.level)?.label ??
+      activePathRecord.course.level
     const scopeLabel =
-      LEARN_SCOPES.find((s) => s.id === generatedPath.scope)?.label ?? generatedPath.scope
+      LEARN_SCOPES.find((s) => s.id === activePathRecord.preferences?.scope)?.label ??
+      activePathRecord.course.geographicScope
+    const track = activePathRecord.course.tracks.find(
+      (t) => t.id === activePathRecord.activeTrackId,
+    )
     return {
-      topic: generatedPath.topic,
+      topic: activePathRecord.course.title,
       levelLabel,
       scopeLabel,
-      cardCount: generatedPath.cards.length,
+      trackTitle: track?.title ?? null,
+      lessonCount: track?.lessons?.length ?? 0,
+      sourceLabel: activePathRecord.sourceLabel,
+      buildMode: activePathRecord.buildMode,
+      tracks: activePathRecord.course.tracks,
+      activeTrackId: activePathRecord.activeTrackId,
     }
-  }, [generatedPath])
+  }, [activePathRecord])
+
+  const generateLessonForStoryRef = useRef(null)
+
+  const generateLessonForStory = useCallback(
+    async (storyCard, { prefetch = false } = {}) => {
+      if (!storyCard?.pathId || !storyCard?.trackId) return
+      const lockKey = storyCard.id
+      if (lessonGenLock.current.has(lockKey)) return
+      lessonGenLock.current.add(lockKey)
+
+      let path = getPathById(storyCard.pathId) ?? activePathRecord
+      if (!path) {
+        lessonGenLock.current.delete(lockKey)
+        return
+      }
+
+      const track = path.course?.tracks?.find((t) => t.id === storyCard.trackId)
+      const lesson = track?.lessons?.find((l) => l.id === storyCard.id)
+      if (!lesson || lesson.generationStatus === 'ready') {
+        lessonGenLock.current.delete(lockKey)
+        return
+      }
+      if (lesson.generationStatus === 'generating') {
+        const started = lesson.generationStartedAt ?? 0
+        const stale = Date.now() - started > 4 * 60 * 1000
+        if (!stale) {
+          lessonGenLock.current.delete(lockKey)
+          return
+        }
+      }
+
+      if (path.isDemo) {
+        lessonGenLock.current.delete(lockKey)
+        return
+      }
+
+      path = updateLessonInPath(path, storyCard.trackId, storyCard.id, {
+        generationStatus: 'generating',
+        generationError: null,
+        generationStartedAt: Date.now(),
+      })
+      setActivePathRecord(path)
+      bumpPaths()
+      if (!prefetch) setLessonGenPhase('research')
+
+      const priorLessonTitles = track.lessons
+        .filter((l) => l.order < lesson.order)
+        .map((l) => l.title)
+
+      const result = await generateLesson({
+        pathId: path.id,
+        trackId: track.id,
+        lessonId: lesson.id,
+        courseTitle: path.course.title,
+        level: path.course.level,
+        geographicScope: path.course.geographicScope,
+        trackTitle: track.title,
+        lesson,
+        priorLessonTitles,
+      })
+
+      if (!result.ok) {
+        path = updateLessonInPath(getPathById(path.id) ?? path, track.id, lesson.id, {
+          generationStatus: 'error',
+          generationError: result.error,
+        })
+        setActivePathRecord(path)
+        bumpPaths()
+        if (!prefetch) setLessonGenPhase('error')
+        lessonGenLock.current.delete(lockKey)
+        return
+      }
+
+      const { presentation, lessonCore, sources } = result.data
+      const catalog = mergeSourcesIntoCatalog(path, sources)
+      path = updateLessonInPath(getPathById(path.id) ?? path, track.id, lesson.id, {
+        generationStatus: 'ready',
+        generatedAt: Date.now(),
+        presentation,
+        lessonCore,
+        sources: sources.map((s) => s.id),
+        generationError: null,
+      })
+      path = upsertPath({ ...path, sourceCatalog: catalog })
+      setActivePathRecord(path)
+      bumpPaths()
+      if (!prefetch) setLessonGenPhase(null)
+      lessonGenLock.current.delete(lockKey)
+
+      const nextLesson = track.lessons.find((l) => l.order === lesson.order + 1)
+      if (nextLesson?.generationStatus === 'planned') {
+        const nextCard = lessonToDisplayCard({
+          pathRecord: path,
+          trackId: track.id,
+          lesson: nextLesson,
+          trackTitle: track.title,
+          trackLessonCount: track.lessons.length,
+        })
+        void generateLessonForStoryRef.current?.(nextCard, { prefetch: true })
+      }
+    },
+    [activePathRecord, bumpPaths],
+  )
+
+  useEffect(() => {
+    generateLessonForStoryRef.current = generateLessonForStory
+  }, [generateLessonForStory])
+
+  useEffect(() => {
+    if (!activeStory?.isGeneratedPath) return
+    if (activeStory.generationStatus === 'ready') {
+      setLessonGenPhase(null)
+      return
+    }
+    if (activeStory.generationStatus === 'error') {
+      setLessonGenPhase('error')
+      return
+    }
+    void generateLessonForStory(activeStory)
+  }, [activeStory, generateLessonForStory])
 
   const inDetail = activeStoryId !== null
 
@@ -1191,6 +1580,17 @@ function App() {
     const ids = Array.isArray(activeStory.relatedCardIds) ? activeStory.relatedCardIds : []
     return ids.map((id) => CARD_BY_ID.get(id)).filter(Boolean)
   }, [activeStory])
+
+  const activePathLessonRaw = useMemo(() => {
+    if (!activeStory?.isGeneratedPath || !activePathRecord) return null
+    const track = activePathRecord.course?.tracks?.find((t) => t.id === activeStory.trackId)
+    return track?.lessons?.find((l) => l.id === activeStory.id) ?? null
+  }, [activeStory, activePathRecord])
+
+  const activePathTrackMeta = useMemo(() => {
+    if (!activeStory?.trackId || !activePathRecord?.course) return null
+    return activePathRecord.course.tracks.find((t) => t.id === activeStory.trackId) ?? null
+  }, [activeStory, activePathRecord])
 
   return (
     <div className={`app${inDetail ? ' app--detail' : ''}`}>
@@ -1415,16 +1815,56 @@ function App() {
               onLengthChange={setLearnLength}
               focus={learnFocus}
               onFocusChange={setLearnFocus}
-              step={learnStep}
+              uiState={learnUiState}
               onContinue={continueLearnTopic}
-              onGenerate={handleGenerateLearningPath}
-              onEditTopic={() => setLearnStep('start')}
+              onGenerate={handleAssessTopic}
+              onEditTopic={() => {
+                setLearnUiState('start')
+                setPlanResult(null)
+                setPlanError(null)
+              }}
               onStartOver={resetLearnFlow}
-              generatedMeta={learnGeneratedMeta}
+              activePathMeta={learnActivePathMeta}
+              planResult={planResult}
+              planError={planError}
+              onRetryPlan={handleRetryPlan}
+              onUseDemoFallback={handleUseDemoFallback}
+              onSelectNarrowing={handleSelectNarrowing}
+              onConfirmSinglePath={handleConfirmSinglePath}
+              onLearnTrack={handleLearnTrack}
+              onBuildFullCourse={handleBuildFullCourse}
+              planningMessage={planningMessage}
+              submitLocked={planSubmitLocked}
             />
-            {learnStep === 'path' && generatedPathCards.length > 0 ? (
+            <MyPathsSection
+              refreshKey={pathsVersion}
+              onResume={handleResumePath}
+              onDelete={handleDeletePath}
+            />
+            {learnUiState === 'path' && generatedPathCards.length > 0 ? (
               <div className="learn-path-cards">
-                <p className="learn-path-order-hint">Reading order · step 1 first</p>
+                {learnActivePathMeta?.buildMode === 'full_course' &&
+                learnActivePathMeta.tracks?.length > 1 ? (
+                  <div className="learn-track-switch">
+                    <span className="learn-legend">Track</span>
+                    <div className="learn-options">
+                      {learnActivePathMeta.tracks.map((track) => (
+                        <button
+                          key={track.id}
+                          type="button"
+                          className={`learn-option${learnActivePathMeta.activeTrackId === track.id ? ' learn-option--active' : ''}`}
+                          onClick={() => handleSwitchTrack(track.id)}
+                        >
+                          {track.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                <p className="learn-path-order-hint">
+                  Planned steps are outlines only. Lesson 1 researches the web and writes in the
+                  background—open any step to read or retry.
+                </p>
                 {generatedPathCards.map((card) => (
                   <StoryPreviewCard
                     key={card.id}
@@ -1436,7 +1876,12 @@ function App() {
                       card.pathOrder ? (
                         <div className="story-card-tags">
                           <span className="meta-badge meta-badge--path">
-                            Step {card.pathOrder} of {generatedPathCards.length}
+                            Step {card.pathOrder} of {card.pathTrackLessonCount ?? generatedPathCards.length}
+                            {card.generationStatus === 'ready'
+                              ? ''
+                              : card.generationStatus === 'planned'
+                                ? ' · tap to generate'
+                                : ''}
                           </span>
                         </div>
                       ) : null
@@ -1468,7 +1913,17 @@ function App() {
           <article
             className={`card card--detail${isNarrativeCard(activeStory) ? ' card--detail-narrative' : ''}`}
           >
-            {isNarrativeCard(activeStory) ? (
+            {isGeneratedStory && activeStory.generationStatus !== 'ready' ? (
+              <div className="card-inner card-inner--detail">
+                <LearningLessonPlaceholder
+                  lesson={activePathLessonRaw}
+                  trackMeta={activePathTrackMeta}
+                  phase={lessonGenPhase ?? 'preparing'}
+                  errorMessage={activePathLessonRaw?.generationError ?? undefined}
+                  onRetry={() => void generateLessonForStory(activeStory)}
+                />
+              </div>
+            ) : isNarrativeCard(activeStory) ? (
               <div className="card-inner card-inner--detail card-inner--rich">
                 <RichStoryDetail
                   card={activeStory}
