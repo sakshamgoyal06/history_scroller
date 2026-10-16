@@ -1254,6 +1254,7 @@ function App() {
         setPlanError({
           message: result.error,
           code: result.code,
+          requestId: result.requestId,
           retryable: result.retryable,
           missingConfig: isMissingConfigError(result),
         })

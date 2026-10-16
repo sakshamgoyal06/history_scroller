@@ -84,6 +84,9 @@ export function LearnTopicPanel({
       <div className="learn-panel learn-panel--status">
         <p className="learn-status-title">Could not plan this topic</p>
         <p className="learn-status-body">{planError?.message ?? 'Something went wrong.'}</p>
+        {planError?.code ? (
+          <p className="learn-status-code">Reference: {planError.code}</p>
+        ) : null}
         <div className="learn-action-row">
           <button type="button" className="learn-primary-btn" onClick={onRetryPlan}>
             Retry
