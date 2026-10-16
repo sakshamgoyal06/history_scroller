@@ -4,6 +4,7 @@ import {
 } from '../lib/learningPathSchemas.js'
 import { runLearningPathPlanner } from '../lib/openaiPlanner.js'
 import { assignStablePlanIds } from '../lib/planIds.js'
+import { normalizePlanShape } from '../lib/normalizePlanShape.js'
 import {
   checkThrottle,
   createRequestId,
@@ -103,29 +104,23 @@ export default async function handler(req, res) {
     )
 
     const withIds = assignStablePlanIds(modelPlan, { requestId })
+    const normalized = normalizePlanShape(withIds, { requestedLength: input.requestedLength })
 
-    if (withIds.scopeDecision === 'needs_narrowing' && !withIds.clarification) {
-      withIds.inputStatus = 'needs_clarification'
-    }
-
-    if (withIds.scopeDecision === 'single_path' && withIds.course?.tracks?.length !== 1) {
-      throw Object.assign(new Error('Invalid single_path plan'), { code: 'PLAN_SHAPE' })
-    }
-
-    if (withIds.scopeDecision === 'multi_track' && (withIds.course?.tracks?.length ?? 0) < 2) {
-      throw Object.assign(new Error('Invalid multi_track plan'), { code: 'PLAN_SHAPE' })
+    if (normalized.scopeDecision === 'needs_narrowing' && !normalized.clarification) {
+      normalized.inputStatus = 'needs_clarification'
     }
 
     const response = PlanLearningPathResponseSchema.parse({
       schemaVersion: 1,
       requestId,
-      ...withIds,
+      ...normalized,
     })
 
     sendJson(res, 200, response)
   } catch (e) {
-    console.error('[plan-learning-path]', requestId, e?.message ?? e)
-    const retryable = e?.code === 'TIMEOUT' || e?.status === 429
+    console.error('[plan-learning-path]', requestId, e?.code, e?.message ?? e, e?.error ?? '')
+    const retryable =
+      e?.code === 'TIMEOUT' || e?.status === 429 || e?.code === 'PLAN_SHAPE'
     const err = safeApiError({
       message: retryable
         ? 'Planning took too long or the service is busy. Try again.'
