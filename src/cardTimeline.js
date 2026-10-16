@@ -48,6 +48,7 @@ export const CARD_YEAR_BY_ID = {
   'metric-prefixes': 1795,
   'leap-year-rule': 1582,
   'time-zones-offset': 1884,
+  'rbi-monetary-policy-narrative': 2016,
 }
 
 /** @param {number} year */

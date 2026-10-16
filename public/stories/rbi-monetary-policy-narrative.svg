@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="bg-rbi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1"/>
+      <stop offset="100%" stop-color="#ebe4da"/>
+    </linearGradient>
+    <linearGradient id="scrim-rbi" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#f7f5f1" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fffcf8" stop-opacity="0.26"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg-rbi)"/>
+  <g>
+    <rect x="280" y="140" width="240" height="160" rx="12" fill="#8b6914" opacity="0.22"/>
+    <path d="M320 200 H480 M320 230 H440 M320 260 H460" stroke="#2c2825" stroke-width="2" opacity="0.28"/>
+    <circle cx="400" cy="115" r="36" fill="none" stroke="#c17f59" stroke-width="2.5" opacity="0.55"/>
+    <path d="M200 320 Q400 280 600 320" fill="none" stroke="#a56845" stroke-width="3" opacity="0.45"/>
+  </g>
+  <rect width="800" height="450" fill="url(#scrim-rbi)"/>
+</svg>
