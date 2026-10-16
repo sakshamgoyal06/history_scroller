@@ -9,6 +9,7 @@ import {
 import { generateMockLearningPath, LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
 import { LearnTopicPanel } from './LearnTopicPanel.jsx'
 import { DailyEdition } from './DailyEdition.jsx'
+import { FeaturedStoryMode } from './FeaturedStoryMode.jsx'
 import {
   getLocalDateKey,
   isDailyEditionVisible,
@@ -601,6 +602,7 @@ const LEARNING_ZONES = [
     description:
       'Prices, trade, farming revolutions, and credit—entry points tied to how India’s economy shows up in the catalog today.',
     cardIds: [
+      'rbi-monetary-policy-narrative',
       'green-revolution',
       'inflation-basket',
       'opportunity-cost',
@@ -1598,6 +1600,7 @@ function App() {
             {showDailyEdition ? (
               <>
                 <DailyEdition catalog={HISTORY_CARDS} onOpenStory={openStory} />
+                <FeaturedStoryMode catalog={HISTORY_CARDS} onOpenStory={openStory} />
                 <h2 className="explore-all-heading">Explore everything</h2>
               </>
             ) : null}
