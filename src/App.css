@@ -1323,6 +1323,35 @@
   opacity: 0.92;
 }
 
+.featured-story-mode {
+  padding: 4px var(--feed-pad) 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.featured-story-mode-header {
+  margin-bottom: 12px;
+}
+
+.featured-story-mode-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.featured-story-mode-sub {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.featured-story-mode-card {
+  margin-bottom: 12px;
+}
+
 .explore-all-heading {
   margin: 8px var(--feed-pad) 12px;
   padding-top: 8px;
