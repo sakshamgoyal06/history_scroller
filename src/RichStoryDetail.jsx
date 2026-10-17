@@ -7,7 +7,13 @@ function beatClass(type) {
   return 'rich-beat rich-beat--explain'
 }
 
-export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
+export function RichStoryDetail({
+  card,
+  badges,
+  relatedCards,
+  onOpenRelated,
+  onReadComplete,
+}) {
   const scrollRef = useRef(null)
   const [readProgress, setReadProgress] = useState(0)
 
@@ -35,6 +41,12 @@ export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
     setReadProgress(scrolled / total)
   }, [])
 
+  const readCompleteSent = useRef(false)
+
+  useEffect(() => {
+    readCompleteSent.current = false
+  }, [card.id])
+
   useEffect(() => {
     updateProgress()
     window.addEventListener('scroll', updateProgress, { passive: true })
@@ -44,6 +56,14 @@ export function RichStoryDetail({ card, badges, relatedCards, onOpenRelated }) {
       window.removeEventListener('resize', updateProgress)
     }
   }, [updateProgress, card.id])
+
+  useEffect(() => {
+    if (!onReadComplete || readCompleteSent.current) return
+    if (readProgress >= 0.85) {
+      readCompleteSent.current = true
+      onReadComplete()
+    }
+  }, [readProgress, onReadComplete])
 
   const immediate = card.consequences?.immediate ?? []
   const longTerm = card.consequences?.longTerm ?? []

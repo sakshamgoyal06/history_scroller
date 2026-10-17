@@ -30,16 +30,6 @@ function OptionGroup({ legend, options, value, onChange, name }) {
   )
 }
 
-function SourceBadge({ label }) {
-  if (!label) return null
-  const isDemo = label === 'demo'
-  return (
-    <span className={`learn-source-badge${isDemo ? ' learn-source-badge--demo' : ''}`}>
-      {isDemo ? 'Demo path' : 'Generated for you'}
-    </span>
-  )
-}
-
 export function LearnTopicPanel({
   topic,
   onTopicChange,
@@ -55,8 +45,6 @@ export function LearnTopicPanel({
   onContinue,
   onGenerate,
   onEditTopic,
-  onStartOver,
-  activePathMeta,
   planResult,
   planError,
   onRetryPlan,
@@ -210,25 +198,6 @@ export function LearnTopicPanel({
         </button>
         <button type="button" className="learn-text-btn" onClick={onEditTopic}>
           Change topic
-        </button>
-      </div>
-    )
-  }
-
-  if (uiState === 'path' && activePathMeta) {
-    return (
-      <div className="learn-panel learn-panel--summary">
-        <div>
-          <SourceBadge label={activePathMeta.sourceLabel} />
-          <p className="learn-path-summary">
-            Path for <strong>{activePathMeta.topic}</strong> · {activePathMeta.levelLabel} ·{' '}
-            {activePathMeta.scopeLabel}
-            {activePathMeta.trackTitle ? ` · ${activePathMeta.trackTitle}` : ''} ·{' '}
-            {activePathMeta.lessonCount} lessons
-          </p>
-        </div>
-        <button type="button" className="learn-secondary-btn" onClick={onStartOver}>
-          New topic
         </button>
       </div>
     )

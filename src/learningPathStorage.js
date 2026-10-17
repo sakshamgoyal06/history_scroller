@@ -45,6 +45,12 @@ export function setActivePathId(pathId) {
   localStorage.setItem(STORAGE_ACTIVE, JSON.stringify({ pathId, updatedAt: Date.now() }))
 }
 
+export function touchPathOpened(pathId) {
+  const path = getPathById(pathId)
+  if (!path) return null
+  return upsertPath({ ...path, lastOpenedAt: Date.now() })
+}
+
 export function getPathById(pathId) {
   return loadAllPaths().find((p) => p.id === pathId) ?? null
 }
@@ -116,6 +122,7 @@ export function createPathRecordFromPlan({
     sourceCatalog: {},
     completedLessonIds: [],
     activeLessonId: null,
+    lastOpenedAt: now,
   }
 }
 
@@ -152,10 +159,14 @@ export function getLesson(pathRecord, trackId, lessonId) {
 
 export function pathProgress(pathRecord) {
   const tracks = pathRecord?.course?.tracks ?? []
+  const activeTrackId = pathRecord.activeTrackId
+  const tracksToCount = activeTrackId
+    ? tracks.filter((t) => t.id === activeTrackId)
+    : tracks
   let total = 0
   let ready = 0
   let completed = 0
-  for (const track of tracks) {
+  for (const track of tracksToCount) {
     for (const lesson of track.lessons) {
       total += 1
       if (lesson.generationStatus === 'ready') ready += 1
@@ -165,15 +176,37 @@ export function pathProgress(pathRecord) {
   return { total, ready, completed, trackCount: tracks.length }
 }
 
+export function markLessonComplete(pathRecord, trackId, lessonId) {
+  if (!pathRecord?.course) return pathRecord
+  const completedIds = new Set(pathRecord.completedLessonIds ?? [])
+  if (completedIds.has(lessonId)) {
+    return touchPathOpened(pathRecord.id) ?? pathRecord
+  }
+  completedIds.add(lessonId)
+  let next = {
+    ...pathRecord,
+    completedLessonIds: [...completedIds],
+    lastOpenedAt: Date.now(),
+  }
+  next = updateLessonInPath(next, trackId, lessonId, { completedAt: Date.now() })
+  return next
+}
+
 export function listPathSummaries() {
-  return loadAllPaths().map((p) => ({
-    id: p.id,
-    title: p.course?.title ?? p.preferences?.topic ?? 'Learning path',
-    scopeDecision: p.scopeDecision,
-    sourceLabel: p.sourceLabel,
-    buildMode: p.buildMode,
-    createdAt: p.createdAt,
-    updatedAt: p.updatedAt,
-    ...pathProgress(p),
-  }))
+  return loadAllPaths()
+    .map((p) => ({
+      id: p.id,
+      title: p.course?.title ?? p.preferences?.topic ?? 'Learning path',
+      scopeDecision: p.scopeDecision,
+      sourceLabel: p.sourceLabel,
+      buildMode: p.buildMode,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+      lastOpenedAt: p.lastOpenedAt ?? p.updatedAt ?? p.createdAt,
+      ...pathProgress(p),
+    }))
+    .sort(
+      (a, b) =>
+        (b.lastOpenedAt ?? b.updatedAt) - (a.lastOpenedAt ?? a.updatedAt),
+    )
 }

@@ -7,6 +7,7 @@ import {
   uniqueDecadeKeysFromCards,
 } from './cardTimeline.js'
 import { LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
+import { LearnPathChapters } from './LearnPathChapters.jsx'
 import { LearnTopicPanel } from './LearnTopicPanel.jsx'
 import { LearningLessonPlaceholder } from './LearningLessonDetail.jsx'
 import { MyPathsSection } from './MyPathsSection.jsx'
@@ -23,8 +24,10 @@ import {
   getPathById,
   loadActivePathId,
   loadAllPaths,
+  markLessonComplete,
   mergeSourcesIntoCatalog,
   setActivePathId,
+  touchPathOpened,
   updateLessonInPath,
   upsertPath,
 } from './learningPathStorage.js'
@@ -62,6 +65,27 @@ function feedUrl() {
 function storyIdFromLocation() {
   const match = /^#story\/([^/#?]+)/.exec(window.location.hash)
   return match?.[1] ?? null
+}
+
+function learnHomeUrl() {
+  return `${window.location.pathname}${window.location.search}#learn`
+}
+
+function learnPathUrl(pathId) {
+  return `${window.location.pathname}${window.location.search}#learn/path/${encodeURIComponent(pathId)}`
+}
+
+function learnPathIdFromLocation() {
+  const match = /^#learn\/path\/([^/#?]+)/.exec(window.location.hash)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function learnHomeHistoryState() {
+  return { view: 'learnHome' }
+}
+
+function learnPathHistoryState(pathId) {
+  return { view: 'learnPath', pathId }
 }
 
 /** Catalog cards: legacy `category`, `story`, `relevance` plus normalized learning fields. */
@@ -846,10 +870,7 @@ function App() {
   const [learnScope, setLearnScope] = useState('both')
   const [learnLength, setLearnLength] = useState(5)
   const [learnFocus, setLearnFocus] = useState('')
-  const [learnUiState, setLearnUiState] = useState(() => {
-    const id = loadActivePathId()
-    return id && getPathById(id) ? 'path' : 'start'
-  })
+  const [learnUiState, setLearnUiState] = useState('home')
   const [planResult, setPlanResult] = useState(null)
   const [planError, setPlanError] = useState(null)
   const [planningMessage, setPlanningMessage] = useState('')
@@ -1023,19 +1044,55 @@ function App() {
     const applyHistoryState = (state) => {
       if (state?.view === 'story' && state.id) {
         setActiveStoryId(state.id)
-      } else {
-        setActiveStoryId(null)
+        setHomePanel('learn')
+        return
       }
+      if (state?.view === 'learnPath' && state.pathId) {
+        setActiveStoryId(null)
+        setHomePanel('learn')
+        setLearnUiState('path')
+        const path = getPathById(state.pathId)
+        if (path) {
+          setActivePathRecord(path)
+          setActivePathId(path.id)
+        }
+        return
+      }
+      if (state?.view === 'learnHome') {
+        setActiveStoryId(null)
+        setHomePanel('learn')
+        setLearnUiState('home')
+        return
+      }
+      setActiveStoryId(null)
     }
 
     const deepLinkId = storyIdFromLocation()
+    const deepLinkPathId = learnPathIdFromLocation()
     const deepLinkKnown =
       deepLinkId &&
       (HISTORY_CARDS.some((c) => c.id === deepLinkId) ||
         Boolean(findLessonCardAcrossPaths(deepLinkId, [], loadAllPaths())))
+
     if (deepLinkKnown) {
       window.history.replaceState(storyHistoryState(deepLinkId), '', storyUrl(deepLinkId))
       setActiveStoryId(deepLinkId)
+      setHomePanel('learn')
+    } else if (deepLinkPathId && getPathById(deepLinkPathId)) {
+      window.history.replaceState(
+        learnPathHistoryState(deepLinkPathId),
+        '',
+        learnPathUrl(deepLinkPathId),
+      )
+      setHomePanel('learn')
+      setLearnUiState('path')
+      const path = getPathById(deepLinkPathId)
+      setActivePathRecord(path)
+      setActivePathId(path.id)
+    } else if (window.location.hash.startsWith('#learn')) {
+      window.history.replaceState(learnHomeHistoryState(), '', learnHomeUrl())
+      setHomePanel('learn')
+      setLearnUiState('home')
     } else {
       window.history.replaceState(FEED_HISTORY_STATE, '', feedUrl())
     }
@@ -1141,10 +1198,12 @@ function App() {
     setActiveStoryId(id)
     const pathCard = findLessonCardAcrossPaths(id, generatedPathCards, loadAllPaths())
     if (pathCard?.pathId) {
-      const path = getPathById(pathCard.pathId)
+      const path = touchPathOpened(pathCard.pathId) ?? getPathById(pathCard.pathId)
       if (path) {
         setActivePathRecord(path)
         setActivePathId(path.id)
+        setHomePanel('learn')
+        setLearnUiState('path')
       }
     }
     const dateKey = getLocalDateKey()
@@ -1187,7 +1246,7 @@ function App() {
   const bumpPaths = useCallback(() => setPathsVersion((v) => v + 1), [])
 
   const resetLearnFlow = useCallback(() => {
-    setLearnUiState('start')
+    setLearnUiState('home')
     setPlanResult(null)
     setPlanError(null)
     setLearnTopic('')
@@ -1197,7 +1256,94 @@ function App() {
     setLearnLength(5)
     setActivePathRecord(null)
     setActivePathId(null)
+    window.history.pushState(learnHomeHistoryState(), '', learnHomeUrl())
   }, [])
+
+  const markActiveLessonComplete = useCallback(() => {
+    if (!activeStory?.isGeneratedPath || !activeStory.trackId || !activePathRecord) return
+    const next = markLessonComplete(activePathRecord, activeStory.trackId, activeStory.id)
+    setActivePathRecord(next)
+    bumpPaths()
+  }, [activeStory, activePathRecord, bumpPaths])
+
+  const openPathScreen = useCallback(
+    (pathId) => {
+      const path = touchPathOpened(pathId) ?? getPathById(pathId)
+      if (!path) return
+      setActivePathId(path.id)
+      setActivePathRecord(path)
+      setLearnUiState('path')
+      setHomePanel('learn')
+      setPlanResult(null)
+      setActiveStoryId(null)
+      window.history.pushState(learnPathHistoryState(path.id), '', learnPathUrl(path.id))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [],
+  )
+
+  const exitLearnPathToHome = useCallback(() => {
+    setLearnUiState('home')
+    setActiveStoryId(null)
+    window.history.pushState(learnHomeHistoryState(), '', learnHomeUrl())
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  const backToPathScreen = useCallback(() => {
+    markActiveLessonComplete()
+    setActiveStoryId(null)
+    setLearnUiState('path')
+    setHomePanel('learn')
+    const pathId = activePathRecord?.id ?? loadActivePathId()
+    if (pathId) {
+      const path = touchPathOpened(pathId) ?? getPathById(pathId)
+      if (path) {
+        setActivePathRecord(path)
+        setActivePathId(path.id)
+      }
+      window.history.pushState(learnPathHistoryState(pathId), '', learnPathUrl(pathId))
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [activePathRecord, markActiveLessonComplete])
+
+  const openNextPathChapter = useCallback(
+    (nextId) => {
+      markActiveLessonComplete()
+      openStory(nextId)
+    },
+    [markActiveLessonComplete, openStory],
+  )
+
+  const handleDetailBack = useCallback(() => {
+    if (activeStory?.isGeneratedPath) {
+      const cards = generatedPathCards.length
+        ? generatedPathCards
+        : plannedLessonsForActiveTrack(
+            activePathRecord ?? getPathById(loadActivePathId() ?? ''),
+          )
+      const idx = cards.findIndex((c) => c.id === activeStory.id)
+      if (idx > 0) {
+        markActiveLessonComplete()
+        if (window.history.state?.view === 'story') {
+          window.history.back()
+        } else {
+          openStory(cards[idx - 1].id)
+        }
+        return
+      }
+      backToPathScreen()
+      return
+    }
+    closeStory()
+  }, [
+    activeStory,
+    generatedPathCards,
+    activePathRecord,
+    markActiveLessonComplete,
+    openStory,
+    backToPathScreen,
+    closeStory,
+  ])
 
   const continueLearnTopic = useCallback(() => {
     if (!learnTopic.trim()) return
@@ -1231,6 +1377,7 @@ function App() {
         bumpPaths()
         setLearnUiState('path')
         setHomePanel('learn')
+        window.history.pushState(learnPathHistoryState(demo.id), '', learnPathUrl(demo.id))
         planSubmitLock.current = false
         setPlanSubmitLocked(false)
         showToast('Demo path ready')
@@ -1302,6 +1449,8 @@ function App() {
     setActivePathRecord(demo)
     bumpPaths()
     setLearnUiState('path')
+    setHomePanel('learn')
+    window.history.pushState(learnPathHistoryState(demo.id), '', learnPathUrl(demo.id))
     showToast('Demo path ready (not live AI)')
   }, [learnTopic, learnLevel, learnScope, learnLength, learnFocus, bumpPaths, showToast])
 
@@ -1329,6 +1478,7 @@ function App() {
       bumpPaths()
       setLearnUiState('path')
       setHomePanel('learn')
+      window.history.pushState(learnPathHistoryState(saved.id), '', learnPathUrl(saved.id))
       window.scrollTo({ top: 0, behavior: 'smooth' })
       showToast('Learning path saved · generating lesson 1…')
       const firstTrack = saved.course?.tracks?.find((t) => t.id === activeTrackId)
@@ -1383,15 +1533,9 @@ function App() {
 
   const handleResumePath = useCallback(
     (pathId) => {
-      const path = getPathById(pathId)
-      if (!path) return
-      setActivePathId(pathId)
-      setActivePathRecord(path)
-      setLearnUiState('path')
-      setHomePanel('learn')
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      openPathScreen(pathId)
     },
-    [],
+    [openPathScreen],
   )
 
   const handleDeletePath = useCallback(
@@ -1402,7 +1546,7 @@ function App() {
       bumpPaths()
       if (activePathRecord?.id === pathId) {
         setActivePathRecord(null)
-        setLearnUiState('start')
+        setLearnUiState('home')
       }
       showToast('Path deleted')
     },
@@ -1598,7 +1742,11 @@ function App() {
       <header className="top-bar">
         <div className="brand">
           {inDetail ? (
-            <button type="button" className="back-btn" onClick={closeStory}>
+            <button type="button" className="back-btn" onClick={handleDetailBack}>
+              ← Back
+            </button>
+          ) : homePanel === 'learn' && learnUiState === 'path' ? (
+            <button type="button" className="back-btn" onClick={exitLearnPathToHome}>
               ← Back
             </button>
           ) : null}
@@ -1611,9 +1759,11 @@ function App() {
                   ? activeZone.title
                   : homePanel === 'zones'
                     ? 'Learning Zones'
-                    : homePanel === 'learn'
-                      ? 'Learn a Topic'
-                      : 'Curiosity Feed'}
+                    : homePanel === 'learn' && learnUiState === 'path' && learnActivePathMeta
+                      ? learnActivePathMeta.topic
+                      : homePanel === 'learn'
+                        ? 'Learn a Topic'
+                        : 'Curiosity Feed'}
           </h1>
           {!inDetail && homePanel !== 'learn' && (
             <div className="header-actions">
@@ -1696,6 +1846,10 @@ function App() {
                 onClick={() => {
                   setHomePanel('learn')
                   setFilterListOpen(false)
+                  if (activeStoryId) return
+                  if (learnUiState === 'planning' || learnUiState === 'saving') return
+                  setLearnUiState('home')
+                  window.history.pushState(learnHomeHistoryState(), '', learnHomeUrl())
                 }}
               >
                 Learn
@@ -1803,94 +1957,73 @@ function App() {
       <main
         className={`feed${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}${homePanel === 'learn' && !inDetail ? ' feed--learn' : ''}`}
       >
-        {!inDetail && homePanel === 'learn' ? (
+        {!inDetail && homePanel === 'learn' && learnUiState !== 'path' ? (
           <>
-            <LearnTopicPanel
-              topic={learnTopic}
-              onTopicChange={setLearnTopic}
-              level={learnLevel}
-              onLevelChange={setLearnLevel}
-              scope={learnScope}
-              onScopeChange={setLearnScope}
-              length={learnLength}
-              onLengthChange={setLearnLength}
-              focus={learnFocus}
-              onFocusChange={setLearnFocus}
-              uiState={learnUiState}
-              onContinue={continueLearnTopic}
-              onGenerate={handleAssessTopic}
-              onEditTopic={() => {
-                setLearnUiState('start')
-                setPlanResult(null)
-                setPlanError(null)
-              }}
-              onStartOver={resetLearnFlow}
-              activePathMeta={learnActivePathMeta}
-              planResult={planResult}
-              planError={planError}
-              onRetryPlan={handleRetryPlan}
-              onUseDemoFallback={handleUseDemoFallback}
-              onSelectNarrowing={handleSelectNarrowing}
-              onConfirmSinglePath={handleConfirmSinglePath}
-              onLearnTrack={handleLearnTrack}
-              onBuildFullCourse={handleBuildFullCourse}
-              planningMessage={planningMessage}
-              submitLocked={planSubmitLocked}
-            />
+            <div className="learn-home-create">
+              <LearnTopicPanel
+                topic={learnTopic}
+                onTopicChange={setLearnTopic}
+                level={learnLevel}
+                onLevelChange={setLearnLevel}
+                scope={learnScope}
+                onScopeChange={setLearnScope}
+                length={learnLength}
+                onLengthChange={setLearnLength}
+                focus={learnFocus}
+                onFocusChange={setLearnFocus}
+                uiState={learnUiState === 'home' ? 'start' : learnUiState}
+                onContinue={continueLearnTopic}
+                onGenerate={handleAssessTopic}
+                onEditTopic={() => {
+                  setLearnUiState('home')
+                  setPlanResult(null)
+                  setPlanError(null)
+                }}
+                planResult={planResult}
+                planError={planError}
+                onRetryPlan={handleRetryPlan}
+                onUseDemoFallback={handleUseDemoFallback}
+                onSelectNarrowing={handleSelectNarrowing}
+                onConfirmSinglePath={handleConfirmSinglePath}
+                onLearnTrack={handleLearnTrack}
+                onBuildFullCourse={handleBuildFullCourse}
+                planningMessage={planningMessage}
+                submitLocked={planSubmitLocked}
+              />
+            </div>
             <MyPathsSection
               refreshKey={pathsVersion}
-              onResume={handleResumePath}
+              onOpenPath={handleResumePath}
               onDelete={handleDeletePath}
             />
-            {learnUiState === 'path' && generatedPathCards.length > 0 ? (
-              <div className="learn-path-cards">
-                {learnActivePathMeta?.buildMode === 'full_course' &&
-                learnActivePathMeta.tracks?.length > 1 ? (
-                  <div className="learn-track-switch">
-                    <span className="learn-legend">Track</span>
-                    <div className="learn-options">
-                      {learnActivePathMeta.tracks.map((track) => (
-                        <button
-                          key={track.id}
-                          type="button"
-                          className={`learn-option${learnActivePathMeta.activeTrackId === track.id ? ' learn-option--active' : ''}`}
-                          onClick={() => handleSwitchTrack(track.id)}
-                        >
-                          {track.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                <p className="learn-path-order-hint">
-                  Planned steps are outlines only. Lesson 1 researches the web and writes in the
-                  background—open any step to read or retry.
-                </p>
-                {generatedPathCards.map((card) => (
-                  <StoryPreviewCard
-                    key={card.id}
-                    id={`card-${card.id}`}
-                    card={card}
-                    interactive
-                    onOpen={() => openStory(card.id)}
-                    badges={
-                      card.pathOrder ? (
-                        <div className="story-card-tags">
-                          <span className="meta-badge meta-badge--path">
-                            Step {card.pathOrder} of {card.pathTrackLessonCount ?? generatedPathCards.length}
-                            {card.generationStatus === 'ready'
-                              ? ''
-                              : card.generationStatus === 'planned'
-                                ? ' · tap to generate'
-                                : ''}
-                          </span>
-                        </div>
-                      ) : null
-                    }
-                  />
-                ))}
+          </>
+        ) : !inDetail && homePanel === 'learn' && learnUiState === 'path' ? (
+          <>
+            {learnActivePathMeta?.buildMode === 'full_course' &&
+            learnActivePathMeta.tracks?.length > 1 ? (
+              <div className="learn-track-switch">
+                <span className="learn-legend">Track</span>
+                <div className="learn-options">
+                  {learnActivePathMeta.tracks.map((track) => (
+                    <button
+                      key={track.id}
+                      type="button"
+                      className={`learn-option${learnActivePathMeta.activeTrackId === track.id ? ' learn-option--active' : ''}`}
+                      onClick={() => handleSwitchTrack(track.id)}
+                    >
+                      {track.title}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
+            <LearnPathChapters
+              pathMeta={learnActivePathMeta}
+              cards={generatedPathCards}
+              completedLessonIds={activePathRecord?.completedLessonIds}
+              onOpenChapter={openStory}
+              onNewTopic={resetLearnFlow}
+            />
           </>
         ) : !inDetail && homePanel === 'zones' ? (
           <div className="zones-panel">
@@ -1944,6 +2077,7 @@ function App() {
                     narrativeRelated.length > 0 ? narrativeRelated : null
                   }
                   onOpenRelated={openStory}
+                  onReadComplete={isGeneratedStory ? markActiveLessonComplete : undefined}
                 />
               </div>
             ) : (
@@ -1972,7 +2106,11 @@ function App() {
                     <button
                       type="button"
                       className="story-next-card"
-                      onClick={() => openStory(recommendedNext.id)}
+                      onClick={() =>
+                        isGeneratedStory
+                          ? openNextPathChapter(recommendedNext.id)
+                          : openStory(recommendedNext.id)
+                      }
                     >
                       <span className="story-next-title">{recommendedNext.title}</span>
                       <span className="story-next-meta">
@@ -1990,7 +2128,11 @@ function App() {
                 <button
                   type="button"
                   className="story-next-card"
-                  onClick={() => openStory(recommendedNext.id)}
+                  onClick={() =>
+                    isGeneratedStory
+                      ? openNextPathChapter(recommendedNext.id)
+                      : openStory(recommendedNext.id)
+                  }
                 >
                   <span className="story-next-title">{recommendedNext.title}</span>
                   <span className="story-next-meta">
@@ -2030,7 +2172,7 @@ function App() {
                 <button
                   type="button"
                   className="action-btn action-btn--save"
-                  onClick={closeStory}
+                  onClick={backToPathScreen}
                 >
                   Back to path
                 </button>
