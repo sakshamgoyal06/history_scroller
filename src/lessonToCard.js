@@ -38,6 +38,7 @@ export function lessonToDisplayCard({
 
   if (presentation) {
     return {
+      ...presentation,
       id: lesson.id,
       pathId: pathRecord.id,
       trackId,
@@ -50,7 +51,7 @@ export function lessonToDisplayCard({
       sourceLabel: pathRecord.sourceLabel,
       isGeneratedPath: true,
       generationStatus: lesson.generationStatus,
-      ...presentation,
+      title: presentation.title ?? lesson.title,
       lessonCore: lesson.lessonCore ?? null,
       videoSearchQuery:
         presentation.videoSearchQuery ?? lesson.lessonBrief?.videoSearchQuery ?? null,
