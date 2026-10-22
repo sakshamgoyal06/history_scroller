@@ -47,7 +47,17 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith('/content/feed-index.json'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'feed-index',
+              expiration: { maxEntries: 2, maxAgeSeconds: 60 * 60 },
+            },
+          },
+        ],
       },
     }),
   ],

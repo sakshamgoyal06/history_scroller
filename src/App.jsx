@@ -32,8 +32,6 @@ import {
   upsertPath,
 } from './learningPathStorage.js'
 import { lessonToDisplayCard, plannedLessonsForActiveTrack } from './lessonToCard.js'
-import { DailyEdition } from './DailyEdition.jsx'
-import { FeaturedStoryMode } from './FeaturedStoryMode.jsx'
 import {
   getLocalDateKey,
   isDailyEditionVisible,
@@ -42,24 +40,71 @@ import {
 } from './dailyEdition.js'
 import { allFlagshipCatalogEntries, isNarrativeCard } from './flagshipStories.js'
 import { RichStoryDetail } from './RichStoryDetail.jsx'
-import { StoryArt, StoryPreviewCard, StoryVideo } from './StoryPreviewCard.jsx'
+import { StoryArt, StoryVideo } from './StoryPreviewCard.jsx'
+import { PrimaryNavigation } from './components/PrimaryNavigation.jsx'
+import { ExplorePanel } from './feed/ExplorePanel.jsx'
+import { LearningReel } from './feed/LearningReel.jsx'
+import { feedItemFromCatalogCard } from './feed/cardAdapter.js'
+import { loadFeedItems } from './feed/feedRepository.js'
+import { loadDetailModePreference, saveDetailModePreference } from './feed/feedStorage.js'
+import { STORY_YOUTUBE } from './feed/storyYoutube.js'
+import { buildPathDripFeedItems } from './feed/pathDrip.js'
+import { LibraryPanel } from './library/LibraryPanel.jsx'
+import { getZoneById } from './zones/zoneData.js'
+import { buildZoneDripFeedItems } from './zones/zoneDripFeed.js'
+import { markZoneStepComplete } from './zones/zoneProgress.js'
+import { ZoneDetail } from './zones/ZoneDetail.jsx'
+import { ZonesPanel } from './zones/ZonesPanel.jsx'
+import { setPathDripEnabled, loadPathDripEnabled } from './zones/zoneProgress.js'
 import './App.css'
 
 const STORAGE_SAVED = 'history-feed-saved'
 const STORAGE_KNOWN = 'history-feed-known'
 
-const FEED_HISTORY_STATE = { view: 'feed' }
+const FEED_HISTORY_STATE = { view: 'feed', mode: 'forYou' }
 
-function storyHistoryState(id) {
-  return { view: 'story', id }
+function feedItemIdFromLocation() {
+  const match = /^#feed\/([^/#?]+)/.exec(window.location.hash)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function zoneIdFromLocation() {
+  const match = /^#zone\/([^/#?]+)/.exec(window.location.hash)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function shortPathIdFromLocation() {
+  const match = /^#path\/([^/#?]+)/.exec(window.location.hash)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+function feedUrl(feedItemId) {
+  const base = `${window.location.pathname}${window.location.search}`
+  return feedItemId ? `${base}#feed/${encodeURIComponent(feedItemId)}` : base
+}
+
+function zoneUrl(zoneId) {
+  return `${window.location.pathname}${window.location.search}#zone/${encodeURIComponent(zoneId)}`
+}
+
+function shortPathUrl(pathId) {
+  return `${window.location.pathname}${window.location.search}#path/${encodeURIComponent(pathId)}`
+}
+
+function feedHistoryState(mode = 'forYou', feedItemId = null) {
+  return { view: 'feed', mode, feedItemId }
+}
+
+function zoneHistoryState(zoneId) {
+  return { view: 'zone', zoneId }
+}
+
+function storyHistoryState(id, returnFeed = null) {
+  return returnFeed ? { view: 'story', id, returnFeed } : { view: 'story', id }
 }
 
 function storyUrl(id) {
   return `${window.location.pathname}${window.location.search}#story/${id}`
-}
-
-function feedUrl() {
-  return `${window.location.pathname}${window.location.search}`
 }
 
 function storyIdFromLocation() {
@@ -399,55 +444,6 @@ const HISTORY_CARDS = [
   ...allFlagshipCatalogEntries(),
 ]
 
-const STORY_YOUTUBE = {
-  alexandria: 'jvWncVbXfJ0',
-  'roman-concrete': 'qL0BB2PRY7k',
-  'silk-road': 'vn3e37VWc0k',
-  'black-death': 'ySClB6-OH-Q',
-  'magna-carta': '7xo4tUMdAMw',
-  'gothic-cathedral': 'kh1qfPWsrJ8',
-  'printing-press': '_YqYtdPUis4',
-  'constantinople-1453': 'BnOS90_cwQA',
-  'da-vinci-notebooks': 'aMsaFP3kgqQ',
-  'scientific-revolution': 'vzo8vnxSARg',
-  'enlightenment-salons': 'NnoFj2cMRLY',
-  'haitian-revolution': '5A_o-nU5s2U',
-  'industrial-mills': 'zhL5DCizj5c',
-  'ww1-telegraph': 'KGlmlSTn-eM',
-  'berlin-wall': 'A9fQPzZ1-hg',
-  'germ-theory': '8HLtFv_KqoE',
-  'ada-lovelace': 'FlfChYGv3Z4',
-  'green-revolution': 'b51G5sB2_hM',
-  'jazz-migration': 'vKaegbtcE00',
-  'un-declaration': 'nDgIVseTkuE',
-  'opportunity-cost': '3ez10ADR_gM',
-  'inflation-basket': '0jJKjgE3qfE',
-  'comparative-advantage': 'NI9TLDIPVcs',
-  'money-multiplier': 'gd8B-zrMSYk',
-  'rain-shadow': 'DoKTTHd-XEQ',
-  'plate-boundaries': 'p-vNSqUy0l4',
-  'monsoon-pattern': 'CR7KL6KSlx4',
-  'exclusive-economic-zone': 'EVzS3x_LYKM',
-  'separation-of-powers': 'HuFR5XBYLfU',
-  'jury-system': 'qVoYFYxGJPg',
-  'census-count': 'Eq-FMB4epyw',
-  'public-records-laws': '5Pyo9v4WTzM',
-  'how-wifi-works': 'xmabFJUKMdg',
-  'qr-code-basics': 'NRgWRXFXLQs',
-  'gps-satellite-timing': '70cDSUI4XKE',
-  'encryption-at-rest': 'ZghMPWGXexs',
-  'supply-chain-safety-stock': 'y_EjCSz1aBo',
-  'renewable-intermittency': 'RnvCbquYeIM',
-  'misinformation-correction': 'cSKGa_7XJkg',
-  'photosynthesis-equation': 'eo5XndJaz-Y',
-  'herd-immunity-threshold': '8BUCi5Tuzms',
-  'crispr-gene-edit': 'jAhjPd4uNFY',
-  'metric-prefixes': '7bUVjJWA6Vw',
-  'leap-year-rule': 'xX96xng7sAE',
-  'time-zones-offset': '74I0M0RKNIE',
-  'rbi-monetary-policy-narrative': '0jJKjgE3qfE',
-}
-
 const LEARNING_DOMAINS = [
   'History',
   'Economics',
@@ -663,94 +659,7 @@ const TOPIC_LIST = [
   ),
 ].sort((a, b) => a.localeCompare(b))
 
-/** Placeholder paths — each zone maps to existing catalog card ids. */
-const LEARNING_ZONES = [
-  {
-    id: 'indian-economy-basics',
-    title: 'Indian Economy Basics',
-    description:
-      'Prices, trade, farming revolutions, and credit—entry points tied to how India’s economy shows up in the catalog today.',
-    cardIds: [
-      'rbi-monetary-policy-narrative',
-      'green-revolution',
-      'inflation-basket',
-      'opportunity-cost',
-      'comparative-advantage',
-      'money-multiplier',
-      'supply-chain-safety-stock',
-    ],
-  },
-  {
-    id: 'roman-empire',
-    title: 'Roman Empire',
-    description:
-      'Engineering, cities, and frontiers—stories from Rome’s world and its long afterlife in memory.',
-    cardIds: [
-      'roman-concrete',
-      'alexandria',
-      'constantinople-1453',
-      'silk-road',
-      'gothic-cathedral',
-    ],
-  },
-  {
-    id: 'how-governments-work',
-    title: 'How Governments Work',
-    description:
-      'Institutions, rights language, courts, and counting citizens—how modern states organize power on paper and in practice.',
-    cardIds: [
-      'separation-of-powers',
-      'jury-system',
-      'census-count',
-      'public-records-laws',
-      'un-declaration',
-      'magna-carta',
-    ],
-  },
-  {
-    id: 'world-geography-essentials',
-    title: 'World Geography Essentials',
-    description:
-      'Climate patterns, plates, oceans, and routes—physical and political geography in bite-sized stories.',
-    cardIds: [
-      'rain-shadow',
-      'plate-boundaries',
-      'monsoon-pattern',
-      'exclusive-economic-zone',
-      'silk-road',
-    ],
-  },
-  {
-    id: 'technology-basics',
-    title: 'Technology Basics',
-    description:
-      'Networks, codes, clocks in orbit, and encryption—how everyday tech actually works under the hood.',
-    cardIds: [
-      'how-wifi-works',
-      'qr-code-basics',
-      'gps-satellite-timing',
-      'encryption-at-rest',
-      'ada-lovelace',
-      'printing-press',
-    ],
-  },
-]
-
 const CARD_BY_ID = new Map(HISTORY_CARDS.map((c) => [c.id, c]))
-
-function cardsForZone(zone) {
-  return zone.cardIds.map((id) => CARD_BY_ID.get(id)).filter(Boolean)
-}
-
-function zoneSummary(zone) {
-  const cards = cardsForZone(zone)
-  const domains = [...new Set(cards.map((c) => c.domain))]
-  return {
-    storyCount: cards.length,
-    domainCount: domains.length,
-    domains,
-  }
-}
 
 function recommendNextCard(currentId, knownIds) {
   const idx = HISTORY_CARDS.findIndex((c) => c.id === currentId)
@@ -829,26 +738,6 @@ function TimelineFilter({ decades, selectedDecades, onToggleDecade, onClear }) {
   )
 }
 
-function LearningZoneCard({ zone, onBrowse }) {
-  const { storyCount, domainCount, domains } = zoneSummary(zone)
-  return (
-    <article className="zone-card">
-      <h2 className="zone-card-title">{zone.title}</h2>
-      <p className="zone-card-desc">{zone.description}</p>
-      <p className="zone-card-meta">
-        {storyCount} {storyCount === 1 ? 'story' : 'stories'} · {domainCount}{' '}
-        {domainCount === 1 ? 'domain' : 'domains'}
-      </p>
-      {domains.length > 0 ? (
-        <p className="zone-card-domains">{domains.join(' · ')}</p>
-      ) : null}
-      <button type="button" className="zone-card-action" onClick={() => onBrowse(zone.id)}>
-        Browse stories
-      </button>
-    </article>
-  )
-}
-
 function loadJson(key, fallback) {
   try {
     const raw = localStorage.getItem(key)
@@ -884,6 +773,16 @@ function App() {
   })
   const [lessonGenPhase, setLessonGenPhase] = useState(null)
   const [activeZoneId, setActiveZoneId] = useState(null)
+  const [activeZoneViewId, setActiveZoneViewId] = useState(() => zoneIdFromLocation())
+  const [feedMode, setFeedMode] = useState('forYou')
+  const [feedItems, setFeedItems] = useState([])
+  const [feedRankKey, setFeedRankKey] = useState(0)
+  const [deepLinkFeedItemId, setDeepLinkFeedItemId] = useState(() => feedItemIdFromLocation())
+  const [slideIndexByFeedId, setSlideIndexByFeedId] = useState({})
+  const [_returnFeed, setReturnFeed] = useState(null)
+  const [offline, setOffline] = useState(() => !navigator.onLine)
+  const [detailMode, setDetailMode] = useState(() => loadDetailModePreference())
+  const [pathDripIds, setPathDripIds] = useState(() => loadPathDripEnabled())
   const [savedCards, setSavedCards] = useState(() =>
     loadJson(STORAGE_SAVED, []),
   )
@@ -936,14 +835,51 @@ function App() {
   }, [savedCards])
 
   const activeZone = useMemo(
-    () => LEARNING_ZONES.find((z) => z.id === activeZoneId) ?? null,
+    () => (activeZoneId ? getZoneById(activeZoneId) : null),
     [activeZoneId],
+  )
+
+  const catalogFeedExtras = useMemo(
+    () => HISTORY_CARDS.map((c) => feedItemFromCatalogCard(c)).filter(Boolean),
+    [],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    void loadFeedItems(catalogFeedExtras).then(({ items }) => {
+      if (cancelled) return
+      setFeedItems(items)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [catalogFeedExtras])
+
+  useEffect(() => {
+    const onOnline = () => setOffline(false)
+    const onOffline = () => setOffline(true)
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', onOffline)
+    return () => {
+      window.removeEventListener('online', onOnline)
+      window.removeEventListener('offline', onOffline)
+    }
+  }, [])
+
+  const zoneDripItems = useMemo(
+    () => buildZoneDripFeedItems(feedItems),
+    [feedItems, feedRankKey],
+  )
+
+  const pathDripItems = useMemo(
+    () => buildPathDripFeedItems(feedItems),
+    [feedItems, pathsVersion, pathDripIds],
   )
 
   const filteredCards = useMemo(() => {
     let pool = showSavedOnly ? savedCardsLive : HISTORY_CARDS
     if (activeZone) {
-      const allowed = new Set(activeZone.cardIds)
+      const allowed = new Set(activeZone.steps.map((s) => s.cardId))
       pool = pool.filter((c) => allowed.has(c.id))
     }
     if (selectedDomain) {
@@ -981,14 +917,10 @@ function App() {
     setActiveZoneId(null)
   }, [])
 
-  const browseZone = useCallback((zoneId) => {
-    setActiveZoneId(zoneId)
-    setHomePanel('feed')
-    setShowSavedOnly(false)
-    setSelectedDomain(null)
-    setSelectedTopics(new Set())
-    setSelectedDecades(new Set())
-    setFilterListOpen(false)
+  const openZoneDetail = useCallback((zoneId) => {
+    setActiveZoneViewId(zoneId)
+    setHomePanel('zones')
+    window.history.pushState(zoneHistoryState(zoneId), '', zoneUrl(zoneId))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
@@ -1044,7 +976,30 @@ function App() {
     const applyHistoryState = (state) => {
       if (state?.view === 'story' && state.id) {
         setActiveStoryId(state.id)
-        setHomePanel('learn')
+        if (state.returnFeed) {
+          setHomePanel('feed')
+          setFeedMode('forYou')
+          setReturnFeed(state.returnFeed)
+          setDeepLinkFeedItemId(state.returnFeed.feedItemId)
+          setSlideIndexByFeedId((prev) => ({
+            ...prev,
+            [state.returnFeed.feedItemId]: state.returnFeed.slideIndex ?? 0,
+          }))
+        }
+        return
+      }
+      if (state?.view === 'zone' && state.zoneId) {
+        setActiveStoryId(null)
+        setHomePanel('zones')
+        setActiveZoneViewId(state.zoneId)
+        return
+      }
+      if (state?.view === 'feed') {
+        setActiveStoryId(null)
+        setHomePanel('feed')
+        setFeedMode(state.mode ?? 'forYou')
+        if (state.feedItemId) setDeepLinkFeedItemId(state.feedItemId)
+        setReturnFeed(null)
         return
       }
       if (state?.view === 'learnPath' && state.pathId) {
@@ -1064,11 +1019,20 @@ function App() {
         setLearnUiState('home')
         return
       }
+      if (state?.view === 'library') {
+        setActiveStoryId(null)
+        setHomePanel('library')
+        return
+      }
       setActiveStoryId(null)
+      setHomePanel('feed')
+      setFeedMode('forYou')
     }
 
     const deepLinkId = storyIdFromLocation()
-    const deepLinkPathId = learnPathIdFromLocation()
+    const deepLinkPathId = learnPathIdFromLocation() ?? shortPathIdFromLocation()
+    const deepLinkFeedId = feedItemIdFromLocation()
+    const deepLinkZoneId = zoneIdFromLocation()
     const deepLinkKnown =
       deepLinkId &&
       (HISTORY_CARDS.some((c) => c.id === deepLinkId) ||
@@ -1077,7 +1041,19 @@ function App() {
     if (deepLinkKnown) {
       window.history.replaceState(storyHistoryState(deepLinkId), '', storyUrl(deepLinkId))
       setActiveStoryId(deepLinkId)
-      setHomePanel('learn')
+    } else if (deepLinkFeedId) {
+      window.history.replaceState(
+        feedHistoryState('forYou', deepLinkFeedId),
+        '',
+        feedUrl(deepLinkFeedId),
+      )
+      setHomePanel('feed')
+      setFeedMode('forYou')
+      setDeepLinkFeedItemId(deepLinkFeedId)
+    } else if (deepLinkZoneId && getZoneById(deepLinkZoneId)) {
+      window.history.replaceState(zoneHistoryState(deepLinkZoneId), '', zoneUrl(deepLinkZoneId))
+      setHomePanel('zones')
+      setActiveZoneViewId(deepLinkZoneId)
     } else if (deepLinkPathId && getPathById(deepLinkPathId)) {
       window.history.replaceState(
         learnPathHistoryState(deepLinkPathId),
@@ -1093,8 +1069,13 @@ function App() {
       window.history.replaceState(learnHomeHistoryState(), '', learnHomeUrl())
       setHomePanel('learn')
       setLearnUiState('home')
+    } else if (window.location.hash === '#library') {
+      window.history.replaceState({ view: 'library' }, '', `${window.location.pathname}${window.location.search}#library`)
+      setHomePanel('library')
     } else {
       window.history.replaceState(FEED_HISTORY_STATE, '', feedUrl())
+      setHomePanel('feed')
+      setFeedMode('forYou')
     }
 
     const onPopState = (event) => {
@@ -1102,8 +1083,29 @@ function App() {
       window.scrollTo(0, 0)
     }
 
+    const onHashChange = () => {
+      const feedId = feedItemIdFromLocation()
+      if (feedId) {
+        setHomePanel('feed')
+        setFeedMode('forYou')
+        setDeepLinkFeedItemId(feedId)
+        setActiveStoryId(null)
+        return
+      }
+      const zoneId = zoneIdFromLocation()
+      if (zoneId && getZoneById(zoneId)) {
+        setHomePanel('zones')
+        setActiveZoneViewId(zoneId)
+        setActiveStoryId(null)
+      }
+    }
+
     window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
+    window.addEventListener('hashchange', onHashChange)
+    return () => {
+      window.removeEventListener('popstate', onPopState)
+      window.removeEventListener('hashchange', onHashChange)
+    }
   }, [])
 
   const showToast = useCallback((message) => {
@@ -1193,8 +1195,50 @@ function App() {
     [showToast],
   )
 
+  const openFeedItemById = useCallback(
+    (feedItemId) => {
+      setHomePanel('feed')
+      setFeedMode('forYou')
+      setDeepLinkFeedItemId(feedItemId)
+      setActiveStoryId(null)
+      window.history.pushState(feedHistoryState('forYou', feedItemId), '', feedUrl(feedItemId))
+    },
+    [],
+  )
+
+  const openStoryFromFeed = useCallback(
+    (feedItem, slideIndex = 0) => {
+      const ret = { feedItemId: feedItem.id, slideIndex }
+      setReturnFeed(ret)
+      setSlideIndexByFeedId((prev) => ({ ...prev, [feedItem.id]: slideIndex }))
+      setFilterListOpen(false)
+      setActiveStoryId(feedItem.parentCardId)
+      setHomePanel('feed')
+      const pathCard = findLessonCardAcrossPaths(
+        feedItem.parentCardId,
+        generatedPathCards,
+        loadAllPaths(),
+      )
+      if (pathCard?.pathId) {
+        const path = touchPathOpened(pathCard.pathId) ?? getPathById(pathCard.pathId)
+        if (path) {
+          setActivePathRecord(path)
+          setActivePathId(path.id)
+        }
+      }
+      window.history.pushState(
+        storyHistoryState(feedItem.parentCardId, ret),
+        '',
+        storyUrl(feedItem.parentCardId),
+      )
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [generatedPathCards],
+  )
+
   const openStory = useCallback((id) => {
     setFilterListOpen(false)
+    setReturnFeed(null)
     setActiveStoryId(id)
     const pathCard = findLessonCardAcrossPaths(id, generatedPathCards, loadAllPaths())
     if (pathCard?.pathId) {
@@ -1276,7 +1320,7 @@ function App() {
       setHomePanel('learn')
       setPlanResult(null)
       setActiveStoryId(null)
-      window.history.pushState(learnPathHistoryState(path.id), '', learnPathUrl(path.id))
+      window.history.pushState(learnPathHistoryState(path.id), '', shortPathUrl(path.id))
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     [],
@@ -1716,8 +1760,52 @@ function App() {
         activeZone,
         activeFilterCount,
         homePanel,
+        feedMode,
       }),
-    [showSavedOnly, activeZone, activeFilterCount, homePanel],
+    [showSavedOnly, activeZone, activeFilterCount, homePanel, feedMode],
+  )
+
+  const handlePrimaryNav = useCallback(
+    (panel) => {
+      setHomePanel(panel)
+      setFilterListOpen(false)
+      if (panel === 'feed') {
+        window.history.pushState(feedHistoryState(feedMode), '', feedUrl(deepLinkFeedItemId))
+      } else if (panel === 'learn') {
+        if (learnUiState === 'planning' || learnUiState === 'saving') return
+        setLearnUiState('home')
+        window.history.pushState(learnHomeHistoryState(), '', learnHomeUrl())
+      } else if (panel === 'zones') {
+        setActiveZoneViewId(null)
+        window.history.pushState({ view: 'zones' }, '', `${window.location.pathname}${window.location.search}#zones`)
+      } else if (panel === 'library') {
+        window.history.pushState({ view: 'library' }, '', `${window.location.pathname}${window.location.search}#library`)
+      }
+    },
+    [feedMode, deepLinkFeedItemId, learnUiState],
+  )
+
+  const togglePathDrip = useCallback((pathId, enabled) => {
+    setPathDripEnabled(pathId, enabled)
+    setPathDripIds(loadPathDripEnabled())
+    setFeedRankKey((k) => k + 1)
+    showToast(enabled ? 'Next lesson will drip into For You' : 'Removed from For You')
+  }, [showToast])
+
+  const openZoneStep = useCallback(
+    (zone, step, mode) => {
+      const feedMatch =
+        feedItems.find((f) => f.id === step.feedItemId || f.parentCardId === step.cardId) ??
+        null
+      if (mode === 'focus' && feedMatch) {
+        openStoryFromFeed(feedMatch, 0)
+        markZoneStepComplete(zone.id, step.order)
+        return
+      }
+      if (feedMatch) openStoryFromFeed(feedMatch, 0)
+      else openStory(step.cardId)
+    },
+    [feedItems, openStory, openStoryFromFeed],
   )
 
   const narrativeRelated = useMemo(() => {
@@ -1737,8 +1825,13 @@ function App() {
     return activePathRecord.course.tracks.find((t) => t.id === activeStory.trackId) ?? null
   }, [activeStory, activePathRecord])
 
+  const showExploreChrome =
+    !inDetail && homePanel === 'feed' && feedMode === 'explore'
+
   return (
-    <div className={`app${inDetail ? ' app--detail' : ''}`}>
+    <div
+      className={`app${inDetail ? ' app--detail' : ''}${homePanel === 'feed' && feedMode === 'forYou' && !inDetail ? ' app--reel' : ''}${!inDetail ? ' app--with-bottom-nav' : ''}`}
+    >
       <header className="top-bar">
         <div className="brand">
           {inDetail ? (
@@ -1753,8 +1846,8 @@ function App() {
           <h1 className={inDetail ? 'brand-title--detail' : ''}>
             {inDetail
               ? (activeStory?.title ?? activeStory?.curiosityQuestion ?? 'Story')
-              : showSavedOnly
-                ? 'Saved'
+              : homePanel === 'library'
+                ? 'Library'
                 : activeZone && homePanel === 'feed'
                   ? activeZone.title
                   : homePanel === 'zones'
@@ -1763,9 +1856,11 @@ function App() {
                       ? learnActivePathMeta.topic
                       : homePanel === 'learn'
                         ? 'Learn a Topic'
-                        : 'Curiosity Feed'}
+                        : homePanel === 'feed' && feedMode === 'forYou'
+                          ? 'For You'
+                          : 'Curiosity Feed'}
           </h1>
-          {!inDetail && homePanel !== 'learn' && (
+          {!inDetail && showExploreChrome && (
             <div className="header-actions">
               <button
                 type="button"
@@ -1802,61 +1897,44 @@ function App() {
                 className={`saved-toggle${showSavedOnly ? ' active' : ''}`}
                 onClick={toggleSavedView}
                 aria-pressed={showSavedOnly}
-                aria-label={
-                  showSavedOnly
-                    ? 'Leave saved view'
-                    : `View ${savedCards.length} saved stories`
-                }
+                aria-label={showSavedOnly ? 'Show all stories' : 'Show saved only'}
               >
-                Saved · {savedCards.length}
+                Saved
               </button>
             </div>
           )}
         </div>
 
+        {!inDetail && homePanel === 'feed' ? (
+          <nav className="feed-subnav" aria-label="Feed mode">
+            <button
+              type="button"
+              className={`feed-subnav-btn${feedMode === 'forYou' ? ' active' : ''}`}
+              aria-current={feedMode === 'forYou' ? 'page' : undefined}
+              onClick={() => {
+                setFeedMode('forYou')
+                window.history.replaceState(feedHistoryState('forYou', deepLinkFeedItemId), '', feedUrl(deepLinkFeedItemId))
+              }}
+            >
+              For You
+            </button>
+            <button
+              type="button"
+              className={`feed-subnav-btn${feedMode === 'explore' ? ' active' : ''}`}
+              aria-current={feedMode === 'explore' ? 'page' : undefined}
+              onClick={() => {
+                setFeedMode('explore')
+                window.history.replaceState(feedHistoryState('explore'), '', feedUrl())
+              }}
+            >
+              Explore
+            </button>
+          </nav>
+        ) : null}
+
         {!inDetail && (
           <>
-            <nav className="home-tabs home-tabs--triple" aria-label="Feed, zones, or learn">
-              <button
-                type="button"
-                className={`home-tab${homePanel === 'feed' ? ' active' : ''}`}
-                aria-current={homePanel === 'feed' ? 'page' : undefined}
-                onClick={() => {
-                  setHomePanel('feed')
-                  setFilterListOpen(false)
-                }}
-              >
-                Feed
-              </button>
-              <button
-                type="button"
-                className={`home-tab${homePanel === 'zones' ? ' active' : ''}`}
-                aria-current={homePanel === 'zones' ? 'page' : undefined}
-                onClick={() => {
-                  setHomePanel('zones')
-                  setFilterListOpen(false)
-                }}
-              >
-                Zones
-              </button>
-              <button
-                type="button"
-                className={`home-tab${homePanel === 'learn' ? ' active' : ''}`}
-                aria-current={homePanel === 'learn' ? 'page' : undefined}
-                onClick={() => {
-                  setHomePanel('learn')
-                  setFilterListOpen(false)
-                  if (activeStoryId) return
-                  if (learnUiState === 'planning' || learnUiState === 'saving') return
-                  setLearnUiState('home')
-                  window.history.pushState(learnHomeHistoryState(), '', learnHomeUrl())
-                }}
-              >
-                Learn
-              </button>
-            </nav>
-
-            {homePanel === 'feed' ? (
+            {showExploreChrome ? (
               <>
                 <div className="filters-scroll" aria-label="Domain filters">
                   <nav className="filters">
@@ -1932,7 +2010,7 @@ function App() {
         )}
       </header>
 
-      {!inDetail && homePanel === 'feed' && (
+      {!inDetail && homePanel === 'feed' && feedMode === 'explore' && (
         <div className="feed-toolbar">
           <p className="feed-status" aria-live="polite">
             {feedStatus}
@@ -2023,18 +2101,86 @@ function App() {
               completedLessonIds={activePathRecord?.completedLessonIds}
               onOpenChapter={openStory}
               onNewTopic={resetLearnFlow}
+              pathDripEnabled={
+                activePathRecord?.id
+                  ? pathDripIds.includes(activePathRecord.id)
+                  : false
+              }
+              onTogglePathDrip={(enabled) => {
+                if (activePathRecord?.id) togglePathDrip(activePathRecord.id, enabled)
+              }}
             />
           </>
+        ) : !inDetail && homePanel === 'library' ? (
+          <LibraryPanel
+            feedItems={feedItems}
+            savedCardsLive={savedCardsLive}
+            catalogById={CARD_BY_ID}
+            onOpenFeedItem={openFeedItemById}
+            onOpenStory={openStory}
+            onOpenPath={openPathScreen}
+            onUnsave={(card) => handleSave(card)}
+            onRefreshLikes={() => setFeedRankKey((k) => k + 1)}
+          />
+        ) : !inDetail && homePanel === 'zones' && activeZoneViewId ? (
+          <ZoneDetail
+            zoneId={activeZoneViewId}
+            onBack={() => {
+              setActiveZoneViewId(null)
+              window.history.pushState({ view: 'zones' }, '', `${window.location.pathname}${window.location.search}#zones`)
+            }}
+            onOpenStep={openZoneStep}
+            onContinueInFeed={(zoneId) => {
+              setHomePanel('feed')
+              setFeedMode('forYou')
+              window.history.pushState(feedHistoryState('forYou'), '', feedUrl())
+              void zoneId
+            }}
+          />
         ) : !inDetail && homePanel === 'zones' ? (
-          <div className="zones-panel">
-            <p className="zones-intro">
-              Structured paths are coming soon. For now, browse a zone to filter the feed to
-              related stories.
-            </p>
-            {LEARNING_ZONES.map((zone) => (
-              <LearningZoneCard key={zone.id} zone={zone} onBrowse={browseZone} />
-            ))}
-          </div>
+          <ZonesPanel onOpenZone={openZoneDetail} />
+        ) : !inDetail && homePanel === 'feed' && feedMode === 'forYou' ? (
+          <LearningReel
+            items={feedItems}
+            dripItems={[...zoneDripItems, ...pathDripItems]}
+            catalogCardById={CARD_BY_ID}
+            savedCardIds={savedIds}
+            knownCardIds={knownIds}
+            onToggleSave={handleSave}
+            onKnown={handleKnown}
+            onGoDeeper={openStoryFromFeed}
+            onToast={showToast}
+            onPreferenceRefresh={() => setFeedRankKey((k) => k + 1)}
+            initialFeedItemId={deepLinkFeedItemId}
+            onActiveFeedItemChange={(id) => {
+              setDeepLinkFeedItemId(id)
+              window.history.replaceState(
+                feedHistoryState('forYou', id),
+                '',
+                feedUrl(id),
+              )
+            }}
+            slideIndexByFeedId={slideIndexByFeedId}
+            onSlideIndexChange={(feedId, idx) =>
+              setSlideIndexByFeedId((prev) => ({ ...prev, [feedId]: idx }))
+            }
+            offline={offline}
+            onOpenLibrary={() => handlePrimaryNav('library')}
+            onContinuePath={() => {
+              const id = loadActivePathId()
+              if (id) openPathScreen(id)
+            }}
+          />
+        ) : !inDetail && homePanel === 'feed' && feedMode === 'explore' ? (
+          <ExplorePanel
+            catalog={HISTORY_CARDS}
+            filteredCards={filteredCards}
+            showDailyEdition={showDailyEdition}
+            knownIds={knownIds}
+            savedIds={savedIds}
+            onOpenStory={openStory}
+            emptyState={emptyState}
+          />
         ) : inDetail && !activeStory ? (
           <div className="empty-state">
             <h2 className="empty-state-title">Story not found</h2>
@@ -2057,72 +2203,105 @@ function App() {
                   onRetry={() => void generateLessonForStory(activeStory)}
                 />
               </div>
-            ) : isNarrativeCard(activeStory) ? (
-              <div className="card-inner card-inner--detail card-inner--rich">
-                <RichStoryDetail
-                  card={activeStory}
-                  badges={
-                    (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
-                      <div className="story-card-tags">
-                        {savedIds.has(activeStory.id) && (
-                          <span className="meta-badge meta-badge--saved">Saved</span>
-                        )}
-                        {knownIds.has(activeStory.id) && (
-                          <span className="meta-badge">Known</span>
-                        )}
-                      </div>
-                    )
-                  }
-                  relatedCards={
-                    narrativeRelated.length > 0 ? narrativeRelated : null
-                  }
-                  onOpenRelated={openStory}
-                  onReadComplete={isGeneratedStory ? markActiveLessonComplete : undefined}
-                />
-              </div>
             ) : (
               <>
-                <StoryDetailHero
-                  card={activeStory}
-                  badges={
-                    (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
-                      <div className="story-card-tags">
-                        {savedIds.has(activeStory.id) && (
-                          <span className="meta-badge meta-badge--saved">Saved</span>
-                        )}
-                        {knownIds.has(activeStory.id) && (
-                          <span className="meta-badge">Known</span>
-                        )}
-                      </div>
-                    )
-                  }
-                />
-                <div className="card-inner card-inner--detail">
-                  <StoryDetailSections card={activeStory} />
-                </div>
-                {recommendedNext ? (
-                  <div className="story-next">
-                    <h3 className="story-section-label">Continue learning</h3>
+                {!isGeneratedStory && isNarrativeCard(activeStory) ? (
+                  <div className="detail-mode-toggle" role="group" aria-label="Detail mode">
                     <button
                       type="button"
-                      className="story-next-card"
-                      onClick={() =>
-                        isGeneratedStory
-                          ? openNextPathChapter(recommendedNext.id)
-                          : openStory(recommendedNext.id)
-                      }
+                      className={`detail-mode-btn${detailMode === 'story' ? ' active' : ''}`}
+                      aria-pressed={detailMode === 'story'}
+                      onClick={() => {
+                        setDetailMode('story')
+                        saveDetailModePreference('story')
+                      }}
                     >
-                      <span className="story-next-title">{recommendedNext.title}</span>
-                      <span className="story-next-meta">
-                        {recommendedNext.domain}
-                        {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
-                      </span>
+                      Story
+                    </button>
+                    <button
+                      type="button"
+                      className={`detail-mode-btn${detailMode === 'explainer' ? ' active' : ''}`}
+                      aria-pressed={detailMode === 'explainer'}
+                      onClick={() => {
+                        setDetailMode('explainer')
+                        saveDetailModePreference('explainer')
+                      }}
+                    >
+                      Explainer
                     </button>
                   </div>
                 ) : null}
+                {isNarrativeCard(activeStory) && detailMode === 'story' ? (
+                  <div className="card-inner card-inner--detail card-inner--rich">
+                    <RichStoryDetail
+                      card={activeStory}
+                      badges={
+                        (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
+                          <div className="story-card-tags">
+                            {savedIds.has(activeStory.id) && (
+                              <span className="meta-badge meta-badge--saved">Saved</span>
+                            )}
+                            {knownIds.has(activeStory.id) && (
+                              <span className="meta-badge">Known</span>
+                            )}
+                          </div>
+                        )
+                      }
+                      relatedCards={
+                        narrativeRelated.length > 0 ? narrativeRelated : null
+                      }
+                      onOpenRelated={openStory}
+                      onReadComplete={isGeneratedStory ? markActiveLessonComplete : undefined}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <StoryDetailHero
+                      card={activeStory}
+                      badges={
+                        (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
+                          <div className="story-card-tags">
+                            {savedIds.has(activeStory.id) && (
+                              <span className="meta-badge meta-badge--saved">Saved</span>
+                            )}
+                            {knownIds.has(activeStory.id) && (
+                              <span className="meta-badge">Known</span>
+                            )}
+                          </div>
+                        )
+                      }
+                    />
+                    <div className="card-inner card-inner--detail">
+                      <StoryDetailSections card={activeStory} />
+                    </div>
+                    {recommendedNext ? (
+                      <div className="story-next">
+                        <h3 className="story-section-label">Continue learning</h3>
+                        <button
+                          type="button"
+                          className="story-next-card"
+                          onClick={() =>
+                            isGeneratedStory
+                              ? openNextPathChapter(recommendedNext.id)
+                              : openStory(recommendedNext.id)
+                          }
+                        >
+                          <span className="story-next-title">{recommendedNext.title}</span>
+                          <span className="story-next-meta">
+                            {recommendedNext.domain}
+                            {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
+                          </span>
+                        </button>
+                      </div>
+                    ) : null}
+                  </>
+                )}
               </>
             )}
-            {isNarrativeCard(activeStory) && !narrativeRelated.length && recommendedNext ? (
+            {isNarrativeCard(activeStory) &&
+            detailMode === 'story' &&
+            !narrativeRelated.length &&
+            recommendedNext ? (
               <div className="story-next">
                 <h3 className="story-section-label">Continue learning</h3>
                 <button
@@ -2179,54 +2358,12 @@ function App() {
               )}
             </div>
           </article>
-        ) : filteredCards.length === 0 ? (
-          <div className="empty-state">
-            <h2 className="empty-state-title">{emptyState.title}</h2>
-            <p className="empty-state-body">{emptyState.body}</p>
-            {emptyState.action && (
-              <button
-                type="button"
-                className="empty-state-action"
-                onClick={emptyState.action.onClick}
-              >
-                {emptyState.action.label}
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            {showDailyEdition ? (
-              <>
-                <DailyEdition catalog={HISTORY_CARDS} onOpenStory={openStory} />
-                <FeaturedStoryMode catalog={HISTORY_CARDS} onOpenStory={openStory} />
-                <h2 className="explore-all-heading">Explore everything</h2>
-              </>
-            ) : null}
-            {filteredCards.map((card) => (
-              <StoryPreviewCard
-                key={card.id}
-                id={`card-${card.id}`}
-                card={card}
-                interactive
-                className={knownIds.has(card.id) ? 'known' : ''}
-                onOpen={() => openStory(card.id)}
-                badges={
-                  (savedIds.has(card.id) || knownIds.has(card.id)) && (
-                    <div className="story-card-tags">
-                      {savedIds.has(card.id) && (
-                        <span className="meta-badge meta-badge--saved">Saved</span>
-                      )}
-                      {knownIds.has(card.id) && (
-                        <span className="meta-badge">Known</span>
-                      )}
-                    </div>
-                  )
-                }
-              />
-            ))}
-          </>
-        )}
+        ) : null}
       </main>
+
+      {!inDetail ? (
+        <PrimaryNavigation active={homePanel} onChange={handlePrimaryNav} variant="bottom" />
+      ) : null}
 
       {toast && (
         <div className="toast" role="status">

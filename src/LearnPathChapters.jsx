@@ -6,6 +6,8 @@ export function LearnPathChapters({
   completedLessonIds,
   onOpenChapter,
   onNewTopic,
+  pathDripEnabled,
+  onTogglePathDrip,
 }) {
   if (!pathMeta || cards.length === 0) return null
 
@@ -25,9 +27,20 @@ export function LearnPathChapters({
             chapters
           </p>
         </div>
-        <button type="button" className="learn-secondary-btn" onClick={onNewTopic}>
-          New topic
-        </button>
+        <div className="learn-path-screen-actions">
+          {onTogglePathDrip ? (
+            <button
+              type="button"
+              className={`learn-secondary-btn${pathDripEnabled ? ' learn-secondary-btn--active' : ''}`}
+              onClick={() => onTogglePathDrip(!pathDripEnabled)}
+            >
+              {pathDripEnabled ? 'Dripping to feed ✓' : 'Add to my feed'}
+            </button>
+          ) : null}
+          <button type="button" className="learn-secondary-btn" onClick={onNewTopic}>
+            New topic
+          </button>
+        </div>
       </header>
 
       {pathMeta.buildMode === 'full_course' && pathMeta.tracks?.length > 1 ? (

@@ -166,8 +166,10 @@ export function isDailyEditionVisible({
   activeZone,
   activeFilterCount,
   homePanel,
+  feedMode,
 }) {
   if (homePanel !== 'feed') return false
+  if (feedMode && feedMode !== 'explore') return false
   if (showSavedOnly) return false
   if (activeZone) return false
   if (activeFilterCount > 0) return false
