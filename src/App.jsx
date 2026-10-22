@@ -1856,9 +1856,7 @@ function App() {
                       ? learnActivePathMeta.topic
                       : homePanel === 'learn'
                         ? 'Learn a Topic'
-                        : homePanel === 'feed' && feedMode === 'forYou'
-                          ? 'For You'
-                          : 'Curiosity Feed'}
+                        : 'Curiosity Feed'}
           </h1>
           {!inDetail && showExploreChrome && (
             <div className="header-actions">
@@ -2033,7 +2031,7 @@ function App() {
       )}
 
       <main
-        className={`feed${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}${homePanel === 'learn' && !inDetail ? ' feed--learn' : ''}`}
+        className={`feed${homePanel === 'feed' && feedMode === 'forYou' && !inDetail ? ' feed--reel' : ''}${homePanel === 'zones' && !inDetail ? ' feed--zones' : ''}${homePanel === 'learn' && !inDetail ? ' feed--learn' : ''}`}
       >
         {!inDetail && homePanel === 'learn' && learnUiState !== 'path' ? (
           <>
