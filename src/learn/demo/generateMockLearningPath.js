@@ -1,13 +1,10 @@
 /**
- * Mock learning-path generator for the "Learn a Topic" MVP.
- * Replace this module with a real AI API call (same input/output shape) in v0.4+.
+ * Offline demo learning-path generator: used when the live planner is not configured
+ * (or VITE_LEARN_FORCE_MOCK=true). Output is clearly labelled as a demo, never live AI.
  */
+import { LEARN_LEVELS } from '../learnOptions.js'
 
-const LEVEL_LABEL = {
-  beginner: 'Beginner',
-  curious: 'Curious',
-  deep: 'Deep Dive',
-}
+const LEVEL_LABEL = Object.fromEntries(LEARN_LEVELS.map((l) => [l.id, l.label]))
 
 function slugTopic(topic) {
   return String(topic ?? '')
@@ -427,20 +424,3 @@ export function generateMockLearningPath(input) {
   }
   return sliced
 }
-
-export const LEARN_LEVELS = [
-  { id: 'beginner', label: 'Beginner' },
-  { id: 'curious', label: 'Curious' },
-  { id: 'deep', label: 'Deep Dive' },
-]
-
-export const LEARN_SCOPES = [
-  { id: 'india', label: 'India' },
-  { id: 'global', label: 'Global' },
-  { id: 'both', label: 'Both' },
-]
-
-export const LEARN_LENGTHS = [
-  { id: 3, label: '3 cards' },
-  { id: 5, label: '5 cards' },
-]

@@ -90,7 +90,7 @@ Structural cleanup in the same pass:
 | H | Medium | **`App.jsx` is still the whole app.** About 40 `useState`s, hand-rolled routing, and the learn flow and generation orchestration all in one component. | P1-2 |
 | I | Medium | **There is no content-safety layer.** User topics aren't moderated, and web-search text flows straight into the lesson writer, an indirect prompt-injection and misinformation risk. React escapes the output, so XSS risk is low. | P0-4 |
 | J | Low | **There is no Content-Security-Policy.** YouTube embeds need a `frame-src` allowlist, so it has to be set deliberately and tested. | P1-6 |
-| K | Low | **Saved cards store whole card objects**, which go stale and take space. `_returnFeed` state is never read. `feed-index.json` is both precached and runtime-cached. | Clean up during P1-2 |
+| K | Low | **Saved cards store whole card objects**, which go stale and take space. (The unused `_returnFeed` state and the double caching of `feed-index.json` were fixed in the repo cleanup, see `docs/BUILD_PLAN.md` §1.) | Store IDs only, with a migration (BUILD_PLAN step 0) |
 | L | Low | **No type checking.** JSDoc types exist but nothing enforces them. | P1-3 |
 
 ---

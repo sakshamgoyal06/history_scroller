@@ -1,4 +1,4 @@
-import { verifiedYoutubeIdForCard } from './storyYoutube.js'
+import { verifiedYoutubeIdForCard } from '../catalog/data/storyYoutube.js'
 
 /** @type {import('./feedTypes.js').FeedItem[]} */
 export const PROTOTYPE_FEED_ITEMS = [

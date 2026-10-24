@@ -82,10 +82,6 @@ export function formatDecadeKeyLabel(key) {
 }
 
 /** @param {number} year */
-export function formatDecadeLabelFromYear(year) {
-  return formatDecadeKeyLabel(decadeKeyFromStart(decadeStartFromYear(year)))
-}
-
 /** Sort decade keys oldest → newest */
 export function compareDecadeKeys(a, b) {
   const parse = (key) => {
