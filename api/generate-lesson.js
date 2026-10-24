@@ -14,7 +14,7 @@ import {
   withTimeout,
 } from '../lib/serverUtils.js'
 
-// Research + writing must finish inside the function's maxDuration (vercel.json: 300s).
+// Research + writing must finish inside the client timeout (300 s, src/learningPathApi.js).
 const LESSON_BUDGET_MS = 280_000
 const RESEARCH_TIMEOUT_MS = 150_000
 const MIN_WRITING_MS = 30_000
