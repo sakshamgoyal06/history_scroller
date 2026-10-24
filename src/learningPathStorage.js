@@ -20,10 +20,12 @@ export function loadAllPaths() {
 }
 
 function saveAllPaths(paths) {
-  localStorage.setItem(
-    STORAGE_PATHS,
-    JSON.stringify({ version: PATH_SCHEMA_VERSION, paths }),
-  )
+  try {
+    localStorage.setItem(STORAGE_PATHS, JSON.stringify({ version: PATH_SCHEMA_VERSION, paths }))
+  } catch (e) {
+    // Quota exceeded (generated lessons are large) or storage disabled; keep the in-memory copy.
+    console.warn('[learning-paths] could not persist paths', e)
+  }
 }
 
 export function loadActivePathId() {
@@ -42,7 +44,11 @@ export function setActivePathId(pathId) {
     localStorage.removeItem(STORAGE_ACTIVE)
     return
   }
-  localStorage.setItem(STORAGE_ACTIVE, JSON.stringify({ pathId, updatedAt: Date.now() }))
+  try {
+    localStorage.setItem(STORAGE_ACTIVE, JSON.stringify({ pathId, updatedAt: Date.now() }))
+  } catch {
+    /* quota or private mode */
+  }
 }
 
 export function touchPathOpened(pathId) {

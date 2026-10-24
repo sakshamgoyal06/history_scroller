@@ -5,16 +5,19 @@ import { plannedLessonsForActiveTrack } from '../lessonToCard.js'
 /**
  * Build feed items for next incomplete lessons on dripped paths.
  * @param {import('./feedTypes.js').FeedItem[]} catalogFeedItems
+ * @param {{ paths?: object[], enabledIds?: string[] }} [state] defaults to reading storage
  */
-export function buildPathDripFeedItems(catalogFeedItems) {
-  const enabled = loadPathDripEnabled()
+export function buildPathDripFeedItems(catalogFeedItems, state = {}) {
+  const enabled = state.enabledIds ?? loadPathDripEnabled()
   if (enabled.length === 0) return []
+  const paths = state.paths ?? loadAllPaths()
 
   /** @type {import('./feedTypes.js').FeedItem[]} */
   const drips = []
   for (const pathId of enabled) {
-    const path = loadAllPaths().find((p) => p.id === pathId)
+    const path = paths.find((p) => p.id === pathId)
     if (!path) continue
+    const pathTitle = path.course?.title ?? path.preferences?.topic ?? 'Your path'
     const lessons = plannedLessonsForActiveTrack(path)
     const completed = new Set(path.completedLessonIds ?? [])
     const next = lessons.find((l) => !completed.has(l.id) && l.generationStatus !== 'error')
@@ -25,7 +28,7 @@ export function buildPathDripFeedItems(catalogFeedItems) {
     if (existing) {
       drips.push({
         ...existing,
-        pathDripLabel: path.topic ?? path.title ?? 'Your path',
+        pathDripLabel: pathTitle,
         pathDripPathId: pathId,
         pathDripStepIndex: next.lessonOrder ?? next.order ?? 1,
         pathDripStepTotal: lessons.length,
@@ -56,7 +59,7 @@ export function buildPathDripFeedItems(catalogFeedItems) {
           id: `pd-${next.id}-context`,
           type: 'context',
           eyebrow: 'Step',
-          body: `Part ${next.lessonOrder ?? next.order ?? '?'} of ${lessons.length} in ${path.topic ?? 'your topic'}.`,
+          body: `Part ${next.lessonOrder ?? next.order ?? '?'} of ${lessons.length} in ${pathTitle}.`,
         },
         {
           id: `pd-${next.id}-takeaway`,
@@ -66,7 +69,7 @@ export function buildPathDripFeedItems(catalogFeedItems) {
         },
       ],
       deepDive: { cardId: next.id, defaultMode: 'story' },
-      pathDripLabel: path.topic ?? path.title ?? 'Your path',
+      pathDripLabel: pathTitle,
       pathDripPathId: pathId,
       pathDripStepIndex: next.lessonOrder ?? next.order ?? 1,
       pathDripStepTotal: lessons.length,

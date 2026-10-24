@@ -3,10 +3,11 @@ import { loadZoneDripEnabled, loadZoneProgress, nextIncompleteZoneStep } from '.
 
 /**
  * @param {import('../feed/feedTypes.js').FeedItem[]} allFeedItems
+ * @param {{ enabled?: Record<string, boolean>, progress?: Record<string, unknown> }} [state] defaults to reading storage
  */
-export function buildZoneDripFeedItems(allFeedItems) {
-  const enabled = loadZoneDripEnabled()
-  const progress = loadZoneProgress()
+export function buildZoneDripFeedItems(allFeedItems, state = {}) {
+  const enabled = state.enabled ?? loadZoneDripEnabled()
+  const progress = state.progress ?? loadZoneProgress()
   /** @type {import('../feed/feedTypes.js').FeedItem[]} */
   const drips = []
 

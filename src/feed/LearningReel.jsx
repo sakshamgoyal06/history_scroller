@@ -59,9 +59,8 @@ export function LearningReel({
 
   const ranked = useMemo(() => {
     void notInterestedVersion
-    const merged = [...items, ...dripItems].filter(
-      (item) => !loadNotInterestedIds().includes(item.id),
-    )
+    const notInterested = new Set(loadNotInterestedIds())
+    const merged = [...items, ...dripItems].filter((item) => !notInterested.has(item.id))
     const session = loadFeedSession()
     const rankedList = rankFeedItems({
       items: merged,
@@ -99,7 +98,7 @@ export function LearningReel({
 
   useEffect(() => {
     if (initialFeedItemId && scrollerRef.current) {
-      const el = scrollerRef.current.querySelector(`[data-feed-id="${initialFeedItemId}"]`)
+      const el = scrollerRef.current.querySelector(`[data-feed-id="${CSS.escape(initialFeedItemId)}"]`)
       el?.scrollIntoView({ behavior: 'instant' })
       setActiveId(initialFeedItemId)
     }
@@ -126,6 +125,7 @@ export function LearningReel({
   useEffect(() => {
     const root = scrollerRef.current
     if (!root) return
+    const timers = visibilityTimers.current
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -163,8 +163,8 @@ export function LearningReel({
     root.querySelectorAll('[data-feed-id]').forEach((el) => observer.observe(el))
     return () => {
       observer.disconnect()
-      visibilityTimers.current.forEach((t) => window.clearTimeout(t))
-      visibilityTimers.current.clear()
+      timers.forEach((t) => window.clearTimeout(t))
+      timers.clear()
     }
   }, [displayList, ranked, markItemExplored, onActiveFeedItemChange])
 
