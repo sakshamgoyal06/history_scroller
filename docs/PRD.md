@@ -5,8 +5,8 @@
 | **Status** | v1.0, approved direction for MVP build |
 | **Owner** | Product lead |
 | **Last updated** | 2026-10-24 |
-| **Code baseline** | `main` @ `5f9ea5a` (v0.7 + engineering review) |
-| **Companion docs** | [`ENGINEERING_REVIEW.md`](ENGINEERING_REVIEW.md): technical state, known issues, P0/P1/P2 engineering roadmap |
+| **Code baseline** | v0.7 + engineering review + repo cleanup (see `BUILD_PLAN.md` §1) |
+| **Companion docs** | [`BUILD_PLAN.md`](BUILD_PLAN.md): milestone plan and checklist that implements this PRD · [`ENGINEERING_REVIEW.md`](ENGINEERING_REVIEW.md): technical state, known issues, P0/P1/P2 engineering roadmap |
 
 > **How to use this document.** This PRD is the source of truth for *why* we're building Curiosity Feed,
 > *who* it is for, *what* the MVP and later phases contain, and *how* we take it to market. Requirement IDs
@@ -780,10 +780,10 @@ Launch criteria per §7.3.
 
 | Pillar | Existing code | Gap to MVP |
 |--------|--------------|------------|
-| Feed | `src/feed/LearningReel.jsx`, `rankFeedItems.js`, `feedRepository.js`, `prototypeFeedItems.js` | Backend-served content, server-side ranking signals, "caught up" state |
-| Daily Edition | `src/dailyEdition.js`, `src/DailyEdition.jsx` | Editorial editions instead of selection from a static catalog; archive |
-| Stories | `src/RichStoryDetail.jsx`, `src/flagshipStories.js`, story detail in `App.jsx` | Sources UI, story view for every card |
-| Paths | `api/*`, `lib/*`, `src/LearnTopicPanel.jsx`, `src/learningPathStorage.js` | Auth, quotas, background jobs, cache, moderation, server persistence |
+| Feed | `src/feed/` (`LearningReel.jsx`, `rankFeedItems.js`, `feedRepository.js`, `prototypeFeedItems.js`) | Backend-served content, server-side ranking signals, "caught up" state |
+| Daily Edition | `src/edition/` | Editorial editions instead of selection from a static catalog; archive |
+| Stories | `src/stories/`, story detail in `App.jsx` | Sources UI, story view for every card |
+| Paths | `api/*`, `lib/*`, `src/learn/` | Auth, quotas, background jobs, cache, moderation, server persistence |
 | Zones | `src/zones/*` | 10+ zones in the CMS, syllabus tags, synced progress |
 | Library | `src/library/LibraryPanel.jsx` | Sync, edition archive, notes |
 | Recall | — | New |
@@ -808,3 +808,4 @@ Launch criteria per §7.3.
 | Date | Version | Change |
 |------|---------|--------|
 | 2026-10-24 | 1.0 | First PRD: vision, personas, MVP, requirements, GTM, metrics, roadmap |
+| 2026-10-24 | 1.0.1 | Linked `BUILD_PLAN.md`; baseline commit updated after the repo cleanup (no requirement changes) |
