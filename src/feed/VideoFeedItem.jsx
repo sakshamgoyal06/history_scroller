@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export function VideoFeedItem({ item, isActive, onExplored, onGoDeeper, actions, metaLine, offline }) {
   const [armed, setArmed] = useState(false)
@@ -7,9 +7,8 @@ export function VideoFeedItem({ item, isActive, onExplored, onGoDeeper, actions,
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
 
-  useEffect(() => {
-    if (!isActive) setArmed(false)
-  }, [isActive])
+  // Scrolling away disarms the player (adjusting state during render, not in an effect).
+  if (!isActive && armed) setArmed(false)
 
   const play = useCallback(() => {
     if (offline && video.provider === 'youtube') return

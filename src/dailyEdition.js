@@ -130,7 +130,11 @@ function loadProgressStore() {
 
 /** @param {Record<string, string[]>} store */
 function saveProgressStore(store) {
-  localStorage.setItem(STORAGE_DAILY_PROGRESS, JSON.stringify(store))
+  try {
+    localStorage.setItem(STORAGE_DAILY_PROGRESS, JSON.stringify(store))
+  } catch {
+    /* quota or private mode */
+  }
 }
 
 /** @param {string} dateKey */

@@ -2,6 +2,14 @@ const ZONE_PROGRESS_KEY = 'curiosity-feed-zone-progress-v1'
 const ZONE_DRIP_KEY = 'curiosity-feed-zone-drip-v1'
 const PATH_DRIP_KEY = 'curiosity-feed-path-drip-v1'
 
+function writeStore(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch {
+    /* quota or private mode */
+  }
+}
+
 function safeParse(raw, fallback) {
   try {
     return raw ? JSON.parse(raw) : fallback
@@ -16,7 +24,7 @@ export function loadZoneProgress() {
 }
 
 export function saveZoneProgress(zones) {
-  localStorage.setItem(ZONE_PROGRESS_KEY, JSON.stringify({ version: 1, zones, updatedAt: Date.now() }))
+  writeStore(ZONE_PROGRESS_KEY, { version: 1, zones, updatedAt: Date.now() })
 }
 
 export function markZoneStepComplete(zoneId, stepOrder) {
@@ -54,7 +62,7 @@ export function setZoneDripEnabled(zoneId, enabled) {
   const enabledMap = loadZoneDripEnabled()
   if (enabled) enabledMap[zoneId] = true
   else delete enabledMap[zoneId]
-  localStorage.setItem(ZONE_DRIP_KEY, JSON.stringify({ version: 1, enabled: enabledMap }))
+  writeStore(ZONE_DRIP_KEY, { version: 1, enabled: enabledMap })
 }
 
 export function loadPathDripEnabled() {
@@ -66,5 +74,5 @@ export function setPathDripEnabled(pathId, enabled) {
   const ids = new Set(loadPathDripEnabled())
   if (enabled) ids.add(pathId)
   else ids.delete(pathId)
-  localStorage.setItem(PATH_DRIP_KEY, JSON.stringify({ version: 1, pathIds: [...ids] }))
+  writeStore(PATH_DRIP_KEY, { version: 1, pathIds: [...ids] })
 }

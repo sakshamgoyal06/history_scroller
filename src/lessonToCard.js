@@ -11,13 +11,14 @@ export function lessonToDisplayCard({
   trackLessonCount,
 }) {
   const presentation = lesson.presentation
-  const sources = Object.values(pathRecord.sourceCatalog ?? {}).filter((src) => {
-    const ids = new Set([
-      ...(lesson.lessonCore?.sourceIds ?? []),
-      ...(lesson.sources ?? []).map((s) => s.id),
-    ])
-    return ids.has(src.id)
-  })
+  // lesson.sources is stored as source IDs; older records may hold full source objects.
+  const lessonSourceIds = new Set([
+    ...(lesson.lessonCore?.sourceIds ?? []),
+    ...(lesson.sources ?? []).map((s) => (typeof s === 'string' ? s : s?.id)),
+  ])
+  const sources = Object.values(pathRecord.sourceCatalog ?? {}).filter((src) =>
+    lessonSourceIds.has(src.id),
+  )
 
   if (lesson.legacyCard) {
     return {

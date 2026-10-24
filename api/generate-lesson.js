@@ -14,7 +14,10 @@ import {
   withTimeout,
 } from '../lib/serverUtils.js'
 
-const LESSON_TIMEOUT_MS = 180_000
+// Research + writing must finish inside the function's maxDuration (vercel.json: 300s).
+const LESSON_BUDGET_MS = 280_000
+const RESEARCH_TIMEOUT_MS = 150_000
+const MIN_WRITING_MS = 30_000
 
 export default async function handler(req, res) {
   const requestId = createRequestId()
@@ -97,6 +100,8 @@ export default async function handler(req, res) {
     title: payload.lesson.title.slice(0, 80),
   })
 
+  const deadline = Date.now() + LESSON_BUDGET_MS
+
   try {
     const research = await withTimeout(
       (signal) =>
@@ -106,7 +111,7 @@ export default async function handler(req, res) {
           signal,
           lessonContext,
         }),
-      LESSON_TIMEOUT_MS,
+      RESEARCH_TIMEOUT_MS,
       'Lesson research',
     )
 
@@ -119,7 +124,7 @@ export default async function handler(req, res) {
           lessonContext,
           research,
         }),
-      LESSON_TIMEOUT_MS,
+      Math.max(deadline - Date.now(), MIN_WRITING_MS),
       'Lesson writing',
     )
 
