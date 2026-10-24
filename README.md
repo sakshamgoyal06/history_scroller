@@ -3,8 +3,8 @@
 A calm, mobile-first learning PWA: a vertical "For You" feed of short story cards, curated
 Learning Zones, and AI-built learning paths for any topic you type in.
 
-Stack: React 19 + Vite 8 (PWA via `vite-plugin-pwa`), two Vercel serverless functions that
-call the OpenAI Responses API, Zod for every API contract. All user data lives in
+Stack: React 19 + Vite 8 (PWA via `vite-plugin-pwa`), a small Node server (`server/`, hosted on
+Railway) whose two AI endpoints call the OpenAI Responses API, Zod for every API contract. All user data lives in
 `localStorage` for now: there are no accounts and no database yet.
 
 > Status: **v0.7, pre-production.** See [`docs/ENGINEERING_REVIEW.md`](docs/ENGINEERING_REVIEW.md)
@@ -25,7 +25,7 @@ Domains: History · Economics · Geography · Civics · Technology · Current Af
 ## Project layout
 
 ```
-api/                      Vercel functions (one file = one endpoint)
+api/                      API handlers (one file = one endpoint, routed by server/app.js)
   plan-learning-path.js     POST: topic → plan (single path / needs narrowing / multi-track)
   generate-lesson.js        POST: planned lesson → web research → structured lesson
 lib/                      Server-only code shared by the endpoints
@@ -78,15 +78,17 @@ uses the demo generator.
 | `npm test` / `npm run test:watch` | Vitest unit tests (`lib/`, `api/`, `src/`) |
 | `npm run lint` | Oxlint (warnings fail) |
 | `npm run build` / `npm run preview` | Production build / serve it locally |
+| `npm start` | Production server: `dist/` + `/api` on `$PORT` (what Railway runs) |
 | `npm run check` | lint + test + build, the same as CI |
 
 CI (`.github/workflows/ci.yml`) runs `check` plus a production dependency audit on every PR.
 
 ## Deployment
 
-Built for Vercel: `api/*.js` become functions (`maxDuration: 300`, see `vercel.json`) and every
-other path rewrites to `index.html`. Set `OPENAI_API_KEY` and `OPENAI_MODEL` in the project's
-environment variables. **Before you expose this publicly, read the P0 items in the engineering
+Hosted on Railway as one always-on Node service: `railway.json` builds with `npm run build` and
+runs `npm start` (`server/index.js`), which serves `dist/`, the `/api` endpoints and a `/healthz`
+check. Set `OPENAI_API_KEY` and `OPENAI_MODEL` in the service's variables. Setup steps and limits
+are in [`docs/DEPLOY_RAILWAY.md`](docs/DEPLOY_RAILWAY.md). **Before you expose this publicly, read the P0 items in the engineering
 review.** The AI endpoints have no authentication or spend cap.
 
 ## Testing the PWA
