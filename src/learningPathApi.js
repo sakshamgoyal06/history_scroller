@@ -1,4 +1,5 @@
-const DEFAULT_TIMEOUT_MS = 120_000
+// Slightly above the server-side planning timeout so the server error wins the race.
+const DEFAULT_TIMEOUT_MS = 130_000
 
 /**
  * @param {string} path
@@ -11,7 +12,7 @@ async function postJson(path, body, options = {}) {
   const timer = setTimeout(() => controller.abort(), timeoutMs)
 
   if (options.signal) {
-    options.signal.addEventListener('abort', () => controller.abort())
+    options.signal.addEventListener('abort', () => controller.abort(), { once: true })
   }
 
   try {
@@ -52,7 +53,7 @@ export function planLearningPath(payload, options) {
 }
 
 export function generateLesson(payload, options) {
-  return postJson('/api/generate-lesson', payload, { ...options, timeoutMs: 180_000 })
+  return postJson('/api/generate-lesson', payload, { ...options, timeoutMs: 300_000 })
 }
 
 export function isForceMockMode() {
