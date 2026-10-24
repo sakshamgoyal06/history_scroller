@@ -48,6 +48,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
+        // Remote content must stay network-first (runtimeCaching below); precaching it would pin
+        // the copy from the last deploy and block publishing without a deploy (PRD FR-FEED-01).
+        globIgnores: ['content/**'],
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.endsWith('/content/feed-index.json'),

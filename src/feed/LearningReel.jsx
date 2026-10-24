@@ -4,23 +4,19 @@ import { SlideFeedItem } from './SlideFeedItem.jsx'
 import { VideoFeedItem } from './VideoFeedItem.jsx'
 import { SessionSummaryCard } from './SessionSummaryCard.jsx'
 import { rankFeedItems } from './rankFeedItems.js'
+import { feedUrl } from '../routing.js'
 import {
   loadExploredIds,
+  loadNotInterestedIds,
   markCompleted,
   markExplored,
   pushRecentlyViewed,
 } from './feedStorage.js'
 import { loadFeedSession, markSessionSummaryShown, startFeedSession, updateFeedSession } from './feedSession.js'
-import { loadNotInterestedIds } from './feedStorage.js'
 
 const EXPLORE_THRESHOLD = 0.7
 const EXPLORE_MS = 2000
 const SUMMARY_AFTER = 8
-
-function feedItemShareUrl(feedItemId) {
-  const base = `${window.location.pathname}${window.location.search}`
-  return `${base}#feed/${encodeURIComponent(feedItemId)}`
-}
 
 export function LearningReel({
   items,
@@ -52,11 +48,6 @@ export function LearningReel({
   const [activeId, setActiveId] = useState(null)
   const [notInterestedVersion, setNotInterestedVersion] = useState(0)
 
-  const recentPenalty = useMemo(() => {
-    const map = new Map()
-    return map
-  }, [])
-
   const ranked = useMemo(() => {
     void notInterestedVersion
     const notInterested = new Set(loadNotInterestedIds())
@@ -66,7 +57,6 @@ export function LearningReel({
       items: merged,
       savedCardIds,
       knownCardIds,
-      recentViewPenalty: recentPenalty,
       dripInserts: [],
     })
 
@@ -85,7 +75,7 @@ export function LearningReel({
       initialFeedItemId ?? rankedList[0]?.id,
     )
     return rankedList
-  }, [items, dripItems, savedCardIds, knownCardIds, recentPenalty, notInterestedVersion, initialFeedItemId])
+  }, [items, dripItems, savedCardIds, knownCardIds, notInterestedVersion, initialFeedItemId])
 
   const displayList = useMemo(() => {
     if (summaryInserted || exploredCount < SUMMARY_AFTER) return ranked
@@ -242,7 +232,7 @@ export function LearningReel({
               onToggleSave={() => handleSaveToggle(item)}
               onKnown={() => handleKnown(item)}
               onToast={onToast}
-              shareUrl={feedItemShareUrl(item.id)}
+              shareUrl={feedUrl(item.id)}
               onPreferenceChange={() => {
                 setNotInterestedVersion((v) => v + 1)
                 onPreferenceRefresh?.()

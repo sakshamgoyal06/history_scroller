@@ -1,8 +1,4 @@
-import {
-  LEARN_LENGTHS,
-  LEARN_LEVELS,
-  LEARN_SCOPES,
-} from './generateMockLearningPath.js'
+import { LEARN_LENGTHS, LEARN_LEVELS, LEARN_SCOPES } from './learnOptions.js'
 
 function OptionGroup({ legend, options, value, onChange, name }) {
   return (

@@ -76,7 +76,7 @@ function applyDiversityOrdering(items, rng) {
  * @param {import('./feedTypes.js').FeedItem[]} params.items
  * @param {Set<string>} params.savedCardIds
  * @param {Set<string>} params.knownCardIds
- * @param {Map<string, number>} params.recentViewPenalty
+ * @param {Map<string, number>} [params.recentViewPenalty] feed item id → recent view count
  * @param {import('./feedTypes.js').FeedItem[]} [params.dripInserts]
  * @param {string} [params.dateKey]
  * @param {number} [params.sessionSalt]
@@ -85,7 +85,7 @@ export function rankFeedItems({
   items,
   savedCardIds,
   knownCardIds,
-  recentViewPenalty,
+  recentViewPenalty = new Map(),
   dripInserts = [],
   dateKey = new Date().toISOString().slice(0, 10),
   sessionSalt = 0,

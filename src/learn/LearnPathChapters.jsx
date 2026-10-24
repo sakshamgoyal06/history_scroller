@@ -1,4 +1,4 @@
-import { StoryPreviewCard } from './StoryPreviewCard.jsx'
+import { StoryPreviewCard } from '../stories/StoryPreviewCard.jsx'
 
 export function LearnPathChapters({
   pathMeta,

@@ -1,6 +1,6 @@
-import { DailyEdition } from '../DailyEdition.jsx'
-import { FeaturedStoryMode } from '../FeaturedStoryMode.jsx'
-import { StoryPreviewCard } from '../StoryPreviewCard.jsx'
+import { DailyEdition } from '../edition/DailyEdition.jsx'
+import { FeaturedStoryMode } from '../stories/FeaturedStoryMode.jsx'
+import { StoryPreviewCard } from '../stories/StoryPreviewCard.jsx'
 
 export function ExplorePanel({
   catalog,

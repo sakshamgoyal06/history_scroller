@@ -7,7 +7,7 @@ import {
   getLocalDateKey,
   selectDailyEdition,
 } from './dailyEdition.js'
-import { StoryPreviewCard } from './StoryPreviewCard.jsx'
+import { StoryPreviewCard } from '../stories/StoryPreviewCard.jsx'
 
 function subscribeProgress(onStoreChange) {
   window.addEventListener('storage', onStoreChange)

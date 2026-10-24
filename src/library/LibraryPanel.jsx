@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { loadLikedIds, toggleLikedId, clearRecentlyViewed, loadRecentlyViewed } from '../feed/feedStorage.js'
-import { listPathSummaries } from '../learningPathStorage.js'
+import { listPathSummaries } from '../learn/learningPathStorage.js'
 import { getFeedItemById } from '../feed/feedRepository.js'
 
 export function LibraryPanel({

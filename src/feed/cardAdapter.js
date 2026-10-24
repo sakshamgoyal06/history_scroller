@@ -1,4 +1,4 @@
-import { verifiedYoutubeIdForCard } from './storyYoutube.js'
+import { verifiedYoutubeIdForCard } from '../catalog/data/storyYoutube.js'
 
 /**
  * Build a minimal slide feed item from a legacy catalog card.
@@ -82,39 +82,5 @@ export function feedItemFromCatalogCard(card) {
           caption: hook,
         }
       : undefined,
-  }
-}
-
-/**
- * @param {Record<string, unknown>} card
- * @returns {import('./feedTypes.js').FeedItem | null}
- */
-export function videoFeedItemFromCard(card) {
-  const youtubeId = verifiedYoutubeIdForCard(card.id)
-  if (!youtubeId) return null
-  const hook = String(card.hook ?? '').trim()
-  return {
-    id: `feed-video-${card.id}`,
-    parentCardId: card.id,
-    type: 'video',
-    title: String(card.title ?? card.id),
-    hook,
-    domain: String(card.domain ?? 'History'),
-    topics: card.category ? [String(card.category)] : [],
-    formatLabel: 'Video',
-    estimatedSeconds: 180,
-    art: {
-      src: card.image ?? `/stories/${card.id}.svg`,
-      alt: String(card.title ?? ''),
-    },
-    video: {
-      provider: 'youtube',
-      youtubeId,
-      poster: card.image ?? `/stories/${card.id}.svg`,
-      title: String(card.title ?? ''),
-      creator: 'Verified catalog source',
-      caption: hook || String(card.scene ?? '').slice(0, 200),
-    },
-    deepDive: { cardId: card.id, defaultMode: 'explainer' },
   }
 }

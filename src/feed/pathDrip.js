@@ -1,6 +1,6 @@
 import { loadPathDripEnabled } from '../zones/zoneProgress.js'
-import { loadAllPaths } from '../learningPathStorage.js'
-import { plannedLessonsForActiveTrack } from '../lessonToCard.js'
+import { loadAllPaths } from '../learn/learningPathStorage.js'
+import { plannedLessonsForActiveTrack } from '../learn/lessonToCard.js'
 
 /**
  * Build feed items for next incomplete lessons on dripped paths.

@@ -1,27 +1,13 @@
+import { STORAGE_KEYS, readJson, writeJson } from '../storage/localStore.js'
 import { isValidFeedItem } from './feedTypes.js'
 import { PROTOTYPE_FEED_ITEMS } from './prototypeFeedItems.js'
 
-const REMOTE_CACHE_KEY = 'curiosity-feed-remote-cache-v1'
-
 function readRemoteCache() {
-  try {
-    const raw = localStorage.getItem(REMOTE_CACHE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
-  } catch {
-    return null
-  }
+  return readJson(STORAGE_KEYS.remoteFeedCache, null)
 }
 
 function writeRemoteCache(payload) {
-  try {
-    localStorage.setItem(
-      REMOTE_CACHE_KEY,
-      JSON.stringify({ fetchedAt: Date.now(), payload }),
-    )
-  } catch {
-    /* ignore */
-  }
+  writeJson(STORAGE_KEYS.remoteFeedCache, { fetchedAt: Date.now(), payload })
 }
 
 /**
