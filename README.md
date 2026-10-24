@@ -7,8 +7,9 @@ Stack: React 19 + Vite 8 (PWA via `vite-plugin-pwa`), two Vercel serverless func
 call the OpenAI Responses API, Zod for every API contract. All user data lives in
 `localStorage` for now: there are no accounts and no database yet.
 
-> Status: **v0.7, pre-production.** See [`docs/ENGINEERING_REVIEW.md`](docs/ENGINEERING_REVIEW.md)
-> for the current assessment, known issues and the prioritized roadmap to production.
+> Status: **v0.7, pre-production.** Product direction, MVP scope and GTM live in
+> [`docs/PRD.md`](docs/PRD.md). The technical assessment, known issues and engineering roadmap live in
+> [`docs/ENGINEERING_REVIEW.md`](docs/ENGINEERING_REVIEW.md).
 
 ## Features
 
