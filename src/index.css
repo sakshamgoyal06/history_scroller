@@ -5,27 +5,30 @@
 }
 
 :root {
-  --bg: #f7f5f1;
-  --bg-deep: #efece6;
-  --surface: #fffcf8;
-  --ink: #2c2825;
-  --ink-muted: #5c5650;
-  --ink-soft: #8a837a;
-  --accent: #c17f59;
-  --accent-deep: #a56845;
-  --accent-soft: rgba(193, 127, 89, 0.14);
-  --line: rgba(44, 40, 37, 0.06);
-  --line-strong: rgba(44, 40, 37, 0.1);
-  --saved: #3d6b5a;
-  --saved-soft: rgba(61, 107, 90, 0.1);
+  /* Curious mode: "monsoon morning" (docs/DESIGN.md §2) */
+  --bg: #eaf0ec;
+  --bg-deep: #dfe7e2;
+  --surface: #f7faf7;
+  --ink: #13272a;
+  --ink-muted: #4f6365;
+  --ink-soft: #7a8c8d;
+  --accent: #0b7a83;
+  --accent-deep: #08636a;
+  --accent-soft: rgba(11, 122, 131, 0.12);
+  --spark: #e59a2f;
+  --line: rgba(19, 39, 42, 0.07);
+  --line-strong: rgba(19, 39, 42, 0.12);
+  --saved: #08636a;
+  --saved-soft: rgba(11, 122, 131, 0.1);
   --radius-card: 20px;
   --radius-chip: 999px;
-  --font-display: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif;
-  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Anybody', 'Arial Narrow', system-ui, sans-serif;
+  --font-ui: 'Mukta', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
   --shadow-card:
     0 0 0 1px var(--line),
-    0 2px 4px rgba(44, 40, 37, 0.03),
-    0 12px 32px rgba(44, 40, 37, 0.05);
+    0 2px 4px rgba(19, 39, 42, 0.03),
+    0 12px 32px rgba(19, 39, 42, 0.05);
   --header-offset: 132px;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }

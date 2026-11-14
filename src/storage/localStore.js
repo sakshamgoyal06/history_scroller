@@ -26,6 +26,12 @@ export const STORAGE_KEYS = {
 
   learningPaths: 'curiosity-feed-learning-paths-v1',
   activePath: 'curiosity-feed-active-path-v1',
+
+  // Two modes (PRD v2.0, FR-ONB-01, FR-UPSC-06)
+  appMode: 'curiosity-app-mode-v1',
+  onboarding: 'curiosity-onboarding-v1',
+  upscProfile: 'curiosity-upsc-profile-v1',
+  upscSaved: 'curiosity-upsc-saved-v1',
 }
 
 /** sessionStorage keys (per-tab feed session). */
