@@ -1,0 +1,970 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Curiosity Two Modes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Mukta:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the phone prototype is pinned on the left; the flow map, brand system and motion spec scroll on the right. On phones the prototype comes first, full width. */
+:root {
+  /* page chrome */
+  --bg: #DDE5E0;
+  --fg: #13272A;
+  --muted: #4F6365;
+  --line: rgba(19, 39, 42, 0.16);
+  --panel: #EBF0EC;
+  /* Curious mode: monsoon morning */
+  --mist: #EAF0EC;
+  --mist-surface: #F7FAF7;
+  --c-ink: #13272A;
+  --c-muted: #56696A;
+  --kingfisher: #0B7A83;
+  --marigold: #E59A2F;
+  --c-line: rgba(19, 39, 42, 0.12);
+  /* UPSC / Study mode: paper, ink, highlighter, sticky flags */
+  --paper: #FBFBF8;
+  --u-surface: #F0F0EA;
+  --u-ink: #0E1116;
+  --u-muted: #4C5260;
+  --u-line: rgba(14, 17, 22, 0.13);
+  --hl: #FFE34A;
+  --on-hl: #0E1116;
+  --u-btn: #0E1116;
+  --u-btn-fg: #FFE34A;
+  --gs1: #C8650F;
+  --gs2: #2A55C9;
+  --gs3: #17824B;
+  --gs4: #B12F6E;
+  /* type */
+  --f-display: 'Anybody', 'Arial Narrow', system-ui, sans-serif;
+  --f-body: 'Mukta', 'Noto Sans', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #081113; --fg: #E2EBE8; --muted: #93A6A4; --line: rgba(226, 235, 232, 0.15); --panel: #0F1C1F;
+    --mist: #0F1C1E; --mist-surface: #16282B; --c-ink: #E3ECE8; --c-muted: #93A6A4; --kingfisher: #5CC2C9; --marigold: #F0B455; --c-line: rgba(227, 236, 232, 0.13);
+    --paper: #111317; --u-surface: #1A1D23; --u-ink: #F2F2EE; --u-muted: #A3A8B3; --u-line: rgba(242, 242, 238, 0.15);
+    --gs1: #F0954A; --gs2: #86A2FF; --gs3: #4CC985; --gs4: #F070AE; --u-btn: #FFE34A; --u-btn-fg: #0E1116;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #081113; --fg: #E2EBE8; --muted: #93A6A4; --line: rgba(226, 235, 232, 0.15); --panel: #0F1C1F;
+  --mist: #0F1C1E; --mist-surface: #16282B; --c-ink: #E3ECE8; --c-muted: #93A6A4; --kingfisher: #5CC2C9; --marigold: #F0B455; --c-line: rgba(227, 236, 232, 0.13);
+  --paper: #111317; --u-surface: #1A1D23; --u-ink: #F2F2EE; --u-muted: #A3A8B3; --u-line: rgba(242, 242, 238, 0.15);
+  --gs1: #F0954A; --gs2: #86A2FF; --gs3: #4CC985; --gs4: #F070AE; --u-btn: #FFE34A; --u-btn-fg: #0E1116;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--kingfisher); outline-offset: 2px; }
+
+.page {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  align-items: start;
+}
+.stage { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: grid; gap: 12px; justify-items: center; }
+.stage-note { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--muted); text-align: center; max-width: 380px; }
+
+/* ---------- phone ---------- */
+.phone {
+  width: 380px;
+  height: min(800px, calc(100dvh - 90px));
+  min-height: 640px;
+  border-radius: 40px;
+  padding: 10px;
+  background: var(--fg);
+  box-shadow: 0 30px 60px -30px rgba(8, 17, 19, 0.45);
+}
+.app {
+  position: relative;
+  height: 100%;
+  border-radius: 31px;
+  overflow: hidden;
+  background: var(--a-bg);
+  color: var(--a-ink);
+  isolation: isolate;
+}
+.app.m-curious { --a-bg: var(--mist); --a-surface: var(--mist-surface); --a-ink: var(--c-ink); --a-muted: var(--c-muted); --a-line: var(--c-line); --a-accent: var(--kingfisher); }
+.app.m-upsc { --a-bg: var(--paper); --a-surface: var(--u-surface); --a-ink: var(--u-ink); --a-muted: var(--u-muted); --a-line: var(--u-line); --a-accent: var(--u-ink); }
+.screen { height: 100%; display: flex; flex-direction: column; }
+.main { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.main::-webkit-scrollbar { display: none; }
+.statusbar { display: flex; justify-content: space-between; padding: 10px 22px 0; font-family: var(--f-mono); font-size: 11px; color: var(--a-muted); }
+
+/* header */
+.hdr { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 16px 10px; }
+.wm { font-family: var(--f-display); font-size: 22px; line-height: 1; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 6px; }
+.m-curious .wm { font-variation-settings: 'wdth' 135, 'wght' 380; }
+.wm-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--marigold); transform: translateY(-6px); }
+.m-upsc .wm { font-variation-settings: 'wdth' 62, 'wght' 860; font-size: 24px; letter-spacing: -0.02em; }
+.wm-tag { font-family: var(--f-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 2px 5px 1px; background: var(--hl); color: var(--on-hl); transform: rotate(-2deg); }
+
+.seg { display: inline-flex; border: 1px solid var(--a-line); border-radius: 999px; padding: 2px; background: var(--a-surface); }
+.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--a-muted); line-height: 1.2; }
+.seg button[aria-pressed="true"] { color: var(--a-ink); }
+.m-curious .seg button[aria-pressed="true"] { background: var(--a-bg); box-shadow: inset 0 0 0 1px var(--a-line); }
+.m-upsc .seg button[aria-pressed="true"] { background: var(--hl); color: var(--on-hl); font-weight: 700; }
+
+/* tabs: words, not icons */
+.tabs { display: flex; justify-content: space-around; padding: 10px 12px 16px; border-top: 1px solid var(--a-line); background: var(--a-bg); }
+.tab { border: 0; background: none; padding: 6px 12px; font-size: 14px; color: var(--a-muted); position: relative; }
+.tab.is-on { color: var(--a-ink); font-weight: 600; }
+.m-curious .tab.is-on::after { content: ""; position: absolute; left: 50%; bottom: -2px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--marigold); }
+.m-upsc .tab.is-on { background: linear-gradient(100deg, transparent 4%, var(--hl) 6%, var(--hl) 94%, transparent 96%); color: var(--on-hl); }
+
+/* shared text bits */
+.mono { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--a-muted); }
+.kicker { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--a-muted); }
+.hl { background: linear-gradient(100deg, transparent 0.15em, var(--hl) 0.3em, var(--hl) calc(100% - 0.3em), transparent calc(100% - 0.15em)); color: var(--on-hl); padding: 0 0.3em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+/* ---------- onboarding ---------- */
+.onb { display: flex; flex-direction: column; height: 100%; }
+.onb-top { padding: 18px 22px 14px; display: grid; gap: 6px; }
+.onb-top h1 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 120, 'wght' 420; font-size: 28px; line-height: 1.08; text-wrap: balance; }
+.onb-top p { margin: 0; color: var(--a-muted); font-size: 15px; }
+.split { flex: 1; display: grid; grid-template-rows: 1fr 1fr; min-height: 0; }
+.half { border: 0; text-align: left; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: filter 0.2s var(--ease); }
+.half:hover { filter: saturate(1.15); }
+.half-cur { background: var(--mist); color: var(--c-ink); border-top: 1px solid var(--c-line); }
+.half-up { background: var(--paper); color: var(--u-ink); border-top: 1px solid var(--u-line); }
+.half-title { font-family: var(--f-display); font-size: 30px; line-height: 1; }
+.half-cur .half-title { font-variation-settings: 'wdth' 140, 'wght' 330; }
+.half-up .half-title { font-variation-settings: 'wdth' 60, 'wght' 880; font-size: 34px; letter-spacing: -0.01em; }
+.half-sample { font-size: 15px; line-height: 1.4; max-width: 30ch; }
+.half-cur .half-sample { color: var(--c-muted); }
+.half-up .half-sample { color: var(--u-muted); }
+.half-go { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.05em; }
+.half-cur .half-go { color: var(--kingfisher); }
+.onb-foot { display: flex; justify-content: space-between; align-items: center; padding: 12px 22px 18px; font-size: 13px; color: var(--a-muted); border-top: 1px solid var(--a-line); }
+.linkbtn { border: 0; background: none; padding: 4px 0; font-size: 14px; font-weight: 600; color: var(--a-accent); }
+.onb-body { flex: 1; overflow-y: auto; padding: 4px 22px 16px; display: grid; gap: 22px; align-content: start; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--a-line); background: var(--a-surface); border-radius: 999px; padding: 7px 14px; font-size: 15px; }
+.m-curious .chip[aria-pressed="true"] { background: var(--kingfisher); border-color: var(--kingfisher); color: var(--mist-surface); }
+.m-upsc .chip { border-radius: 4px; }
+.m-upsc .chip[aria-pressed="true"] { background: var(--u-btn); border-color: var(--u-btn); color: var(--u-btn-fg); font-weight: 600; }
+.field { display: grid; gap: 8px; }
+.cta { margin: 0 22px 20px; border: 0; padding: 14px 18px; font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.m-curious .cta { background: var(--kingfisher); color: var(--mist-surface); border-radius: 999px; }
+.m-upsc .cta { background: var(--u-btn); color: var(--u-btn-fg); border-radius: 6px; }
+.cta[disabled] { opacity: 0.4; cursor: default; }
+.steps-dots { font-family: var(--f-mono); font-size: 11px; color: var(--a-muted); }
+
+/* ---------- Curious feed ---------- */
+.track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 0 16px 10px; }
+.track i { height: 3px; border-radius: 2px; background: var(--a-line); }
+.track i.on { background: var(--kingfisher); }
+.feed { scroll-snap-type: y mandatory; }
+.post { height: 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; flex-direction: column; }
+.c-post { padding: 0 12px 10px; gap: 10px; }
+.c-plate {
+  --tone: var(--kingfisher);
+  flex: 0 0 38%;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--tone) 16%, var(--mist-surface));
+  color: color-mix(in srgb, var(--tone) 80%, var(--c-ink));
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.c-plate svg { position: absolute; right: -6px; top: 8px; width: 62%; height: auto; opacity: 0.85; }
+.c-plate .kicker { color: inherit; position: relative; }
+.segs { position: absolute; left: 14px; right: 14px; top: 12px; display: flex; gap: 4px; }
+.segs i { flex: 1; height: 3px; border-radius: 2px; background: color-mix(in srgb, currentColor 22%, transparent); }
+.segs i.on { background: currentColor; }
+.c-text { flex: 1; min-height: 0; padding: 4px 8px; cursor: pointer; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.c-hook { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 118, 'wght' 400; font-size: 27px; line-height: 1.12; text-wrap: balance; letter-spacing: -0.005em; }
+.c-body { margin: 0; font-size: 18px; line-height: 1.5; text-wrap: pretty; }
+.c-spark { color: var(--marigold); font-weight: 600; }
+.c-hint { margin-top: auto; font-family: var(--f-mono); font-size: 11px; color: var(--a-muted); }
+.c-actions { display: flex; align-items: center; gap: 4px; padding: 0 4px; }
+.act { border: 0; background: none; padding: 8px 10px; font-size: 14px; color: var(--a-muted); border-radius: 999px; }
+.act[aria-pressed="true"] { color: var(--kingfisher); font-weight: 600; }
+.act-deeper { margin-left: auto; color: var(--a-ink); font-weight: 600; border: 1px solid var(--a-line); padding: 8px 14px; }
+.c-end { padding: 22px 22px 18px; gap: 16px; }
+.c-end h2 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 125, 'wght' 380; font-size: 34px; line-height: 1.05; }
+.learned { list-style: none; margin: 0; padding: 0; display: grid; }
+.learned li { padding: 10px 0; border-bottom: 1px solid var(--a-line); font-size: 15px; line-height: 1.4; display: grid; grid-template-columns: 22px 1fr; gap: 6px; }
+.learned li span { font-family: var(--f-mono); font-size: 11px; color: var(--marigold); padding-top: 3px; }
+.tomorrow { background: var(--a-surface); border-radius: 16px; padding: 14px 16px; font-size: 15px; display: grid; gap: 2px; }
+.end-actions { display: flex; gap: 10px; margin-top: auto; }
+.pill { border: 1px solid var(--a-line); background: none; border-radius: 999px; padding: 11px 16px; font-size: 15px; font-weight: 500; }
+.pill-solid { background: var(--kingfisher); color: var(--mist-surface); border-color: var(--kingfisher); }
+
+/* story reading view */
+.back { display: flex; align-items: center; gap: 8px; padding: 6px 16px 10px; }
+.back button { border: 0; background: none; font-size: 15px; font-weight: 600; color: var(--a-accent); padding: 4px 0; }
+.read { padding: 4px 22px 28px; display: grid; gap: 14px; }
+.read h1 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 115, 'wght' 420; font-size: 30px; line-height: 1.08; text-wrap: balance; }
+.read p { margin: 0; font-size: 17px; line-height: 1.6; }
+.read h3 { margin: 8px 0 0; }
+.pull { font-family: var(--f-display); font-variation-settings: 'wdth' 120, 'wght' 360; font-size: 21px; line-height: 1.3; border-left: 3px solid var(--marigold); padding-left: 14px; }
+.srcs { list-style: none; margin: 0; padding: 0; display: grid; }
+.srcs li { padding: 8px 0; border-top: 1px solid var(--a-line); font-size: 14px; line-height: 1.4; }
+.srcs li b { display: block; font-weight: 600; }
+.next-up { border: 0; text-align: left; background: var(--a-surface); border-radius: 16px; padding: 14px 16px; display: grid; gap: 2px; }
+.next-up b { font-size: 16px; }
+
+/* explore & library rows */
+.pad { padding: 4px 18px 24px; display: grid; gap: 20px; align-content: start; }
+.h-screen { margin: 0; font-family: var(--f-display); font-size: 28px; line-height: 1.05; }
+.m-curious .h-screen { font-variation-settings: 'wdth' 125, 'wght' 400; }
+.m-upsc .h-screen { font-variation-settings: 'wdth' 64, 'wght' 850; font-size: 32px; }
+.ask-box { display: grid; gap: 10px; }
+.ask-box textarea, .ask-box input { width: 100%; font: inherit; font-size: 17px; color: var(--a-ink); background: var(--a-surface); border: 1px solid var(--a-line); border-radius: 16px; padding: 14px 16px; resize: none; }
+.m-upsc .ask-box textarea { border-radius: 6px; border: 2px solid var(--u-ink); background: var(--paper); min-height: 104px; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { border-top: 1px solid var(--a-line); }
+.rows li:last-child { border-bottom: 1px solid var(--a-line); }
+.row { width: 100%; border: 0; background: none; text-align: left; padding: 12px 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.row b { font-weight: 600; font-size: 16px; }
+.row small { grid-column: 1; font-size: 13px; color: var(--a-muted); }
+.row .meter { grid-row: 1 / span 2; grid-column: 2; width: 54px; height: 4px; border-radius: 2px; background: var(--a-line); position: relative; overflow: hidden; }
+.row .meter i { position: absolute; inset: 0 auto 0 0; background: var(--kingfisher); }
+.plan { display: grid; gap: 0; }
+.plan-step { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--a-line); }
+.plan-step span { font-family: var(--f-mono); font-size: 12px; color: var(--kingfisher); padding-top: 2px; }
+.inline-note { font-size: 14px; color: var(--a-muted); background: var(--a-surface); border-radius: 14px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.m-upsc .inline-note { border-radius: 6px; }
+
+/* ---------- UPSC feed ---------- */
+.gsbar { display: flex; gap: 6px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
+.gsbar::-webkit-scrollbar { display: none; }
+.gsf { flex: none; border: 1.5px solid var(--u-line); background: var(--paper); border-radius: 4px; padding: 4px 9px; font-family: var(--f-mono); font-size: 12px; font-weight: 500; color: var(--u-ink); display: inline-flex; gap: 6px; align-items: center; }
+.gsf i { width: 8px; height: 8px; background: var(--gsc, var(--u-ink)); border-radius: 1px; }
+.gsf[aria-pressed="true"] { background: var(--u-ink); color: var(--paper); border-color: var(--u-ink); }
+.dayline { display: flex; justify-content: space-between; align-items: baseline; padding: 0 16px 8px; }
+.dayline b { font-family: var(--f-display); font-variation-settings: 'wdth' 70, 'wght' 800; font-size: 15px; letter-spacing: 0.01em; text-transform: uppercase; }
+.u-post { padding: 6px 16px 12px; gap: 12px; border-top: 1px solid var(--u-line); }
+.u-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.flag { --gsc: var(--gs2); display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gsc); padding: 3px 8px 3px 0; }
+.flag::before { content: ""; width: 12px; height: 16px; background: var(--gsc); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%); }
+.u-head { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 66, 'wght' 820; font-size: 31px; line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+.u-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.u-step { border: 0; background: none; padding: 6px 0 0; border-top: 3px solid var(--u-line); text-align: left; font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.03em; color: var(--u-muted); line-height: 1.25; }
+.u-step.done { border-top-color: var(--u-ink); color: var(--u-ink); }
+.u-step.on { border-top-color: var(--u-ink); color: var(--u-ink); font-weight: 600; }
+.u-body { flex: 1; min-height: 0; overflow-y: auto; cursor: pointer; display: flex; flex-direction: column; gap: 10px; }
+.u-body p { margin: 0; font-size: 18px; line-height: 1.48; }
+.facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.facts li { font-size: 16px; line-height: 1.4; display: grid; grid-template-columns: 18px 1fr; gap: 4px; }
+.facts li::before { content: "▸"; font-size: 12px; padding-top: 3px; color: var(--u-muted); }
+.u-body .c-hint { color: var(--u-muted); }
+.u-foot { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn-ink { border: 0; border-radius: 6px; background: var(--u-btn); color: var(--u-btn-fg); padding: 12px 14px; font-weight: 700; font-size: 15px; text-align: left; display: flex; justify-content: space-between; gap: 8px; }
+.btn-line { border: 1.5px solid var(--u-ink); border-radius: 6px; background: none; padding: 10px 12px; font-weight: 600; font-size: 14px; }
+.btn-line[aria-pressed="true"] { background: var(--hl); color: var(--on-hl); border-color: var(--hl); }
+.u-src { grid-column: 1 / -1; margin: 0; font-size: 12px; color: var(--u-muted); line-height: 1.35; }
+.u-end { padding: 20px 18px 16px; gap: 14px; border-top: 1px solid var(--u-line); }
+.stamp { font-family: var(--f-display); font-variation-settings: 'wdth' 58, 'wght' 900; font-size: 46px; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.01em; }
+.tally { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tally div { border-top: 3px solid var(--gsc); padding-top: 6px; font-family: var(--f-mono); font-size: 11px; }
+.tally b { display: block; font-family: var(--f-display); font-variation-settings: 'wdth' 70, 'wght' 800; font-size: 22px; }
+.u-end .rows .row b { font-size: 15px; }
+.soon { font-family: var(--f-mono); font-size: 10px; border: 1px solid var(--u-line); border-radius: 3px; padding: 1px 5px; color: var(--u-muted); }
+
+/* explainer */
+.exp-top { padding: 4px 18px 10px; display: grid; gap: 8px; border-bottom: 2px solid var(--u-ink); }
+.exp-top h1 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 64, 'wght' 840; font-size: 30px; line-height: 1.02; text-wrap: balance; }
+.exp-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.exp-index { display: flex; gap: 14px; overflow-x: auto; padding: 8px 18px; border-bottom: 1px solid var(--u-line); scrollbar-width: none; position: sticky; top: 0; background: var(--paper); z-index: 2; }
+.exp-index::-webkit-scrollbar { display: none; }
+.exp-index button { flex: none; border: 0; background: none; font-family: var(--f-mono); font-size: 11px; padding: 2px 0; color: var(--u-muted); }
+.exp { padding: 6px 18px 28px; display: grid; gap: 0; }
+.exp section { padding: 14px 0; border-bottom: 1px solid var(--u-line); display: grid; gap: 8px; scroll-margin-top: 40px; }
+.exp h3 { margin: 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--u-muted); font-weight: 600; }
+.exp p { margin: 0; font-size: 16px; line-height: 1.55; }
+.oneline { font-family: var(--f-display); font-variation-settings: 'wdth' 85, 'wght' 600; font-size: 20px !important; line-height: 1.3 !important; }
+.debate { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.debate div { display: grid; gap: 6px; align-content: start; }
+.debate b { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.debate p { font-size: 14px !important; }
+.mains { border: 2px solid var(--u-ink); border-radius: 6px; padding: 12px 14px; font-family: var(--f-display); font-variation-settings: 'wdth' 80, 'wght' 600; font-size: 17px; line-height: 1.3; }
+.building { padding: 24px 18px; display: grid; gap: 14px; }
+.build-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.build-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--u-line); font-size: 15px; color: var(--u-muted); transition: color 0.2s; }
+.build-list li.ok { color: var(--u-ink); }
+.build-list li.ok span::after { content: "done"; font-family: var(--f-mono); font-size: 11px; background: var(--hl); color: var(--on-hl); padding: 1px 5px; }
+.build-list li.now span::after { content: "writing"; font-family: var(--f-mono); font-size: 11px; }
+
+/* ---------- switch overlay ---------- */
+.switch { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+.sw-fill { position: absolute; inset: 0; }
+.sw-label { position: absolute; left: 0; right: 0; top: 41%; display: grid; justify-items: center; gap: 6px; text-align: center; padding: 0 24px; }
+.sw-title { font-family: var(--f-display); font-size: 52px; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.01em; }
+.sw-sub { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.04em; }
+
+/* ---------- right column ---------- */
+.notes { display: grid; gap: 44px; min-width: 0; }
+.notes h1 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 130, 'wght' 360; font-size: clamp(34px, 5vw, 52px); line-height: 1; letter-spacing: -0.01em; text-wrap: balance; }
+.notes h1 em { font-style: normal; font-variation-settings: 'wdth' 58, 'wght' 900; background: linear-gradient(100deg, transparent 0.1em, var(--hl) 0.2em, var(--hl) calc(100% - 0.2em), transparent calc(100% - 0.1em)); color: var(--on-hl); padding: 0 0.15em; }
+.notes h2 { margin: 0 0 12px; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.lede { font-size: 18px; line-height: 1.55; max-width: 62ch; margin: 14px 0 0; color: var(--fg); }
+.lede + .lede { margin-top: 10px; color: var(--muted); font-size: 16px; }
+.flow { display: grid; gap: 18px; }
+.lane { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: start; }
+.lane-name { font-family: var(--f-display); font-size: 17px; line-height: 1.15; padding-top: 6px; }
+.lane-name.cur { font-variation-settings: 'wdth' 130, 'wght' 420; color: var(--kingfisher); }
+.lane-name.up { font-variation-settings: 'wdth' 62, 'wght' 860; }
+.lane-name.mid { font-variation-settings: 'wdth' 100, 'wght' 600; }
+.lane-steps { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.jump { border: 1px solid var(--line); background: var(--panel); color: var(--fg); padding: 6px 11px; border-radius: 8px; font-size: 14px; line-height: 1.3; }
+.jump:hover { border-color: var(--fg); }
+.jump.is-on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.arrow { color: var(--muted); font-size: 13px; }
+.flow-help { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.sys { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sys-col { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.sys-col h3 { margin: 0; font-family: var(--f-display); font-size: 24px; line-height: 1.05; }
+.sys-col.cur h3 { font-variation-settings: 'wdth' 135, 'wght' 380; }
+.sys-col.up h3 { font-variation-settings: 'wdth' 60, 'wght' 880; }
+.sw-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px; }
+.swatch { display: grid; gap: 4px; font-family: var(--f-mono); font-size: 10px; color: var(--muted); }
+.swatch i { height: 40px; border-radius: 6px; border: 1px solid var(--line); }
+.sys-col p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--fg); }
+.type-spec { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 14px; }
+.ts-a { font-family: var(--f-display); font-size: 40px; line-height: 1; transition: font-variation-settings 0.6s var(--ease); font-variation-settings: 'wdth' 135, 'wght' 330; }
+.type-spec:hover .ts-a { font-variation-settings: 'wdth' 58, 'wght' 900; }
+.ts-cap { font-size: 14px; color: var(--muted); max-width: 60ch; }
+.motion-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.motion-tbl th, .motion-tbl td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.motion-tbl th { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.motion-tbl td:first-child { font-family: var(--f-mono); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tbl-wrap { overflow-x: auto; }
+.play-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.play { border: 0; border-radius: 6px; padding: 9px 14px; font-weight: 600; font-size: 14px; }
+.play-up { background: var(--hl); color: var(--on-hl); }
+.play-cur { background: var(--kingfisher); color: var(--mist-surface); }
+.rules { list-style: none; margin: 0; padding: 0; display: grid; }
+.rules li { padding: 12px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 15ch) minmax(0, 1fr); gap: 14px; font-size: 15px; line-height: 1.5; }
+.rules li b { font-weight: 600; }
+.rules li span { color: var(--muted); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.req { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 16px 48px; }
+  .stage { position: static; }
+  .notes { order: -1; gap: 36px; }
+  .notes > .intro { order: -1; }
+}
+@media (max-width: 440px) {
+  .phone { width: 100%; padding: 6px; border-radius: 32px; height: 760px; max-height: calc(100dvh - 60px); min-height: 600px; }
+  .app { border-radius: 27px; }
+  .sys { grid-template-columns: minmax(0, 1fr); }
+  .lane { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .rules li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .u-head { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+  .ts-a { transition: none; }
+}
+</style>
+
+<div class="page">
+  <div class="stage">
+    <div class="phone"><div class="app m-curious" id="app"><div class="screen" id="screen"></div>
+      <div class="switch" id="switch" hidden><div class="sw-fill" id="swFill"></div><div class="sw-label" id="swLabel"><span class="sw-title" id="swTitle">Study mode</span><span class="sw-sub" id="swSub"></span></div></div>
+    </div></div>
+    <p class="stage-note">Tap the right side of a post for the next slide, the left side to go back. Scroll for the next post. Content is sample content for the prototype, not today's news.</p>
+  </div>
+
+  <div class="notes">
+    <section class="intro">
+      <h1>One app. A calm feed, and a <em>study mode</em>.</h1>
+      <p class="lede">Curious mode is what you open instead of Instagram: five good stories, then it ends. UPSC mode is the same habit with the exam switched on: today's current affairs in four short steps, and any topic explained the way UPSC asks it.</p>
+      <p class="lede">Both run on one engine (PRD v2, P1–P9). What changes between them is pace, density and tone, so the switch between them is the one moment in the app that gets real animation.</p>
+    </section>
+
+    <section>
+      <h2>Flow map · tap a screen</h2>
+      <div class="flow" id="flow">
+        <div class="lane"><div class="lane-name mid">Start</div><div class="lane-steps">
+          <button class="jump" data-go="onb-mode">Choose a mode</button><span class="arrow">→</span>
+          <button class="jump" data-go="onb-curious">Pick 3 interests</button><span class="arrow">or</span>
+          <button class="jump" data-go="onb-upsc">Exam setup</button>
+        </div></div>
+        <div class="lane"><div class="lane-name cur">Curious mode</div><div class="lane-steps">
+          <button class="jump" data-go="c-today">Today's 5</button><span class="arrow">→</span>
+          <button class="jump" data-go="c-story">Go deeper</button><span class="arrow">→</span>
+          <button class="jump" data-go="c-end">Done for today</button>
+          <button class="jump" data-go="c-explore">Explore</button>
+          <button class="jump" data-go="c-library">Library</button>
+        </div></div>
+        <div class="lane"><div class="lane-name up">UPSC mode</div><div class="lane-steps">
+          <button class="jump" data-go="u-today">Today's current affairs</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-explain">Explain it UPSC-style</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-end">Caught up</button>
+          <button class="jump" data-go="u-ask">Ask anything</button>
+          <button class="jump" data-go="u-library">GS Library</button>
+        </div></div>
+        <div class="lane"><div class="lane-name mid">The switch</div><div class="lane-steps">
+          <button class="jump" data-play="upsc">Enter study mode</button>
+          <button class="jump" data-play="curious">Back to Curious</button>
+        </div></div>
+      </div>
+      <p class="flow-help">Nothing in either mode opens a pop-up. Going deeper, explaining and asking are full pages with a back link; the end of a session is the last page of the feed.</p>
+    </section>
+
+    <section>
+      <h2>Brand system</h2>
+      <div class="sys">
+        <div class="sys-col cur">
+          <h3>Curious</h3>
+          <div class="sw-row">
+            <div class="swatch"><i style="background:var(--mist)"></i>Mist</div>
+            <div class="swatch"><i style="background:var(--c-ink)"></i>Slate ink</div>
+            <div class="swatch"><i style="background:var(--kingfisher)"></i>Kingfisher</div>
+            <div class="swatch"><i style="background:var(--marigold)"></i>Marigold</div>
+          </div>
+          <p>A monsoon morning: cool mist ground, slate ink, kingfisher teal for actions. Marigold is the "huh" spark and appears once per screen at most. Cool and low-contrast enough for 11 pm in bed, which is when a lot of scrolling happens.</p>
+        </div>
+        <div class="sys-col up">
+          <h3>UPSC · Study</h3>
+          <div class="sw-row">
+            <div class="swatch"><i style="background:var(--paper)"></i>Paper</div>
+            <div class="swatch"><i style="background:var(--u-ink)"></i>Ink</div>
+            <div class="swatch"><i style="background:var(--hl)"></i>Highlighter</div>
+            <div class="swatch"><i style="background:linear-gradient(90deg,var(--gs1) 25%,var(--gs2) 25% 50%,var(--gs3) 50% 75%,var(--gs4) 75%)"></i>GS flags</div>
+          </div>
+          <p>Taken from how aspirants already study: newspaper and notebook paper, black ink, a yellow highlighter on the line that matters, and coloured sticky flags. Each GS paper has its own flag colour, so GS2 and GS3 read apart at a glance.</p>
+        </div>
+      </div>
+      <div class="type-spec" style="margin-top:18px">
+        <div class="ts-a">curiosity</div>
+        <p class="ts-cap">One variable typeface, Anybody, carries both moods. Curious sets it wide and light; Study sets it condensed and heavy (hover to see it tighten). Entering study mode literally tightens the type. Body text is Mukta from Ek Type in Mumbai, which also covers Devanagari for the Hindi UPSC edition. IBM Plex Mono labels dates, GS tags and sources.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>The switch into study mode</h2>
+      <div class="tbl-wrap"><table class="motion-tbl">
+        <thead><tr><th>Time</th><th>Into study (≈1.0 s)</th><th>Back to Curious (≈0.8 s)</th></tr></thead>
+        <tbody>
+          <tr><td>0–260 ms</td><td>A highlighter stroke swipes left to right across the screen at a slight angle.</td><td>A mist circle grows out of the toggle you tapped.</td></tr>
+          <tr><td>260–520 ms</td><td>The stroke widens to fill the screen. "Study mode" condenses from wide/light to narrow/heavy.</td><td>"Curious mode" relaxes from narrow/heavy to wide/light.</td></tr>
+          <tr><td>520 ms</td><td>Today's current-affairs feed is laid in underneath. A 12 ms vibration on Android.</td><td>Today's 5 is laid in underneath, resumed where you left it.</td></tr>
+          <tr><td>720–1040 ms</td><td>The yellow wipes upward off the screen like a page turn, revealing the feed.</td><td>The mist fades out.</td></tr>
+          <tr><td>Reduced motion</td><td colspan="2">A 200 ms crossfade with the mode name. No sweep, no type morph, no vibration.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="play-row"><button class="play play-up" data-play="upsc">Play: into study mode</button><button class="play play-cur" data-play="curious">Play: back to Curious</button></div>
+    </section>
+
+    <section>
+      <h2>Choices we made, and the defaults we refused</h2>
+      <ul class="rules">
+        <li><b>New palette</b><span>The current app is warm cream with a serif and terracotta, which is also the look most AI-generated apps land on. Curious moves to cool mist and kingfisher; Study gets paper and highlighter. No gradients anywhere.</span></li>
+        <li><b>No pop-ups</b><span>Mode is a toggle in the header, not a modal. Sign-in is asked inline at the first save (FR-ACCT-02). "Explain it UPSC-style" opens a full page you can bookmark, not a sheet.</span></li>
+        <li><b>No card grid</b><span>A post is the whole screen. Lists are rows divided by rules. The only things that look like objects are the story plate and the GS flags, because they carry meaning.</span></li>
+        <li><b>Words for tabs</b><span>Three tabs per mode, labelled in words: Today, Explore, Library or Today, Ask, Library. Down from four in the current app (Zones and Learn merge into Explore).</span></li>
+        <li><b>Endings, not streaks</b><span>Curious ends on "That's today's 5" with what you learned; UPSC ends on "Caught up" with a tally by GS paper. No streak counter, no badges (PRD principle 6).</span></li>
+        <li><b>Structure is visible</b><span>Curious posts follow hook, context, reveal, why it matters, takeaway. UPSC posts show their four steps by name (What happened, Background, Key facts, Why it matters) so aspirants learn where to look.</span></li>
+        <li><b>Trust on screen</b><span>Sources sit under every post and story. AI-written explainers say so; cached editor-checked ones say that instead (FR-TRUST-03).</span></li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var app = document.getElementById('app');
+  var screen = document.getElementById('screen');
+  var sw = document.getElementById('switch');
+  var swFill = document.getElementById('swFill');
+  var swLabel = document.getElementById('swLabel');
+  var swTitle = document.getElementById('swTitle');
+  var swSub = document.getElementById('swSub');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- content ---------------- */
+  var G = {
+    stepwell: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 14h88v80H6z"/><path d="M16 24h68v70"/><path d="M26 34h48v60"/><path d="M36 44h28v50"/><path d="M44 54h12v40"/><path d="M6 94h88"/><path d="M16 24v70M26 34v60M36 44v50M44 54v40"/></svg>',
+    zero: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="52" cy="50" r="34"/><circle cx="52" cy="50" r="22"/><circle cx="52" cy="50" r="3" fill="currentColor"/></svg>',
+    banana: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 30c18 22 50 26 74 6"/><path d="M14 50c18 22 50 26 74 6"/><path d="M14 70c18 22 50 26 74 6"/><path d="M84 32l6-8M84 52l6-8M84 72l6-8"/></svg>',
+    scroll: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 20h80M10 32h72M10 44h64M10 56h50M10 68h34M10 80h18"/><path d="M90 20c-4 6 2 10-6 14M82 32c-5 5 1 9-6 12"/></svg>',
+    monsoon: '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 8l-10 24M38 6L28 30M56 8L46 32M74 6L64 30M92 8L82 32M28 40l-10 24M46 38L36 62M64 40L54 64M82 38L72 62M36 70l-8 20M54 70l-8 20M72 70l-8 20"/></svg>'
+  };
+  var KICK = { hook: '', context: 'Context', reveal: "Here's the thing", why: 'Why it matters', takeaway: 'Takeaway' };
+  var CUR = [
+    { id: 'stepwell', domain: 'History · Architecture', tone: '--kingfisher', glyph: 'stepwell', min: '1 min',
+      slides: [['hook', 'In Gujarat, people built palaces that go down, not up.'],
+        ['context', 'Western India gets most of its rain in a few monsoon months. For the rest of the year, water sat deep underground.'],
+        ['reveal', 'Stepwells like Rani ki Vav in Patan, built in the 11th century, let people walk down seven levels of stairs to the water, past hundreds of carved figures.'],
+        ['why', 'A stepwell was water store, shrine and cool public meeting place at once. Many fell out of use once pumps and piped water arrived.'],
+        ['takeaway', 'Rani ki Vav became a UNESCO World Heritage Site in 2014. <span class="c-spark">Storing monsoon water for the dry months is the same idea behind rainwater harvesting today.</span>']],
+      learned: 'Stepwells stored monsoon water seven levels underground.',
+      sources: [['UNESCO World Heritage Centre', 'Rani-ki-Vav (the Queen’s Stepwell) at Patan, Gujarat'], ['Archaeological Survey of India', 'Rani-ki-Vav, Patan']] },
+    { id: 'zero', domain: 'Science · Maths', tone: '--marigold', glyph: 'zero', min: '1 min',
+      slides: [['hook', 'Someone had to write down the rules for nothing.'],
+        ['context', 'Many cultures had a placeholder for an empty place in a number. Treating zero as a number you can add and multiply was a different step.'],
+        ['reveal', 'In 628 CE, Brahmagupta’s Brahmasphutasiddhanta set out rules for zero: a number minus itself is zero, and any number times zero is zero.'],
+        ['why', 'Those rules travelled through Arabic scholars to Europe and became part of the arithmetic everyone learns in school.'],
+        ['takeaway', '<span class="c-spark">He got stuck on dividing by zero.</span> So did mathematicians for centuries after him.']],
+      learned: 'Brahmagupta wrote the first rules for zero as a number, in 628 CE.',
+      sources: [['MacTutor History of Mathematics, University of St Andrews', 'Brahmagupta'], ['Encyclopaedia Britannica', 'Brahmagupta']] },
+    { id: 'banana', domain: 'Science · Biology', tone: '--kingfisher', glyph: 'banana', min: '1 min',
+      slides: [['hook', 'Almost every banana in an export shop is a copy of the same plant.'],
+        ['context', 'Cavendish bananas have no viable seeds. Farmers grow new plants from suckers and cuttings of old ones.'],
+        ['reveal', 'So a Cavendish plantation is a field of clones. A disease that can kill one plant can kill all of them.'],
+        ['why', 'A soil fungus called Tropical Race 4 is spreading through Cavendish farms worldwide, including in India, the world’s largest banana grower.'],
+        ['takeaway', 'It has happened before. <span class="c-spark">The Gros Michel banana was pushed out of the export trade by an earlier strain by the 1960s.</span>']],
+      learned: 'Cavendish bananas are clones, so one fungus threatens all of them.',
+      sources: [['FAO', 'Fusarium wilt of banana, Tropical Race 4'], ['Encyclopaedia Britannica', 'Banana']] },
+    { id: 'alexandria', domain: 'History', tone: '--marigold', glyph: 'scroll', min: '1 min',
+      slides: [['hook', 'The Library of Alexandria didn’t burn down in one night.'],
+        ['context', 'It is usually pictured as one great fire that wiped out the knowledge of the ancient world.'],
+        ['reveal', 'Historians think it faded over centuries: funding cuts, scholars driven out, and several fires and wars, including damage during Julius Caesar’s siege in 48 BCE.'],
+        ['why', 'Knowledge usually disappears through neglect, not one dramatic event.'],
+        ['takeaway', 'The real question for any library or archive is <span class="c-spark">who keeps paying for it.</span>']],
+      learned: 'The Library of Alexandria declined over centuries, not in one fire.',
+      sources: [['Encyclopaedia Britannica', 'Library of Alexandria'], ['World History Encyclopedia', 'Library of Alexandria']] },
+    { id: 'monsoon', domain: 'Geography', tone: '--kingfisher', glyph: 'monsoon', min: '1 min',
+      slides: [['hook', 'India’s monsoon has an official start, and a rule for declaring it.'],
+        ['context', 'Around 1 June each year, the southwest monsoon reaches Kerala.'],
+        ['reveal', 'IMD declares onset only when rain at a set of 14 stations in Kerala and nearby, wind strength and depth, and cloud cover all cross fixed thresholds.'],
+        ['why', 'The date moves sowing, power demand and markets, so a clear rule replaces guesswork.'],
+        ['takeaway', 'The normal onset date is 1 June, <span class="c-spark">give or take about a week.</span>']],
+      learned: 'IMD declares monsoon onset over Kerala by a fixed set of rules.',
+      sources: [['India Meteorological Department', 'Criteria for declaring onset of southwest monsoon over Kerala']] }
+  ];
+
+  var STEPS = ['What happened', 'Background', 'Key facts', 'Why it matters'];
+  var UP = [
+    { id: 'u-gov', gs: 'GS2', gsName: 'Polity', gsc: '--gs2', min: '2 min',
+      head: 'Can a Governor just sit on a state bill?',
+      what: 'A state government is back in court over bills pending with its Governor for months. It is a repeat fight: Punjab, Tamil Nadu and Kerala have all gone to the Supreme Court over this since 2023.',
+      bg: 'Article 200 gives the Governor four options on a bill passed by the state legislature: give assent, withhold assent, return it for reconsideration, or reserve it for the President.',
+      facts: ['<span class="hl">Art 200</span>: Governor’s options on state bills', '<span class="hl">Art 201</span>: bills reserved for the President', 'Money bills cannot be returned for reconsideration', 'If the House passes a returned bill again, the Governor shall not withhold assent', '2023, State of Punjab case: the Supreme Court said a Governor cannot keep a bill pending indefinitely'],
+      why: 'Centre–state relations, the Governor’s discretion versus the elected government, and whether the Constitution needs time limits. Use it in GS2 answers on federalism.',
+      src: 'Constitution of India, Arts 163, 200, 201 · Supreme Court, State of Punjab v. Principal Secretary to the Governor of Punjab (2023)' },
+    { id: 'u-mpc', gs: 'GS3', gsName: 'Economy', gsc: '--gs3', min: '2 min',
+      head: 'Who actually decides the repo rate?',
+      what: 'The RBI’s Monetary Policy Committee has announced its decision on the repo rate after its latest meeting.',
+      bg: 'Since 2016, the repo rate is set by a six-member Monetary Policy Committee, not by the RBI Governor alone.',
+      facts: ['Set up under <span class="hl">Section 45ZB, RBI Act 1934</span> (amended 2016)', '6 members: 3 from the RBI including the Governor, 3 external members appointed by the Centre', 'The Governor has a casting vote in a tie', 'Inflation target: <span class="hl">4% CPI</span>, with a band of 2–6%', 'Meets at least four times a year'],
+      why: 'Links inflation, growth and monetary policy in GS3. Mains asks about inflation targeting and how independent the MPC really is.',
+      src: 'RBI Act 1934, Sections 45ZA–45ZB · Reserve Bank of India, Monetary Policy Committee' },
+    { id: 'u-gib', gs: 'GS3', gsName: 'Environment', gsc: '--gs3', min: '2 min',
+      head: 'Why power lines matter for the Great Indian Bustard',
+      what: 'Protecting the Great Indian Bustard is back in the news over overhead power lines in its Thar desert habitat.',
+      bg: 'The bustard is a heavy bird with poor forward vision. It flies into overhead power lines, many of them built for solar and wind projects in the Thar.',
+      facts: ['IUCN status: <span class="hl">Critically Endangered</span>', 'Schedule I, Wildlife (Protection) Act 1972', 'State bird of Rajasthan', 'Main habitat: Desert National Park, Jaisalmer', '2024, M.K. Ranjitsinh case: the Supreme Court recognised a right against the adverse effects of climate change'],
+      why: 'Conservation versus clean energy is a classic GS3 trade-off. Use it for answers on biodiversity, renewable energy and environmental law.',
+      src: 'IUCN Red List, Ardeotis nigriceps · Supreme Court, M.K. Ranjitsinh v. Union of India (2024)' },
+    { id: 'u-wd', gs: 'GS1', gsName: 'Geography', gsc: '--gs1', min: '2 min',
+      head: 'What a western disturbance is, and why wheat farmers care',
+      what: 'Western disturbances are bringing winter rain and snow to north-west India this week.',
+      bg: 'A western disturbance is a low-pressure system that forms over the Mediterranean region and is carried east by the subtropical westerly jet stream.',
+      facts: ['Origin: Mediterranean and west Asia', 'Carried by the <span class="hl">subtropical westerly jet</span>', 'Winter rain in Punjab, Haryana, Delhi and western UP', 'Snowfall in the western Himalayas', 'Helps rabi crops, especially <span class="hl">wheat</span>'],
+      why: 'Links climatology in GS1 with agriculture in GS3. Mains angle: changing patterns of western disturbances and what that means for farming and Himalayan snow.',
+      src: 'India Meteorological Department, glossary · NCERT Class XI, India: Physical Environment, ch. 4 Climate' }
+  ];
+  var EXTRA = { id: 'u-ist', head: 'Why India’s clocks are 5 hours 30 minutes ahead',
+    body: ['Indian Standard Time is set by the 82.5°E line of longitude, which passes near Mirzapur in Uttar Pradesh.', 'The Earth turns 15° an hour, so 82.5° ÷ 15 = 5.5 hours ahead of Greenwich.', 'That’s why the North-east sees sunrise long before its clocks say so, and why some states have asked for a second time zone.'],
+    src: 'Survey of India · NCERT Class XI, India: Physical Environment, ch. 1' };
+
+  var EXPL = {
+    'u-gov': { title: 'The Governor and state bills', gs: 'GS2 · Polity', cached: true,
+      one: 'Article 200 gives the Governor four choices on a state bill. The courts have said sitting on it forever is not one of them.',
+      ctx: 'Since 2023, several states have gone to the Supreme Court over bills their Governors held for months or years. The question each time: is the Governor bound by a deadline, and by the advice of the elected government?',
+      stat: 'Arts 153–162 set up the Governor’s office. Art 163: the Governor acts on the aid and advice of the council of ministers, except where the Constitution gives discretion. Art 200: options on bills. Art 201: bills reserved for the President. Art 361: the Governor’s personal immunity.',
+      facts: ['Four options under Art 200: assent, withhold, return, reserve', 'Money bills cannot be returned', 'A bill passed again after return: the Governor shall not withhold assent', 'Sarkaria Commission (1988): reserve bills for the President only in rare cases', 'Punchhi Commission (2010): suggested a six-month limit for decisions on bills'],
+      pro: 'A check on bills that may be unconstitutional. Reserving a bill for the President can protect national interest.',
+      con: 'An unelected office can stall an elected legislature. With no time limit, the power is open to misuse for political ends.',
+      way: 'Time limits by convention or amendment, clear grounds for reserving bills, and more Centre–state dialogue through the Inter-State Council (Art 263).',
+      mains: 'Examine the Governor’s powers over assent to state bills. Should the Constitution set time limits?',
+      srcs: [['Constitution of India', 'Articles 163, 200, 201, 263'], ['Supreme Court of India', 'State of Punjab v. Principal Secretary to the Governor of Punjab (2023)'], ['Inter-State Council Secretariat', 'Reports of the Sarkaria (1988) and Punchhi (2010) Commissions']] },
+    'tenth': { title: 'The anti-defection law', gs: 'GS2 · Polity', cached: false,
+      one: 'The Tenth Schedule lets a legislator be disqualified for switching parties, with a few exceptions.',
+      ctx: 'Floor-crossing in the 1960s to 80s brought down governments. “Aaya Ram, Gaya Ram” comes from a Haryana MLA who changed parties three times in one day in 1967.',
+      stat: 'The 52nd Amendment Act, 1985 added the Tenth Schedule. The 91st Amendment Act, 2003 removed the one-third “split” exception and capped the size of ministries.',
+      facts: ['Grounds: giving up party membership, or voting or abstaining against the whip without permission', 'An independent who joins a party after election is disqualified', 'A nominated member may join a party within six months of taking their seat', 'Merger exception: two-thirds of the legislature party must agree', 'The Speaker or Chairman decides; Kihoto Hollohan (1992) made that decision open to judicial review'],
+      pro: 'Keeps governments stable and respects the mandate voters gave a party.',
+      con: 'Curbs a legislator’s freedom to vote by conscience, strengthens party bosses, and leaves decisions with a Speaker who may be partisan or slow.',
+      way: 'In 2020 the Supreme Court asked Speakers to decide within three months and asked Parliament to consider an independent tribunal. The Dinesh Goswami Committee (1990) suggested decisions by the President or Governor on the Election Commission’s advice.',
+      mains: 'Has the anti-defection law achieved its purpose? Suggest reforms.',
+      srcs: [['Constitution of India', 'Tenth Schedule'], ['Supreme Court of India', 'Kihoto Hollohan v. Zachillhu (1992)'], ['Supreme Court of India', 'Keisham Meghachandra Singh v. Speaker, Manipur Legislative Assembly (2020)']] }
+  };
+
+  /* ---------------- state ---------------- */
+  var S = { screen: 'onb-mode', slide: {}, gs: 'All', saved: {}, interests: { History: 1, Science: 1 }, exam: 'UPSC CSE', year: '2027', lang: 'English', explain: 'u-gov', from: 'u-today', ask: '', building: false, seen: 0 };
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function modeOf(scr) { return (scr.indexOf('u-') === 0 || scr === 'onb-upsc') ? 'upsc' : 'curious'; }
+
+  /* ---------------- chrome ---------------- */
+  function status() { return '<div class="statusbar"><span>9:41</span><span>4G ▪▪▪</span></div>'; }
+  function header(mode) {
+    var wm = mode === 'upsc'
+      ? '<span class="wm">curiosity <span class="wm-tag">STUDY</span></span>'
+      : '<span class="wm">curiosity<span class="wm-dot"></span></span>';
+    return '<header class="hdr">' + wm + '<div class="seg" role="group" aria-label="Mode">' +
+      '<button type="button" data-mode="curious" aria-pressed="' + (mode === 'curious') + '">Curious</button>' +
+      '<button type="button" data-mode="upsc" aria-pressed="' + (mode === 'upsc') + '">Study</button></div></header>';
+  }
+  function tabs(mode, on) {
+    var t = mode === 'upsc' ? [['u-today', 'Today'], ['u-ask', 'Ask'], ['u-library', 'Library']] : [['c-today', 'Today'], ['c-explore', 'Explore'], ['c-library', 'Library']];
+    return '<nav class="tabs" aria-label="Sections">' + t.map(function (x) {
+      return '<button type="button" class="tab' + (x[0] === on ? ' is-on' : '') + '" data-go="' + x[0] + '"' + (x[0] === on ? ' aria-current="page"' : '') + '>' + x[1] + '</button>';
+    }).join('') + '</nav>';
+  }
+
+  /* ---------------- onboarding ---------------- */
+  function onbMode() {
+    return '<div class="onb">' + status() +
+      '<div class="onb-top"><span class="steps-dots">1 of 2</span><h1>What do you want your scroll to be?</h1><p>Pick one. You can switch any time from the top of the app.</p></div>' +
+      '<div class="split">' +
+      '<button type="button" class="half half-cur" data-pick="curious"><span class="half-title">Just curious</span><span class="half-sample">Five good stories a day, then it ends. History, science, how things work.</span><span class="half-go">Stepwells, zero, the monsoon →</span></button>' +
+      '<button type="button" class="half half-up" data-pick="upsc"><span class="half-title">Preparing for UPSC</span><span class="half-sample">Today’s current affairs in four short steps, and <span class="hl">any topic explained UPSC-style</span>.</span><span class="half-go">GS1–GS4 · Prelims facts · Mains angles →</span></button>' +
+      '</div><div class="onb-foot"><span>No sign-up needed to start</span><button type="button" class="linkbtn" data-go="c-today">Skip</button></div></div>';
+  }
+  function onbCurious() {
+    var all = ['History', 'Science', 'Economics', 'Geography', 'Technology', 'Polity & Society', 'Environment', 'Odd facts'];
+    var n = Object.keys(S.interests).length;
+    return '<div class="onb">' + status() +
+      '<div class="onb-top"><span class="steps-dots">2 of 2</span><h1>Pick three things you’d happily read about.</h1><p>This only sets your first Today’s 5. It learns from what you save.</p></div>' +
+      '<div class="onb-body"><div class="chips">' + all.map(function (x) {
+        return '<button type="button" class="chip" data-int="' + esc(x) + '" aria-pressed="' + !!S.interests[x] + '">' + esc(x) + '</button>';
+      }).join('') + '</div></div>' +
+      '<button type="button" class="cta" data-go="c-today"' + (n < 3 ? ' disabled' : '') + '><span>' + (n < 3 ? 'Pick ' + (3 - n) + ' more' : 'Open today’s 5') + '</span><span>→</span></button></div>';
+  }
+  function grp(label, key, opts) {
+    return '<div class="field"><span class="kicker">' + label + '</span><div class="chips">' + opts.map(function (o) {
+      return '<button type="button" class="chip" data-set="' + key + '" data-val="' + esc(o) + '" aria-pressed="' + (S[key] === o) + '">' + esc(o) + '</button>';
+    }).join('') + '</div></div>';
+  }
+  function onbUpsc() {
+    return '<div class="onb">' + status() +
+      '<div class="onb-top"><span class="steps-dots">2 of 2</span><h1 style="font-variation-settings:\'wdth\' 66,\'wght\' 840">Set up study mode</h1><p>Three taps. Change any of it later.</p></div>' +
+      '<div class="onb-body">' + grp('Exam', 'exam', ['UPSC CSE', 'State PSC']) + grp('Attempt', 'year', ['2026', '2027', '2028']) + grp('Read in', 'lang', ['English', 'हिन्दी']) +
+      '<p class="mono" style="margin:0">Today’s current affairs publish by 9:00 AM IST.</p></div>' +
+      '<button type="button" class="cta" data-play="upsc"><span>Open today’s current affairs</span><span>→</span></button></div>';
+  }
+
+  /* ---------------- Curious ---------------- */
+  function curPost(p, i) {
+    var k = S.slide[p.id] || 0; var s = p.slides[k];
+    var segs = p.slides.map(function (_, j) { return '<i class="' + (j <= k ? 'on' : '') + '"></i>'; }).join('');
+    var text = s[0] === 'hook' ? '<p class="c-hook">' + s[1] + '</p>' : '<span class="kicker">' + KICK[s[0]] + '</span><p class="c-body">' + s[1] + '</p>';
+    var hint = k < p.slides.length - 1 ? 'Tap for more · ' + (k + 1) + '/' + p.slides.length : (i < CUR.length - 1 ? 'Scroll for story ' + (i + 2) + ' of 5' : 'Scroll to finish');
+    return '<section class="post c-post" data-post="' + p.id + '" aria-label="Story ' + (i + 1) + ' of 5">' +
+      '<div class="c-plate" data-tap="' + p.id + '" style="--tone:var(' + p.tone + ')"><div class="segs">' + segs + '</div>' + G[p.glyph] + '<span class="kicker">' + p.domain + ' · ' + p.min + '</span></div>' +
+      '<div class="c-text" data-tap="' + p.id + '">' + text + '<span class="c-hint">' + hint + '</span></div>' +
+      '<div class="c-actions"><button type="button" class="act" data-save="' + p.id + '" aria-pressed="' + !!S.saved[p.id] + '">' + (S.saved[p.id] ? 'Saved' : 'Save') + '</button>' +
+      '<button type="button" class="act" data-knew="' + p.id + '" aria-pressed="false">I knew this</button>' +
+      '<button type="button" class="act act-deeper" data-deeper="' + p.id + '">Go deeper</button></div></section>';
+  }
+  function curEnd() {
+    return '<section class="post c-end" id="c-end"><span class="kicker">Today · 14 Nov</span><h2>That’s today’s 5.</h2>' +
+      '<ul class="learned">' + CUR.map(function (p, i) { return '<li><span>0' + (i + 1) + '</span>' + p.learned + '</li>'; }).join('') + '</ul>' +
+      '<div class="tomorrow"><b>Tomorrow: 3 quick “remember this?” cards</b><span class="mono">About a minute, before your next 5</span></div>' +
+      '<div class="end-actions"><button type="button" class="pill pill-solid" data-go="c-explore">Keep exploring</button><button type="button" class="pill" data-go="c-library">See what I saved</button></div></section>';
+  }
+  function cToday() {
+    var track = '<div class="track" id="track">' + CUR.map(function (_, i) { return '<i class="' + (i <= S.seen ? 'on' : '') + '"></i>'; }).join('') + '</div>';
+    return status() + header('curious') + track + '<div class="main feed" id="feed">' + CUR.map(curPost).join('') + curEnd() + '</div>' + tabs('curious', 'c-today');
+  }
+  function cStory() {
+    var p = CUR[0];
+    return status() + header('curious') + '<div class="back"><button type="button" data-go="c-today">← Today’s 5</button></div>' +
+      '<div class="main"><article class="read"><span class="kicker">History · Architecture · 4 min story</span>' +
+      '<h1>The palaces that go down: India’s stepwells</h1>' +
+      '<p>Walk into Rani ki Vav in Patan and you go down, not up. The steps drop through seven levels of carved galleries until they reach the water, which for most of the year sat far below the dry ground of north Gujarat.</p>' +
+      '<p class="pull">A stepwell was a water tank, a temple and the coolest public room in town, all at once.</p>' +
+      '<p>Western India gets most of its rain in a few monsoon months. Stepwells were built to reach groundwater through the long dry season. Rani ki Vav was built in the 11th century, traditionally linked to Queen Udayamati in memory of King Bhima I, and later silted over by the Saraswati river before being excavated in the 20th century.</p>' +
+      '<p>As pumps and piped water spread, many stepwells were abandoned and filled with rubbish. Some are now being cleaned and recharged as part of local water projects.</p>' +
+      '<h3 class="kicker">Sources</h3><ul class="srcs">' + p.sources.map(function (s) { return '<li><b>' + s[0] + '</b>' + s[1] + '</li>'; }).join('') + '</ul>' +
+      '<button type="button" class="next-up" data-go="c-today"><span class="mono">Continue learning</span><b>Someone had to write down the rules for nothing</b><span class="mono">Science · Maths · 1 min</span></button>' +
+      '</article></div>' + tabs('curious', 'c-today');
+  }
+  function cExplore() {
+    var series = [['How money works', '8 stories', 38], ['India’s water', '6 stories', 0], ['Weird science', '10 stories', 60], ['Maps that lie', '5 stories', 0]];
+    var plan = S.ask ? '<div class="plan"><span class="kicker">Your path · 4 short lessons</span>' +
+      ['What a semiconductor actually is', 'Silicon, sand and doping', 'How a chip gets made, and why so few places can', 'Why India wants a fab of its own'].map(function (l, i) {
+        return '<div class="plan-step"><span>' + (i + 1) + '</span><div>' + l + '</div></div>';
+      }).join('') + '<p class="mono" style="margin:8px 0 0">AI-written · sources checked automatically · first lesson ready in about a minute</p></div>' : '';
+    return status() + header('curious') + '<div class="main"><div class="pad">' +
+      '<h1 class="h-screen">What do you want to understand?</h1>' +
+      '<form class="ask-box" id="pathForm"><label class="visually-hidden" for="pathInput">Topic</label><input id="pathInput" type="text" value="' + esc(S.ask || 'How do semiconductors work?') + '">' +
+      '<button type="submit" class="pill pill-solid" style="justify-self:start">Make me a short path</button></form>' + plan +
+      '<div><span class="kicker">Series</span><ul class="rows" style="margin-top:8px">' + series.map(function (s) {
+        return '<li><button type="button" class="row"><b>' + s[0] + '</b><small>' + s[1] + (s[2] ? ' · ' + s[2] + '% done' : '') + '</small><span class="meter"><i style="width:' + s[2] + '%"></i></span></button></li>';
+      }).join('') + '</ul></div></div></div>' + tabs('curious', 'c-explore');
+  }
+  function cLibrary() {
+    var saved = CUR.filter(function (p) { return S.saved[p.id]; });
+    var list = (saved.length ? saved : [CUR[0], CUR[2]]).map(function (p) {
+      return '<li><button type="button" class="row" data-go="c-story"><b>' + p.slides[0][1] + '</b><small>' + p.domain + '</small></button></li>';
+    }).join('');
+    return status() + header('curious') + '<div class="main"><div class="pad"><h1 class="h-screen">Library</h1>' +
+      '<div class="inline-note"><span>Sign in to keep these on every phone.</span><button type="button" class="linkbtn">Sign in</button></div>' +
+      '<div><span class="kicker">Saved' + (saved.length ? '' : ' · examples') + '</span><ul class="rows" style="margin-top:8px">' + list + '</ul></div>' +
+      '<div><span class="kicker">Things you’ve learned this week</span><ul class="rows" style="margin-top:8px">' +
+      '<li><div class="row"><b>12 stories</b><small>History 5 · Science 4 · Geography 3</small></div></li>' +
+      '<li><div class="row"><b>1 path in progress</b><small>How money works · lesson 3 of 8</small></div></li></ul></div></div></div>' + tabs('curious', 'c-library');
+  }
+
+  /* ---------------- UPSC ---------------- */
+  function upPost(p, i, n) {
+    var k = S.slide[p.id] || 0;
+    var steps = STEPS.map(function (s, j) { return '<button type="button" class="u-step' + (j < k ? ' done' : '') + (j === k ? ' on' : '') + '" data-ustep="' + p.id + '" data-k="' + j + '">' + s + '</button>'; }).join('');
+    var body = k === 0 ? '<p>' + p.what + '</p>' : k === 1 ? '<p>' + p.bg + '</p>' : k === 2 ? '<span class="kicker">For Prelims</span><ul class="facts">' + p.facts.map(function (f) { return '<li><span>' + f + '</span></li>'; }).join('') + '</ul>' : '<span class="kicker">For Mains</span><p>' + p.why + '</p>';
+    return '<section class="post u-post" data-post="' + p.id + '">' +
+      '<div class="u-top"><span class="flag" style="--gsc:var(' + p.gsc + ')">' + p.gs + ' · ' + p.gsName + '</span><span class="mono">' + (i + 1) + ' / ' + n + ' · ' + p.min + '</span></div>' +
+      '<h2 class="u-head">' + p.head + '</h2><div class="u-steps">' + steps + '</div>' +
+      '<div class="u-body" data-utap="' + p.id + '">' + body + '<span class="c-hint">' + (k < 3 ? 'Tap for ' + STEPS[k + 1].toLowerCase() : 'Scroll for the next item') + '</span></div>' +
+      '<div class="u-foot"><button type="button" class="btn-ink" data-explain="' + p.id + '"><span>Explain it UPSC-style</span><span>→</span></button>' +
+      '<button type="button" class="btn-line" data-save="' + p.id + '" aria-pressed="' + !!S.saved[p.id] + '">' + (S.saved[p.id] ? 'Saved' : 'Save to ' + p.gs) + '</button>' +
+      '<p class="u-src">Sources: ' + p.src + '</p></div></section>';
+  }
+  function upExtra() {
+    return '<section class="post u-post"><div class="u-top"><span class="flag" style="--gsc:var(--u-muted)">Good to know · GS1</span><span class="mono">1 min</span></div>' +
+      '<h2 class="u-head">' + EXTRA.head + '</h2><div class="u-body" style="cursor:default">' + EXTRA.body.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div>' +
+      '<div class="u-foot"><p class="u-src">Sources: ' + EXTRA.src + '</p></div></section>';
+  }
+  function upEnd() {
+    var c = { GS1: 0, GS2: 0, GS3: 0, GS4: 0 }; UP.forEach(function (p) { c[p.gs]++; });
+    return '<section class="post u-end" id="u-end"><span class="mono">Sample day · 14 Nov</span><div class="stamp">Caught up<br><span class="hl">on today.</span></div>' +
+      '<div class="tally">' + ['GS1', 'GS2', 'GS3', 'GS4'].map(function (g, i) { return '<div style="--gsc:var(--gs' + (i + 1) + ')"><b>' + c[g] + '</b>' + g + '</div>'; }).join('') + '</div>' +
+      '<ul class="rows"><li><button type="button" class="row" data-go="u-library"><b>Yesterday’s recall · 4 cards</b><small>About a minute</small></button></li>' +
+      '<li><button type="button" class="row" data-go="u-ask"><b>Ask about anything</b><small>Any topic, event or question, explained UPSC-style</small></button></li>' +
+      '<li><div class="row"><b>Weekly quiz</b><small>Add-on, comes later</small><span class="soon">LATER</span></div></li></ul>' +
+      '<p class="mono" style="margin:auto 0 0">Next edition: tomorrow, 9:00 AM IST</p></section>';
+  }
+  function uToday() {
+    var list = UP.filter(function (p) { return S.gs === 'All' || p.gs === S.gs; });
+    var counts = { All: UP.length }; UP.forEach(function (p) { counts[p.gs] = (counts[p.gs] || 0) + 1; });
+    var gsbar = '<div class="gsbar" role="group" aria-label="Filter by GS paper">' + ['All', 'GS1', 'GS2', 'GS3', 'GS4'].map(function (g, i) {
+      return '<button type="button" class="gsf" data-gs="' + g + '" aria-pressed="' + (S.gs === g) + '"' + (i ? ' style="--gsc:var(--gs' + i + ')"' : '') + '>' + (i ? '<i></i>' : '') + g + ' ' + (counts[g] || 0) + '</button>';
+    }).join('') + '</div>';
+    var body = list.length ? list.map(function (p, i) { return upPost(p, i, list.length); }).join('') : '<section class="post u-post"><p style="font-size:17px">Nothing tagged ' + S.gs + ' today. <button type="button" class="linkbtn" data-gs="All">Show all</button></p></section>';
+    return status() + header('upsc') + '<div class="dayline"><b>Today’s current affairs</b><span class="mono">Sample day · ~9 min</span></div>' + gsbar +
+      '<div class="main feed" id="feed">' + body + (S.gs === 'All' ? upExtra() : '') + upEnd() + '</div>' + tabs('upsc', 'u-today');
+  }
+  function explFromPost(p) {
+    return { title: p.head, gs: p.gs + ' · ' + p.gsName, cached: false, one: p.bg, ctx: p.what, stat: null, facts: p.facts, pro: null, con: null, way: null, mains: null, why: p.why, srcs: [['Sources', p.src]] };
+  }
+  function uExplain() {
+    var e = EXPL[S.explain] || explFromPost(UP.filter(function (p) { return p.id === S.explain; })[0]);
+    var idx = [['ex-ctx', 'Context'], ['ex-stat', 'Static link'], ['ex-facts', 'Prelims facts'], ['ex-deb', 'Debate'], ['ex-way', 'Way forward'], ['ex-mains', 'Mains'], ['ex-src', 'Sources']].filter(function (x) {
+      return !((x[0] === 'ex-stat' && !e.stat) || (x[0] === 'ex-deb' && !e.pro) || (x[0] === 'ex-way' && !e.way));
+    });
+    var back = S.from === 'u-ask' ? '← Ask' : '← Today';
+    return status() + header('upsc') + '<div class="back"><button type="button" data-go="' + S.from + '">' + back + '</button></div>' +
+      '<div class="main" id="explMain"><div class="exp-top"><span class="flag" style="--gsc:var(--gs' + e.gs.charAt(2) + ')">' + e.gs + '</span><h1>' + e.title + '</h1>' +
+      '<div class="exp-meta"><span class="mono">' + (e.cached ? 'Editor-checked · opened instantly' : 'AI-written · sources checked automatically') + '</span>' +
+      '<button type="button" class="btn-line" style="padding:5px 10px;font-size:13px" data-save="exp-' + S.explain + '" aria-pressed="' + !!S.saved['exp-' + S.explain] + '">' + (S.saved['exp-' + S.explain] ? 'Saved' : 'Save to ' + e.gs.slice(0, 3)) + '</button></div></div>' +
+      '<nav class="exp-index" aria-label="Sections">' + idx.map(function (x) { return '<button type="button" data-jump="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</nav>' +
+      '<div class="exp"><section><p class="oneline">' + e.one + '</p></section>' +
+      '<section id="ex-ctx"><h3>Context</h3><p>' + e.ctx + '</p></section>' +
+      (e.stat ? '<section id="ex-stat"><h3>Static linkage · constitutional basis</h3><p>' + e.stat + '</p></section>' : '') +
+      '<section id="ex-facts"><h3>Prelims facts</h3><ul class="facts">' + e.facts.map(function (f) { return '<li><span>' + f + '</span></li>'; }).join('') + '</ul></section>' +
+      (e.pro ? '<section id="ex-deb"><h3>Arguments</h3><div class="debate"><div><b>For</b><p>' + e.pro + '</p></div><div><b>Against</b><p>' + e.con + '</p></div></div></section>' : '') +
+      (e.way ? '<section id="ex-way"><h3>Way forward</h3><p>' + e.way + '</p></section>' : '') +
+      '<section id="ex-mains"><h3>Mains angle · practice prompt</h3>' + (e.mains ? '<p class="mains">' + e.mains + '</p>' : '<p>' + e.why + '</p>') + '</section>' +
+      '<section id="ex-src"><h3>Sources</h3><ul class="srcs">' + e.srcs.map(function (s) { return '<li><b>' + s[0] + '</b>' + s[1] + '</li>'; }).join('') + '</ul></section>' +
+      '</div></div>' + tabs('upsc', S.from);
+  }
+  function uAsk() {
+    if (S.building) {
+      return status() + header('upsc') + '<div class="main"><div class="building"><span class="kicker">Explaining</span><h1 class="h-screen" style="font-size:26px">' + esc(S.ask) + '</h1>' +
+        '<ul class="build-list" id="buildList">' + ['Context', 'Static linkage', 'Prelims facts', 'Arguments', 'Way forward', 'Mains angle', 'Sources'].map(function (x) { return '<li><b style="font-weight:500">' + x + '</b><span></span></li>'; }).join('') + '</ul>' +
+        '<p class="mono" style="margin:0">Usually ready in under 30 seconds. You can leave; it will be in your Library.</p></div></div>' + tabs('upsc', 'u-ask');
+    }
+    var sugg = ['Explain the anti-defection law', 'Basic structure doctrine in 5 minutes', 'Why is the Kerala coast eroding?', 'What does the 16th Finance Commission do?'];
+    return status() + header('upsc') + '<div class="main"><div class="pad"><h1 class="h-screen">Ask about anything.</h1>' +
+      '<form class="ask-box" id="askForm"><label class="visually-hidden" for="askInput">Topic, event or question</label><textarea id="askInput" rows="3" placeholder="A topic, a news event, or a question you saw in a paper">' + esc(S.ask) + '</textarea>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="mono">2 of 2 free this week</span><button type="submit" class="btn-ink"><span>Explain UPSC-style</span><span>→</span></button></div></form>' +
+      '<div><span class="kicker">Try</span><ul class="rows" style="margin-top:8px">' + sugg.map(function (s) { return '<li><button type="button" class="row" data-ask="' + esc(s) + '"><b style="font-weight:500">' + s + '</b></button></li>'; }).join('') + '</ul></div>' +
+      '<p class="mono" style="margin:0">The prototype answers every question with the anti-defection sample.</p></div></div>' + tabs('upsc', 'u-ask');
+  }
+  function uLibrary() {
+    var shelves = [['GS1', 'History, geography, society', 3, 1], ['GS2', 'Polity, governance, IR', 7, 2], ['GS3', 'Economy, environment, S&T', 5, 3], ['GS4', 'Ethics', 1, 4]];
+    return status() + header('upsc') + '<div class="main"><div class="pad"><h1 class="h-screen">Your GS shelves</h1>' +
+      '<ul class="rows">' + shelves.map(function (s) {
+        return '<li><button type="button" class="row"><b><span class="flag" style="--gsc:var(--gs' + s[3] + ');padding:0">' + s[0] + '</span> ' + s[1] + '</b><small>' + s[2] + ' saved</small></button></li>';
+      }).join('') + '<li><button type="button" class="row" data-explain-lib="tenth"><b>Explainers</b><small>4 saved · latest: The anti-defection law</small></button></li></ul>' +
+      '<div class="inline-note"><span><b style="color:var(--u-ink)">Yesterday’s recall</b><br>4 cards from 13 Nov · about a minute</span><button type="button" class="btn-line">Start</button></div>' +
+      '<p class="mono" style="margin:0">Monthly compilation PDF and Prelims practice come later as Plus add-ons.</p></div></div>' + tabs('upsc', 'u-library');
+  }
+
+  /* ---------------- render ---------------- */
+  var VIEWS = { 'onb-mode': onbMode, 'onb-curious': onbCurious, 'onb-upsc': onbUpsc, 'c-today': cToday, 'c-story': cStory, 'c-explore': cExplore, 'c-library': cLibrary, 'u-today': uToday, 'u-explain': uExplain, 'u-ask': uAsk, 'u-library': uLibrary };
+  function render(keepScroll) {
+    var feed = document.getElementById('feed'); var top = keepScroll && feed ? feed.scrollTop : 0;
+    var m = modeOf(S.screen);
+    app.className = 'app m-' + m;
+    screen.innerHTML = VIEWS[S.screen]();
+    var f = document.getElementById('feed');
+    if (f) { f.scrollTop = top; f.addEventListener('scroll', onFeedScroll, { passive: true }); }
+    document.querySelectorAll('.jump[data-go]').forEach(function (b) {
+      var g = b.getAttribute('data-go');
+      b.classList.toggle('is-on', g === S.screen || (g === 'onb-mode' && S.screen === 'onb-mode'));
+    });
+  }
+  function onFeedScroll(e) {
+    var f = e.currentTarget; var i = Math.round(f.scrollTop / f.clientHeight);
+    if (S.screen === 'c-today') {
+      S.seen = Math.min(i, CUR.length - 1);
+      var t = document.getElementById('track');
+      if (t) Array.prototype.forEach.call(t.children, function (el, j) { el.className = j <= S.seen ? 'on' : ''; });
+    }
+  }
+  function go(scr) {
+    if (scr === 'c-end' || scr === 'u-end') {
+      var base = scr === 'c-end' ? 'c-today' : 'u-today';
+      if (base === 'u-today') S.gs = 'All';
+      S.screen = base; render();
+      var end = document.getElementById(scr);
+      var f = document.getElementById('feed');
+      if (end && f) { f.style.scrollSnapType = 'none'; f.scrollTop = end.offsetTop - f.offsetTop; f.style.scrollSnapType = ''; }
+      return;
+    }
+    if (scr === 'u-explain') S.from = S.from === 'u-ask' ? 'u-ask' : 'u-today';
+    S.screen = scr; S.building = false; render();
+  }
+
+  /* ---------------- the switch ---------------- */
+  var busy = false;
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function finish(anims) { anims.forEach(function (a) { try { a.cancel(); } catch (e) {} }); sw.hidden = true; busy = false; }
+  function switchTo(mode) {
+    if (busy) return; busy = true;
+    var target = mode === 'upsc' ? 'u-today' : 'c-today';
+    var toUp = mode === 'upsc';
+    sw.hidden = false;
+    swFill.style.background = toUp ? 'var(--hl)' : 'var(--mist)';
+    swLabel.style.color = toUp ? 'var(--on-hl)' : 'var(--c-ink)';
+    swTitle.textContent = toUp ? 'Study mode' : 'Curious mode';
+    swSub.textContent = toUp ? 'Sample day · 4 current-affairs items · ~9 min' : 'Today’s 5 · picks up where you left off';
+    var narrow = "'wdth' 60, 'wght' 880", wide = "'wdth' 145, 'wght' 260";
+    var anims = [];
+    if (reduce || !swFill.animate) {
+      swFill.style.clipPath = 'none';
+      anims.push(sw.animate ? sw.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, fill: 'forwards' }) : null);
+      swTitle.style.fontVariationSettings = toUp ? narrow : wide;
+      return wait(130).then(function () { S.gs = 'All'; S.screen = target; render(); return wait(120); })
+        .then(function () { var a = sw.animate ? sw.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, fill: 'forwards' }) : null; return a ? a.finished : null; })
+        .then(function () { finish(anims.filter(Boolean)); sw.getAnimations && sw.getAnimations().forEach(function (a) { a.cancel(); }); swTitle.style.fontVariationSettings = ''; });
+    }
+    var full = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+    var a1, a2;
+    if (toUp) {
+      a1 = swFill.animate([
+        { clipPath: 'polygon(0% 47%, 0% 45%, 0% 57%, 0% 59%)' },
+        { clipPath: 'polygon(0% 47%, 100% 39%, 100% 53%, 0% 61%)', offset: 0.5 },
+        { clipPath: full }], { duration: 520, easing: 'cubic-bezier(.65,0,.25,1)', fill: 'forwards' });
+      a2 = swTitle.animate([
+        { fontVariationSettings: wide, opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, offset: 0.25 },
+        { fontVariationSettings: narrow, opacity: 1, transform: 'translateY(0)' }], { duration: 620, delay: 180, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+    } else {
+      a1 = swFill.animate([{ clipPath: 'circle(0% at 82% 7%)' }, { clipPath: 'circle(150% at 82% 7%)' }], { duration: 440, easing: 'cubic-bezier(.33,0,.2,1)', fill: 'forwards' });
+      a2 = swTitle.animate([
+        { fontVariationSettings: narrow, opacity: 0 },
+        { opacity: 1, offset: 0.3 },
+        { fontVariationSettings: wide, opacity: 1 }], { duration: 560, delay: 120, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+    }
+    var a3 = swSub.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 320, fill: 'forwards' });
+    anims.push(a1, a2, a3);
+    return a1.finished.then(function () {
+      S.gs = 'All'; S.screen = target; render();
+      if (toUp && navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+      return wait(toUp ? 220 : 160);
+    }).then(function () {
+      var out;
+      if (toUp) {
+        out = swFill.animate([{ clipPath: full }, { clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)' }], { duration: 320, easing: 'cubic-bezier(.7,0,.3,1)', fill: 'forwards' });
+        anims.push(swLabel.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-60px)', opacity: 0 }], { duration: 260, easing: 'ease-in', fill: 'forwards' }));
+      } else {
+        out = sw.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+      }
+      anims.push(out);
+      return out.finished;
+    }).then(function () { finish(anims); });
+  }
+
+  /* ---------------- events ---------------- */
+  function tapSide(e, el) { var r = el.getBoundingClientRect(); return (e.clientX - r.left) < r.width * 0.35 ? -1 : 1; }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button, [data-tap], [data-utap]');
+    if (!t) return;
+    var d = t.dataset;
+    if (d.play) { switchTo(d.play); return; }
+    if (d.go) { if (d.go === 'u-today' || d.go === 'u-ask' || d.go === 'u-library') S.from = d.go === 'u-ask' ? 'u-ask' : 'u-today'; go(d.go); return; }
+    if (d.mode) { if (modeOf(S.screen) !== d.mode) switchTo(d.mode); return; }
+    if (d.pick) { go(d.pick === 'upsc' ? 'onb-upsc' : 'onb-curious'); return; }
+    if (d.int) { if (S.interests[d.int]) delete S.interests[d.int]; else S.interests[d.int] = 1; render(); return; }
+    if (d.set) { S[d.set] = d.val; render(); return; }
+    if (d.tap) {
+      var p = CUR.filter(function (x) { return x.id === d.tap; })[0];
+      var k = (S.slide[p.id] || 0) + tapSide(e, t);
+      S.slide[p.id] = Math.max(0, Math.min(p.slides.length - 1, k)); render(true); return;
+    }
+    if (d.utap) { var k2 = (S.slide[d.utap] || 0) + tapSide(e, t); S.slide[d.utap] = Math.max(0, Math.min(3, k2)); render(true); return; }
+    if (d.ustep) { S.slide[d.ustep] = +d.k; render(true); return; }
+    if (d.save) { S.saved[d.save] = !S.saved[d.save]; render(true); return; }
+    if (d.knew) { t.setAttribute('aria-pressed', 'true'); t.textContent = 'Noted, fewer like this'; return; }
+    if (d.deeper) { go('c-story'); return; }
+    if (d.explain) { S.explain = d.explain; S.from = 'u-today'; S.screen = 'u-explain'; render(); return; }
+    if (d.explainLib) { S.explain = d.explainLib; S.from = 'u-library'; S.screen = 'u-explain'; render(); return; }
+    if (d.gs) { S.gs = d.gs; render(); return; }
+    if (d.ask) { S.ask = d.ask; startBuild(); return; }
+    if (d.jump) { var el = document.getElementById(d.jump); var m = document.getElementById('explMain'); if (el && m) m.scrollTo({ top: el.offsetTop - m.offsetTop - 40, behavior: reduce ? 'auto' : 'smooth' }); return; }
+  });
+  document.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (e.target.id === 'askForm') { S.ask = document.getElementById('askInput').value.trim() || 'Explain the anti-defection law'; startBuild(); }
+    if (e.target.id === 'pathForm') { S.ask = document.getElementById('pathInput').value.trim() || 'How do semiconductors work?'; render(); }
+  });
+  function startBuild() {
+    S.building = true; S.screen = 'u-ask'; render();
+    var items = document.querySelectorAll('#buildList li'); var i = 0;
+    function step() {
+      if (S.screen !== 'u-ask' || !S.building) return;
+      if (i > 0) { items[i - 1].className = 'ok'; }
+      if (i < items.length) { items[i].className = 'now'; i++; setTimeout(step, reduce ? 60 : 230); }
+      else setTimeout(function () { if (S.building) { S.building = false; S.explain = 'tenth'; S.from = 'u-ask'; S.screen = 'u-explain'; render(); } }, 250);
+    }
+    step();
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest('input, textarea')) return;
+    if (S.screen !== 'c-today' && S.screen !== 'u-today') return;
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    var f = document.getElementById('feed'); if (!f) return;
+    var i = Math.round(f.scrollTop / f.clientHeight); var post = f.children[i]; if (!post || !post.dataset.post) return;
+    var id = post.dataset.post; var max = S.screen === 'c-today' ? CUR.filter(function (x) { return x.id === id; })[0].slides.length - 1 : 3;
+    S.slide[id] = Math.max(0, Math.min(max, (S.slide[id] || 0) + (e.key === 'ArrowRight' ? 1 : -1))); render(true);
+  });
+
+  render();
+})();
+</script>
+</body></html>

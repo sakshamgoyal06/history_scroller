@@ -939,3 +939,4 @@ Launch criteria per §7.3.
 | 2026-10-24 | 1.0 | First PRD: vision, personas, MVP, requirements, GTM, metrics, roadmap |
 | 2026-10-24 | 1.0.1 | Linked `BUILD_PLAN.md`; baseline commit updated after the repo cleanup (no requirement changes) |
 | 2026-11-14 | 2.0 | New direction: general "swap your scroll" curiosity app plus UPSC mode (current-affairs-first feed, "Explain it UPSC-style"); exam mode and syllabus-first scope removed; North Star → Weekly Swappers; D-07..D-10 |
+| 2026-11-14 | 2.0.1 | Linked `DESIGN.md` (two-mode design system, flows, study-mode switch) and its clickable prototype; no requirement changes |
