@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Status** | Active. Milestone **M0 (Foundations)** is next |
-| **Last updated** | 2026-10-24 |
+| **Last updated** | 2026-11-14 (aligned with PRD v2.0: Curious mode + UPSC mode) |
 | **Drives** | [`PRD.md`](PRD.md) (what and why) · [`ENGINEERING_REVIEW.md`](ENGINEERING_REVIEW.md) (technical findings) |
 
 > **How to use this plan**
@@ -34,7 +34,7 @@
   |--------|----------|
   | `catalog/` | catalog data, timeline |
   | `feed/` | P1 Feed |
-  | `edition/` | P2 Daily Edition |
+  | `edition/` | P2 Today's 5 |
   | `stories/` | P3 Stories |
   | `learn/` | P4 Paths |
   | `zones/` | P5 Zones |
@@ -125,7 +125,7 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 - [ ] **M0.2 Database schema v1 + migrations**
   - **Covers:** NFR-03, PRD §11.2 · **needs:** 🟡 D-STACK
   - **Work:**
-    - Tables: `users`, `profiles` (goal, exam, interests, region), `content_items` (versioned body, sources, status, syllabus tags), `editions`, `zones`, `paths`, `lessons`, `user_item_events`, `recall_items`, `recall_state`.
+    - Tables: `users`, `profiles` (mode, exam, interests, region), `content_items` (versioned body, sources, status, mode pool, GS tags, event date, hook strength), `editions`, `zones`, `paths`, `lessons`, `user_item_events`, `recall_items`, `recall_state`.
     - Row-level security policies.
     - Checked-in migrations and a seed script that loads the current 46 cards, 10 prototype posts and 5 zones from `src/catalog/data` and `src/feed/prototypeFeedItems.js`.
   - **Done when:** `npm run db:migrate` + `db:seed` reproduce staging from scratch; RLS tests show user A can't read user B's rows.
@@ -236,26 +236,26 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
   - **Done when:** every published card has art.
 - [ ] **M1.7 Content production**
   - **Covers:** PRD §7.2 content · 🟡 editors
-  - **Work:** 300 cards across 8 domains (≥ 60 current affairs), 10 zones with syllabus tags, and 30 editions published back-to-back before alpha.
-  - **Done when:** the Studio dashboard shows the counts and editions are 30/30 on time.
+  - **Work:** Curious mode: 300 cards (≥ 80% evergreen), 15 zones, a 14-day Today's 5 buffer. UPSC mode: 30 consecutive days of current affairs (≥ 8 posts/day) via M1.21, plus ≥ 60 evergreen cards tagged for the UPSC pool.
+  - **Done when:** the Studio dashboard shows the counts and UPSC current affairs are 30/30 on time.
 
 ### M1-B · Learner experience (PRD P1–P7)
 
 - [ ] **M1.9 Onboarding**
   - **Covers:** FR-ONB-01..04 · **needs:** M0.3
-  - **Work:** goal (exam/curious + which exam), ≥ 3 interests, region default; notification opt-in asked after the first finished edition.
+  - **Work:** mode (Curious / UPSC), ≥ 3 interests (Curious) or exam (UPSC), region default; mode switch in settings; nudge opt-in asked after the first finished session.
   - **Done when:** it's 3 screens or fewer and skippable, and the choices seed ranking and the path defaults.
-- [ ] **M1.10 Daily Edition v2**
+- [ ] **M1.10 Today's 5 v2**
   - **Covers:** FR-ED-01..04 · **needs:** M1.4, M1.5
   - **Work:**
-    - Replace `edition/dailyEdition.js` selection with the editorial edition from the API.
+    - Replace `edition/dailyEdition.js` selection with editor-scheduled picks from the API.
     - x/5 progress, a completion state, and an archive of the last 30 days in the Library.
   - **Done when:** the edition opens offline after one online load (FR-FEED-05).
 - [ ] **M1.11 Feed v2: ranking and finite sessions**
   - **Covers:** FR-FEED-02..05 · **needs:** M1.4, M1.9
   - **Work:**
-    - Pin edition items first.
-    - Add goal and syllabus match plus freshness to `rankFeedItems`.
+    - Pin Today's 5 (Curious) or today's current affairs (UPSC) first.
+    - Add mode pool, freshness and hook strength to `rankFeedItems`.
     - Show a "You're caught up" state; keep the session summary.
   - **Done when:** the diversity rule is tested and the caught-up state is reachable.
 - [ ] **M1.12 Sources and trust UI**
@@ -285,12 +285,28 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
   - **Covers:** FR-ZONE-01..02, FR-LIB-01 · **needs:** M1.4, M0.4
   - **Done when:** zones come from the API, and progress and the Library sync across devices.
 
+### M1-E · UPSC mode (PRD P9, FR-UPSC-*, FR-CMS-07..08)
+
+- [ ] **M1.21 Current-affairs intake in Studio**
+  - **Covers:** FR-CMS-07..08 · **needs:** M1.1, M1.2 · 🟡 D-EDIT
+  - **Work:** scheduled 06:00 IST fetch from PIB, PRS, RBI, courts, ministries and selected news feeds; AI shortlist of exam-relevant items; drafts in the UPSC post template (what happened, background, key facts, why it matters, GS tag, sources); review queue; scheduled 09:00 publish.
+  - **Done when:** drafts are queued by 07:00 for 7 days in a row and an editor can publish a day's feed in under an hour.
+- [ ] **M1.22 UPSC feed**
+  - **Covers:** FR-UPSC-01, 02, 05 · **needs:** M1.4, M1.9, M1.11
+  - **Work:** mode-aware feed (~80% today's current affairs, ~20% interesting cards), "caught up on today" state, past days and GS-paper filter, UPSC post renderer.
+  - **Done when:** switching mode changes the feed, the mix rule is tested, and the last 30 days are browsable.
+- [ ] **M1.23 "Explain it UPSC-style" + Ask anything**
+  - **Covers:** FR-UPSC-03, 04, 06 · **needs:** M0.1 (quotas); M1.8 for background jobs
+  - **Work:** a UPSC explainer template and schema on the existing plan → research → write pipeline (`lib/`); entry points from every UPSC post and a typed question box; cache by normalized topic; AI-written label; save to a GS-wise Library.
+  - **Done when:** 30 golden UPSC topics pass the eval (sources, sections present, no factual errors on review), and a cached explainer opens instantly.
+  - **Note:** this can be prototyped early, right after M0.1, because the paths pipeline already exists.
+
 ### M1-C · Growth hooks (PRD FR-GROW-*)
 
-- [ ] **M1.14 Morning push**
-  - **Covers:** FR-GROW-02 · **needs:** M1.9, M1.10
-  - **Work:** Web Push (VAPID), sent at the user's chosen time when the edition is ready.
-  - **Done when:** the delivery rate is tracked and opt-out takes one tap.
+- [ ] **M1.14 Install prompt + optional nudge**
+  - **Covers:** FR-GROW-02, FR-GROW-05 · **needs:** M1.9, M1.10
+  - **Work:** install-to-home-screen prompt after the first finished session; opt-in Web Push (VAPID) at the user's chosen time, or "today's current affairs are ready" in UPSC mode.
+  - **Done when:** install rate (M-09) and delivery rate are tracked and opt-out takes one tap.
 - [ ] **M1.16 Share as image + deep link**
   - **Covers:** FR-GROW-01, FR-FEED-07
   - **Work:** client-side canvas render in story/WhatsApp format, with a link that opens for signed-out users.
@@ -325,16 +341,17 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 
 **M2: Closed beta → Plus (months 3–6), PRD Phase 2**
 - [ ] **M2.1** Plus billing: UPI autopay and cards through a payment gateway, plus plan-aware quotas (FR-PATH-04). 🟡 pricing (A5)
-- [ ] **M2.2** Hindi UI + Hindi edition pilot. Externalize strings first (NFR-10).
-- [ ] **M2.3** Exam mode v1: syllabus dashboard, weak-area paths, original practice questions (PRD P8).
-- [ ] **M2.4** Full spaced repetition (FR-RECALL-05), notes (FR-LIB-02), revision-sheet export (FR-LIB-03, FR-ED-05).
+- [ ] **M2.2** Hindi UI + Hindi content pilot, UPSC mode first. Externalize strings first (NFR-10).
+- [ ] **M2.3** UPSC add-ons: daily/weekly quiz on the feed, original Prelims-style practice, monthly current-affairs compilation (FR-UPSC-07).
+- [ ] **M2.4** Full spaced repetition (FR-RECALL-05), notes (FR-LIB-02), revision-sheet export (FR-LIB-03), monthly recap (FR-ED-05).
 - [ ] **M2.5** Creator zones + referral program (FR-GROW-03).
 - [ ] **M2.6** Path sharing (FR-PATH-08).
+- [ ] **M2.7** Android app (TWA) with swap tools: widget, opt-in "offer a story when I open a chosen app" after a privacy review (PRD P8).
 
 **M3: Public beta and scale (months 6–12), PRD Phase 3**
-- [ ] **M3.1** TWA/Android app, then iOS, if PWA limits block growth.
+- [ ] **M3.1** iOS, if data supports it.
 - [ ] **M3.2** More languages.
-- [ ] **M3.3** Institutions tier.
+- [ ] **M3.3** More exam modes (State PSC, banking/SSC) on the current-affairs pipeline.
 - [ ] **M3.4** Learned ranking.
 - [ ] **M3.5** Original short video.
 - [ ] **M3.6** LLM provider abstraction + failover.
@@ -347,8 +364,9 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 |----|----------|----------|-----------|-------|--------|
 | D-STACK | Confirm the §3 stack (Supabase, Upstash, Inngest, Sentry, PostHog) | As proposed | M0.1 / M0.2 start | Eng lead + owner | ⬜ open |
 | D-AUTH | Phone OTP at alpha, or Google-only first (cheaper, no DLT setup) | Google + email magic link at alpha, phone OTP by beta | M0.3 | Product | ⬜ open |
-| D-EXAM | First syllabus taxonomy (PRD open question 1) | UPSC-style GS tags | M0.2 (schema), M1.7 | Product | ⬜ open |
-| D-EDIT | Editors: in-house vs freelance; who staffs the 24 h correction SLA | 1 in-house lead + 2 freelancers | M1.7 | Product/Content | ⬜ open |
+| D-EXAM | First exam taxonomy | UPSC GS tags (our own mapping) | M0.2 (schema), M1.7 | Product | ✅ UPSC (PRD D-10) |
+| D-MODE | Launch order: both modes in alpha, or one first (PRD open question 7) | Shared engine; design partners in both; Phase 0 data picks the alpha lead | M1 start | Owner | ⬜ open |
+| D-EDIT | Editors: who reviews UPSC current affairs daily by 09:00, and who staffs corrections | 1 UPSC-background editor + 1 general editor (freelance at first) | M1.7 | Product/Content | ⬜ open |
 | D-NAME | Keep "Curiosity Feed"? Rename the repo `history_scroller`? | Trademark/domain check, then rename | Before alpha invites | Owner | ⬜ open |
 | D-AGE | Minimum age 13+ or 18+ | 18+ at alpha (simpler consent), revisit | M0.15 | Legal | ⬜ open |
 | D-BUDGET | Monthly AI budget for alpha | Set from M0.5 cost-per-lesson data | M0.1 | Owner | ⬜ open |
@@ -362,7 +380,8 @@ Add one line per merged PR that ticks a box.
 | Date | Task(s) | PR | Notes |
 |------|---------|----|-------|
 | 2026-10-24 | Baseline: tests, CI, bug fixes, review | #17 | Engineering review findings 1–12 fixed |
-| 2026-10-24 | Baseline: PRD, cleanup, src/ restructure, this plan | — | See §1 |
+| 2026-10-24 | Baseline: PRD, cleanup, src/ restructure, this plan | #21 | See §1 |
+| 2026-11-14 | Plan aligned with PRD v2.0 (Curious + UPSC modes); added M1.21–M1.23, M2.7 | — | No tasks ticked |
 
 ---
 
@@ -373,7 +392,9 @@ D-STACK ──▶ M0.2 DB ──▶ M0.3 Accounts ──▶ M0.4 Sync/import ─
    │            │             │
    │            │             ├──▶ M0.1 per-user quotas ──▶ M1.2 AI drafts, M1.8 jobs
    │            │             └──▶ M1.9 Onboarding ──▶ M1.11 Feed v2, M1.14 Push
-   │            └──▶ M1.1 Studio ──▶ M1.3 Review ──▶ M1.5 Edition builder ──▶ M1.10 Edition v2
+   │            └──▶ M1.1 Studio ──▶ M1.3 Review ──▶ M1.5 Edition builder ──▶ M1.10 Today's 5 v2
+   │                      └──▶ M1.21 CA intake ──▶ M1.22 UPSC feed
+M0.1 quotas ──▶ M1.23 UPSC explainer (prototype early) ──▶ M1.8 jobs + cache
    │                      └──▶ M1.2 ──▶ M1.13 Recall
    └──▶ M0.6 Analytics (any time; before alpha)
 M0.11 App split ──▶ M0.12 ──▶ (every M1-B task is easier after this)
