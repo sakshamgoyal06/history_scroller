@@ -1,6 +1,6 @@
 # Curiosity design: two modes
 
-Status: v1.1 draft, 2026-11-15. Implements the experience in PRD v2.1 (§6, §8.1, §8.11, §10.3a).
+Status: v1.2 draft, 2026-11-15. Implements the experience in PRD v2.1 (§6, §8.1, §8.11, §10.3a) and D-12.
 Clickable prototype: [`docs/design/two-mode-prototype.html`](design/two-mode-prototype.html) (open in a browser).
 
 ## 1. The idea
@@ -10,8 +10,8 @@ One app, two moods on one engine.
 - **Curious mode** is what you open instead of Instagram: calm, light, five good stories (Today's 5), then it ends.
 - **UPSC mode** ("Study") is the same habit with the exam switched on, in three parts (PRD v2.1, D-11):
   1. **Today:** national and international current affairs in four short steps, ending with 2–3 revision cards due today.
-  2. **Learn (Learning Zone):** subject → standard book → chapter; each chapter is one explainer video plus a deck of
-     8–20 highlight cards that cite book and chapter.
+  2. **Learn (Learning Zone):** subject → chapter; each chapter is distilled into one explainer video plus a deck
+     of 8–20 highlight cards in our own UPSC format, each citing a public source. No book or publisher is named (D-12).
   3. **Ask:** any topic or question, answered only from authentic sources, every sentence cited, or "no authentic
      source found".
 
@@ -81,10 +81,10 @@ UPSC · Today ──▶ GS filter (All · GS1–GS4) ──▶ CA post, national
    │                              arguments, way forward, Mains prompt, sources)
    ├─▶ 2–3 revision cards due today (question → Show answer → Again tomorrow / Got it)
    └─▶ "Caught up on today" (tally by GS paper, Learning Zone, Ask, later: weekly quiz)
-UPSC · Learn ──▶ "N revision cards due" ──▶ Subject (GS flag) ──▶ Book (author, % revised)
+UPSC · Learn ──▶ "N revision cards due" ──▶ Subject (GS flag) ──▶ Chapter list (% revised)
    └─▶ Chapter: explainer video (+ 60-second text fallback) ──▶ "Revise 8 highlight cards"
          └─▶ deck: tap right/left; card types Concept · Article · Date · Term · Common confusion · Asked like this;
-             every card cites book + chapter (+ a public source) ──▶ "Chapter revised" ──▶ due again in 1, 3, 7, 21 days
+             every card cites a public source (Constitution, IMD, …) ──▶ "Chapter revised" ──▶ due again in 1, 3, 7, 21 days
 UPSC · Ask ──▶ question + visible source allow-list ──▶ one of:
    ├─▶ cited answer: sections, a citation chip on every sentence, "Sources · what each one says", count of dropped
    │   unsupported sentences
@@ -103,7 +103,7 @@ Screen-to-requirement map:
 | UPSC Today, GS filter, revision cards, caught up | FR-UPSC-01, FR-UPSC-02, FR-UPSC-05, FR-UPSC-11 |
 | Revise the basics link | FR-UPSC-12 |
 | Explain it UPSC-style | FR-UPSC-03, FR-TRUST-03 |
-| Learning Zone: subjects, books, chapters | FR-UPSC-08 |
+| Learning Zone: subjects, chapters | FR-UPSC-08 |
 | Chapter: video + highlight deck | FR-UPSC-09, FR-UPSC-10, FR-UPSC-11 |
 | Ask anything (cited / covered / no source) | FR-UPSC-04, FR-UPSC-04a, FR-UPSC-04b, FR-PATH-04 (quota line) |
 | Saved (in Learn) | FR-UPSC-06 |
@@ -129,13 +129,13 @@ render the target screen at the fill midpoint so there is no flash. Everything e
 (150–250 ms) ease-out transitions only.
 
 ## 5. Content rules the design depends on
-- Highlight cards are our own wording and point to the book and chapter; no copied passages, tables or figures
-  (PRD §10.3a). The Learning Zone footer says so: "Buy or borrow the book; this helps you revise it."
-- The chapter video is curated and credited; the fallback summary is always there because embeds fail on patchy networks.
+- Highlight cards distil the chapter's information in our own UPSC-format wording and cite public sources; no book or
+  publisher is named anywhere, and no passages, tables or figures are copied (PRD D-12, §10.3a). The Learning Zone
+  footer says so: "Each chapter is distilled into our own UPSC-format cards. Every card cites a public source."
+- The chapter video is curated and credited; until an editor picks one, the slot says so honestly (no placeholder titles); the fallback summary is always there because embeds fail on patchy networks.
 - Ask shows its allow-list before you type, so the "no source found" state is expected rather than a failure.
 
 ## 6. Open questions
 - Name of the mode in UI: "Study" in the toggle vs "UPSC mode" in onboarding. Prototype uses both; test with aspirants.
 - Hindi: Mukta covers it, but Study headlines in condensed Anybody need a Devanagari display pairing (candidate: Mukta 800).
 - Launch order (D-MODE) does not change the design; a single-mode launch hides the toggle.
-- Page ranges on cards (FR-UPSC-09 says "+ page range") depend on edition; show them only once editions are fixed per book.
