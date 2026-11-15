@@ -4,7 +4,7 @@
 
 -- ---------------------------------------------------------------- helpers
 create or replace function public.set_updated_at() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = '' as $$
 begin
   new.updated_at := now();
   return new;
@@ -218,7 +218,11 @@ create policy "own paths" on public.paths for all to authenticated
 create policy "own lessons" on public.lessons for all to authenticated
   using (owner = auth.uid()) with check (owner = auth.uid());
 
--- Table privileges (Supabase grants these by default; stated here so the migration is self-contained).
+-- Table privileges. Supabase grants ALL on new public tables to anon and authenticated by default, which would
+-- let a user update their own `plan`. Start from nothing and grant only what each role needs.
+revoke all on public.content_items, public.editions, public.zones, public.subjects, public.chapters,
+  public.recall_items, public.profiles, public.saved_items, public.user_item_events, public.recall_state,
+  public.chapter_progress, public.paths, public.lessons from anon, authenticated;
 grant usage on schema public to anon, authenticated;
 grant select on public.content_items, public.editions, public.zones, public.subjects, public.chapters,
   public.recall_items to anon, authenticated;

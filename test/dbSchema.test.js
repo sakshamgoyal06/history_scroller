@@ -19,6 +19,8 @@ const SUPABASE_SHIM = `
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   grant usage on schema auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
+  -- Like Supabase: new tables in public are fully granted to anon and authenticated by default.
+  alter default privileges in schema public grant all on tables to anon, authenticated;
 `
 
 const A = '00000000-0000-0000-0000-00000000000a'
