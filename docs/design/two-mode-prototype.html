@@ -365,6 +365,63 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .req { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
 
+/* UPSC v2.1: revise links, revision cards, Learning Zone, cited answers */
+.revise { border: 1.5px solid var(--u-ink); border-radius: 6px; background: var(--paper); padding: 10px 12px; text-align: left; display: grid; gap: 2px; width: 100%; }
+.revise b { font-size: 16px; }
+.u-rev .rev-flag { --gsc: var(--u-ink); }
+.rev-from { margin: 0; }
+.rev-q { font-size: 27px; }
+.rev-a { display: grid; gap: 6px; padding: 12px 14px; background: var(--hl); color: var(--on-hl); border-radius: 4px; }
+.rev-a p { margin: 0; font-size: 18px; line-height: 1.4; }
+.rev-a .u-src { color: var(--on-hl); opacity: 0.75; }
+.rev-grade { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.rev-show { margin-top: auto; }
+.rev-ch { justify-self: start; color: var(--u-ink); }
+.due { border: 0; border-radius: 6px; background: var(--hl); color: var(--on-hl); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; text-align: left; font-size: 15px; }
+.due .mono { color: var(--on-hl); opacity: 0.75; }
+.due-go { font-weight: 700; }
+.subject { display: grid; gap: 4px; }
+.subject-head { display: flex; align-items: center; gap: 10px; }
+.subject-head h2 { margin: 0; font-family: var(--f-display); font-variation-settings: 'wdth' 70, 'wght' 800; font-size: 22px; }
+.m-upsc .row .meter i { background: var(--u-ink); }
+.book-top { display: grid; gap: 6px; }
+.chapters { list-style: none; margin: 0; padding: 0; }
+.chapters li { border-top: 1px solid var(--a-line); }
+.ch-row { grid-template-columns: 26px 1fr auto; }
+.ch-row .ch-n { grid-row: 1 / span 2; }
+.ch-row b, .ch-row small { grid-column: 2; }
+.ch-row .meter { grid-column: 3; }
+.ch-row:not(.ch-ready):not([data-ch]) { cursor: default; }
+.ch-ready b { background: linear-gradient(100deg, transparent 0.15em, var(--hl) 0.3em, var(--hl) calc(100% - 0.3em), transparent calc(100% - 0.15em)); color: var(--on-hl); padding: 0 0.3em; justify-self: start; }
+.video { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 6px; background: var(--u-ink); color: var(--paper); display: flex; align-items: flex-end; gap: 12px; padding: 14px; }
+.video b { display: block; font-family: var(--f-display); font-variation-settings: 'wdth' 75, 'wght' 750; font-size: 18px; line-height: 1.15; }
+.video .mono { color: var(--paper); opacity: 0.7; }
+.play { position: absolute; left: 50%; top: 40%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; background: var(--hl); }
+.play::after { content: ""; position: absolute; left: 21px; top: 16px; border-left: 16px solid var(--on-hl); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+.fallback { font-size: 15px; border-bottom: 1px solid var(--u-line); padding-bottom: 8px; }
+.fallback summary { cursor: pointer; font-weight: 600; }
+.fallback p { margin: 8px 0 0; line-height: 1.5; }
+.deck-segs { display: flex; gap: 3px; padding: 0 16px 10px; }
+.deck-segs i { flex: 1; height: 3px; background: var(--u-line); }
+.deck-segs i.on { background: var(--u-ink); }
+.deck { padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
+.deck-type { font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; align-self: flex-start; border: 1.5px solid var(--u-ink); padding: 2px 7px; border-radius: 3px; }
+.deck-body { margin: 0; font-size: 19px; line-height: 1.5; }
+.deck-cite { margin: 0; font-family: var(--f-mono); font-size: 11px; line-height: 1.5; color: var(--u-muted); border-top: 1px solid var(--u-line); padding-top: 10px; }
+.deck .c-hint { margin-top: auto; color: var(--u-muted); }
+.deck-actions { display: grid; grid-template-columns: auto 1fr; gap: 8px; padding: 0 16px 12px; }
+.deck-done { gap: 16px; }
+.allow { display: grid; gap: 8px; }
+.allow-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.allow-list span { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--u-line); border-radius: 3px; padding: 3px 7px; }
+.cite { border: 0; background: var(--u-ink); color: var(--hl); font-family: var(--f-mono); font-size: 10px; font-weight: 600; line-height: 1; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 3px; margin-left: 3px; vertical-align: 2px; }
+.cited { list-style: none; margin: 0; padding: 0; display: grid; }
+.cited li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--u-line); transition: background 0.3s; }
+.cited li.flash { background: var(--hl); color: var(--on-hl); }
+.cited .cn { font-family: var(--f-mono); font-size: 11px; font-weight: 600; }
+.cited b { display: block; font-size: 14px; }
+.cited p { margin: 4px 0 0; font-size: 14px !important; line-height: 1.45 !important; }
+
 @media (max-width: 900px) {
   .page { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 16px 48px; }
   .stage { position: static; }
@@ -396,7 +453,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   <div class="notes">
     <section class="intro">
       <h1>One app. A calm feed, and a <em>study mode</em>.</h1>
-      <p class="lede">Curious mode is what you open instead of Instagram: five good stories, then it ends. UPSC mode is the same habit with the exam switched on: today's current affairs in four short steps, and any topic explained the way UPSC asks it.</p>
+      <p class="lede">Curious mode is what you open instead of Instagram: five good stories, then it ends. UPSC mode is the same habit with the exam switched on: national and international current affairs in four short steps, chapter-by-chapter revision of the standard books, and answers to any question from authentic sources only.</p>
       <p class="lede">Both run on one engine (PRD v2, P1–P9). What changes between them is pace, density and tone, so the switch between them is the one moment in the app that gets real animation.</p>
     </section>
 
@@ -415,12 +472,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
           <button class="jump" data-go="c-explore">Explore</button>
           <button class="jump" data-go="c-library">Library</button>
         </div></div>
-        <div class="lane"><div class="lane-name up">UPSC mode</div><div class="lane-steps">
-          <button class="jump" data-go="u-today">Today's current affairs</button><span class="arrow">→</span>
+        <div class="lane"><div class="lane-name up">UPSC · Today</div><div class="lane-steps">
+          <button class="jump" data-go="u-today">Current affairs</button><span class="arrow">→</span>
           <button class="jump" data-go="u-explain">Explain it UPSC-style</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-today-rev">Revision cards due</button><span class="arrow">→</span>
           <button class="jump" data-go="u-end">Caught up</button>
-          <button class="jump" data-go="u-ask">Ask anything</button>
-          <button class="jump" data-go="u-library">GS Library</button>
+        </div></div>
+        <div class="lane"><div class="lane-name up">UPSC · Learn</div><div class="lane-steps">
+          <button class="jump" data-go="u-learn">Learning Zone</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-book">Book</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-chapter">Chapter + video</button><span class="arrow">→</span>
+          <button class="jump" data-go="u-deck">Highlight cards</button>
+        </div></div>
+        <div class="lane"><div class="lane-name up">UPSC · Ask</div><div class="lane-steps">
+          <button class="jump" data-go="u-ask">Ask anything</button><span class="arrow">→</span>
+          <button class="jump" data-ask="Explain the anti-defection law">Cited answer</button><span class="arrow">or</span>
+          <button class="jump" data-ask="Who is the best Polity teacher on YouTube?">No source found</button>
         </div></div>
         <div class="lane"><div class="lane-name mid">The switch</div><div class="lane-steps">
           <button class="jump" data-play="upsc">Enter study mode</button>
@@ -484,6 +551,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
         <li><b>Words for tabs</b><span>Three tabs per mode, labelled in words: Today, Explore, Library or Today, Ask, Library. Down from four in the current app (Zones and Learn merge into Explore).</span></li>
         <li><b>Endings, not streaks</b><span>Curious ends on "That's today's 5" with what you learned; UPSC ends on "Caught up" with a tally by GS paper. No streak counter, no badges (PRD principle 6).</span></li>
         <li><b>Structure is visible</b><span>Curious posts follow hook, context, reveal, why it matters, takeaway. UPSC posts show their four steps by name (What happened, Background, Key facts, Why it matters) so aspirants learn where to look.</span></li>
+        <li><b>Sources or silence</b><span>UPSC answers come only from an allow-list (Constitution, NCERT, PIB, PRS, courts, official data). Each sentence carries a numbered citation you can tap; the source list shows what each one says. With nothing authentic to cite, the answer says so instead of guessing (FR-UPSC-04a/b).</span></li>
+        <li><b>Books, revised</b><span>The Learning Zone follows how aspirants study: subject, then the book they already use, then the chapter. Each chapter opens with one explainer video and a deck of 8 highlight cards that cite book and chapter. News posts link to the chapter behind them (FR-UPSC-08..12).</span></li>
         <li><b>Trust on screen</b><span>Sources sit under every post and story. AI-written explainers say so; cached editor-checked ones say that instead (FR-TRUST-03).</span></li>
       </ul>
     </section>
@@ -612,8 +681,80 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
       srcs: [['Constitution of India', 'Tenth Schedule'], ['Supreme Court of India', 'Kihoto Hollohan v. Zachillhu (1992)'], ['Supreme Court of India', 'Keisham Meghachandra Singh v. Speaker, Manipur Legislative Assembly (2020)']] }
   };
 
+  /* ---------------- UPSC v2.1: Learning Zone, revision, grounded Ask ---------------- */
+  UP.forEach(function (p) { if (p.id === 'u-gov') p.ch = 'pol-gov'; if (p.id === 'u-wd') p.ch = 'geo-climate'; });
+  UP.splice(2, 0, { id: 'u-wto', gs: 'GS2', gsName: 'International', gsc: '--gs2', min: '2 min',
+    head: 'Why the WTO’s top trade court has been empty since 2019',
+    what: 'Trade disputes keep piling up at the WTO with no final court to hear appeals, and reform talks come up at every ministerial meeting.',
+    bg: 'WTO disputes go to a panel first. Either side can appeal to the Appellate Body. Since December 2019 it has had too few members to hear any appeal, because new appointments have been blocked.',
+    facts: ['WTO set up in <span class="hl">1995</span> by the Marrakesh Agreement; headquarters in Geneva', 'Appellate Body: 7 members, 3 hear each appeal', 'Non-functional since <span class="hl">December 2019</span>', 'An appeal “into the void” leaves a panel ruling unenforced', 'Some members use an interim arbitration arrangement (MPIA); India has not joined it'],
+    why: 'Rules-based trade, India’s disputes (agriculture subsidies, tariffs) and reform of global institutions. Use it in GS2 answers on international institutions and GS3 on trade.',
+    src: 'World Trade Organization, Dispute settlement: Appellate Body · WTO, Understanding on Rules and Procedures Governing the Settlement of Disputes' });
+
+  var REV = [
+    { id: 'r1', ch: 'pol-gov', q: 'Which Article gives the Governor the option to reserve a state bill for the President?', a: 'Article 200. A reserved bill is then dealt with under Article 201.', cite: 'Laxmikanth, Indian Polity · ch. Governor · Constitution of India, Arts 200–201' },
+    { id: 'r2', ch: 'geo-climate', q: 'Which jet stream carries western disturbances into north-west India?', a: 'The subtropical westerly jet stream, which lies south of the Himalayas in winter.', cite: 'NCERT Class XI, India: Physical Environment · ch. 4 Climate' },
+    { id: 'r3', ch: 'pol-gov', q: 'Under Article 163, whose advice does the Governor act on?', a: 'The council of ministers headed by the Chief Minister, except where the Constitution allows discretion.', cite: 'Laxmikanth, Indian Polity · ch. Governor · Constitution of India, Art 163' }
+  ];
+
+  var ZONE = [
+    { id: 'polity', name: 'Polity', gs: 'GS2', gsc: '--gs2', books: [
+      { id: 'laxmikanth', title: 'Indian Polity', author: 'M. Laxmikanth', chapters: [['Preamble', 100], ['Fundamental Rights', 100], ['Parliament', 60], ['Governor', 0, 'pol-gov'], ['Chief Minister', 0], ['State Legislature', 0], ['Emergency Provisions', 0]] },
+      { id: 'ncert-const', title: 'Indian Constitution at Work', author: 'NCERT Class XI', chapters: [['Constitution: Why and How?', 100], ['Rights in the Indian Constitution', 40], ['Executive', 0]] } ] },
+    { id: 'geo', name: 'Geography', gs: 'GS1', gsc: '--gs1', books: [
+      { id: 'ncert-ipe', title: 'India: Physical Environment', author: 'NCERT Class XI', chapters: [['India: Location', 100], ['Structure and Physiography', 100], ['Drainage System', 30], ['Climate', 0, 'geo-climate'], ['Natural Vegetation', 0], ['Soils', 0], ['Natural Hazards and Disasters', 0]] } ] },
+    { id: 'modern', name: 'Modern History', gs: 'GS1', gsc: '--gs1', soon: true, books: [] }
+  ];
+
+  var DECKS = {
+    'pol-gov': { title: 'Governor', subject: 'Polity', gs: 'GS2', book: 'Laxmikanth, Indian Polity', bookId: 'laxmikanth', video: 'The Governor’s powers, in 10 minutes',
+      summary: 'The Governor is the constitutional head of a state, appointed by the President, who mostly acts on the state government’s advice. The flashpoints are discretion: reserving bills, the choice of Chief Minister when no party has a majority, and reports to the Centre.',
+      cards: [
+        ['Concept', 'Two hats', 'The Governor is the <span class="hl">constitutional head of the state</span> and also the Centre’s link to it. Art 153 provides a Governor for each state; one person can hold the post for two or more states.', 'Art 153'],
+        ['Appointment', 'Chosen by the President', 'Appointed by the President by warrant under hand and seal (Art 155). Holds office during the <span class="hl">pleasure of the President</span> (Art 156); the normal term is five years.', 'Arts 155–156'],
+        ['Qualifications', 'Only two in the text', 'A citizen of India who has completed <span class="hl">35 years</span> of age (Art 157). Cannot be a member of Parliament or a state legislature, or hold an office of profit (Art 158).', 'Arts 157–158'],
+        ['Article', 'Aid and advice', 'Art 163: a council of ministers headed by the Chief Minister aids and advises the Governor, <span class="hl">except where the Constitution allows discretion</span>. If a question arises whether a matter is discretionary, the Governor’s decision is final.', 'Art 163'],
+        ['Article', 'Four options on a bill', 'Under Art 200 the Governor can <span class="hl">assent, withhold, return</span> (not a money bill) or <span class="hl">reserve</span> it for the President. A bill passed again after return cannot be withheld.', 'Arts 200–201'],
+        ['Article', 'Ordinances', 'Art 213: when the legislature is not in session, the Governor can issue an ordinance. It must be laid before the legislature and lapses <span class="hl">six weeks</span> after it reassembles.', 'Art 213'],
+        ['Common confusion', 'Governor vs President on bills', 'Both can give or withhold assent and return a non-money bill. Only the Governor has the extra option to <span class="hl">reserve</span> a bill for someone else, the President.', 'Arts 111, 200'],
+        ['Asked like this', 'How Prelims tests it', 'Statement questions mix up who can do what: reserve a bill, issue an ordinance, recommend President’s Rule. Learn the Article next to each power and these become quick marks.', 'Arts 200, 213, 356']
+      ] },
+    'geo-climate': { title: 'Climate', subject: 'Geography', gs: 'GS1', book: 'NCERT Class XI, India: Physical Environment', bookId: 'ncert-ipe', video: 'How India’s monsoon works',
+      summary: 'India has a monsoon climate: winds reverse with the seasons. Latitude, the Himalayas, land–water contrast and jet streams shape it. Western disturbances bring winter rain to the north-west; the retreating monsoon brings Tamil Nadu most of its rain.',
+      cards: [
+        ['Concept', 'A monsoon climate', 'India’s climate is called <span class="hl">monsoon type</span>: the defining feature is a seasonal reversal of winds, with a wet summer and a dry winter over most of the country.', 'ch. 4'],
+        ['Concept', 'Why the Himalayas matter', 'The Himalayas block cold winds from Central Asia in winter and hold the monsoon winds in summer, so the north stays warmer and wetter than its latitude suggests.', 'ch. 4'],
+        ['Concept', 'Western disturbances', 'Winter rain in the north-west comes from low-pressure systems from the <span class="hl">Mediterranean</span>, carried in by the westerly jet. It is small in amount but valuable for rabi crops.', 'ch. 4'],
+        ['Concept', 'Two jet streams', 'In winter a <span class="hl">subtropical westerly jet</span> lies south of the Himalayas. In summer an <span class="hl">easterly jet</span> blows over the southern Peninsula.', 'ch. 4'],
+        ['Date', 'Onset and spread', 'The monsoon reaches Kerala around <span class="hl">1 June</span> and covers the whole country by about mid-July.', 'ch. 4 · IMD'],
+        ['Term', 'Mango showers', 'Pre-monsoon showers in Kerala and coastal Karnataka, which help mangoes ripen early. In Bengal and Assam the evening thunderstorms are called <span class="hl">Kalbaisakhi</span>.', 'ch. 4'],
+        ['Common confusion', 'Tamil Nadu’s rainy season', 'The Tamil Nadu coast gets most of its rain in <span class="hl">October–November</span>, during the retreating monsoon, not in June–September.', 'ch. 4'],
+        ['Term', 'Loo', 'Hot, dry, gusty winds that blow over the northern plains in May and June afternoons.', 'ch. 4']
+      ] }
+  };
+
+  /* Ask anything: answers built only from allow-listed sources, every sentence cited. */
+  var ALLOW = ['Constitution & India Code', 'NCERT', 'PIB', 'PRS', 'RBI', 'Supreme Court', 'Economic Survey', 'UN, WTO, World Bank'];
+  var ANSWERS = {
+    'Explain the anti-defection law': { title: 'The anti-defection law', gs: 'GS2 · Polity',
+      sources: [
+        ['Constitution of India, Tenth Schedule', 'India Code', 'Paragraph 2: grounds for disqualification on defection. Paragraph 4: merger exception.'],
+        ['Constitution (Fifty-second Amendment) Act, 1985', 'India Code', 'Inserted the Tenth Schedule.'],
+        ['Constitution (Ninety-first Amendment) Act, 2003', 'India Code', 'Omitted paragraph 3 (split) of the Tenth Schedule.'],
+        ['Kihoto Hollohan v. Zachillhu (1992)', 'Supreme Court of India', 'Decisions of the Speaker/Chairman under the Tenth Schedule are subject to judicial review.'],
+        ['Keisham Meghachandra Singh v. Speaker, Manipur (2020)', 'Supreme Court of India', 'Disqualification petitions should be decided within three months, barring extraordinary circumstances.']
+      ],
+      sections: [
+        ['In one line', [['The Tenth Schedule disqualifies a legislator who gives up party membership or defies the party whip, with a merger exception.', [1]]]],
+        ['Static linkage', [['The 52nd Amendment Act, 1985 added the Tenth Schedule to the Constitution.', [2]], ['The 91st Amendment Act, 2003 removed the one-third “split” exception.', [3]]]],
+        ['Prelims facts', [['Voluntarily giving up party membership, or voting or abstaining against the whip without permission, are grounds for disqualification.', [1]], ['An independent member who joins a party after election is disqualified.', [1]], ['A merger is protected if two-thirds of the legislature party agree to it.', [1]], ['The Speaker or Chairman decides, and that decision is open to judicial review.', [1, 4]]]],
+        ['Way forward', [['The Supreme Court has said disqualification petitions should be decided within three months.', [5]]]]
+      ],
+      dropped: 1 },
+  };
+
   /* ---------------- state ---------------- */
-  var S = { screen: 'onb-mode', slide: {}, gs: 'All', saved: {}, interests: { History: 1, Science: 1 }, exam: 'UPSC CSE', year: '2027', lang: 'English', explain: 'u-gov', from: 'u-today', ask: '', building: false, seen: 0 };
+  var S = { screen: 'onb-mode', slide: {}, gs: 'All', saved: {}, interests: { History: 1, Science: 1 }, exam: 'UPSC CSE', year: '2027', lang: 'English', explain: 'u-gov', from: 'u-today', ask: '', building: false, seen: 0, rev: {}, book: 'laxmikanth', ch: 'pol-gov', chFrom: 'u-book', deckIdx: 0 };
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function modeOf(scr) { return (scr.indexOf('u-') === 0 || scr === 'onb-upsc') ? 'upsc' : 'curious'; }
@@ -629,7 +770,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
       '<button type="button" data-mode="upsc" aria-pressed="' + (mode === 'upsc') + '">Study</button></div></header>';
   }
   function tabs(mode, on) {
-    var t = mode === 'upsc' ? [['u-today', 'Today'], ['u-ask', 'Ask'], ['u-library', 'Library']] : [['c-today', 'Today'], ['c-explore', 'Explore'], ['c-library', 'Library']];
+    var t = mode === 'upsc' ? [['u-today', 'Today'], ['u-learn', 'Learn'], ['u-ask', 'Ask']] : [['c-today', 'Today'], ['c-explore', 'Explore'], ['c-library', 'Library']];
     return '<nav class="tabs" aria-label="Sections">' + t.map(function (x) {
       return '<button type="button" class="tab' + (x[0] === on ? ' is-on' : '') + '" data-go="' + x[0] + '"' + (x[0] === on ? ' aria-current="page"' : '') + '>' + x[1] + '</button>';
     }).join('') + '</nav>';
@@ -731,29 +872,34 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   /* ---------------- UPSC ---------------- */
+  function chTitle(id) { return DECKS[id] ? DECKS[id].subject + ' · ' + DECKS[id].title : ''; }
   function upPost(p, i, n) {
     var k = S.slide[p.id] || 0;
     var steps = STEPS.map(function (s, j) { return '<button type="button" class="u-step' + (j < k ? ' done' : '') + (j === k ? ' on' : '') + '" data-ustep="' + p.id + '" data-k="' + j + '">' + s + '</button>'; }).join('');
     var body = k === 0 ? '<p>' + p.what + '</p>' : k === 1 ? '<p>' + p.bg + '</p>' : k === 2 ? '<span class="kicker">For Prelims</span><ul class="facts">' + p.facts.map(function (f) { return '<li><span>' + f + '</span></li>'; }).join('') + '</ul>' : '<span class="kicker">For Mains</span><p>' + p.why + '</p>';
+    var revise = p.ch ? '<button type="button" class="revise" data-ch="' + p.ch + '" data-chfrom="u-today"><span class="kicker">Revise the basics</span><b>' + chTitle(p.ch) + '</b><span class="mono">' + DECKS[p.ch].book + ' · ' + DECKS[p.ch].cards.length + ' cards + video →</span></button>' : '';
     return '<section class="post u-post" data-post="' + p.id + '">' +
       '<div class="u-top"><span class="flag" style="--gsc:var(' + p.gsc + ')">' + p.gs + ' · ' + p.gsName + '</span><span class="mono">' + (i + 1) + ' / ' + n + ' · ' + p.min + '</span></div>' +
       '<h2 class="u-head">' + p.head + '</h2><div class="u-steps">' + steps + '</div>' +
-      '<div class="u-body" data-utap="' + p.id + '">' + body + '<span class="c-hint">' + (k < 3 ? 'Tap for ' + STEPS[k + 1].toLowerCase() : 'Scroll for the next item') + '</span></div>' +
+      '<div class="u-body" data-utap="' + p.id + '">' + body + (k === 3 ? revise : '') + '<span class="c-hint">' + (k < 3 ? 'Tap for ' + STEPS[k + 1].toLowerCase() : 'Scroll for the next item') + '</span></div>' +
       '<div class="u-foot"><button type="button" class="btn-ink" data-explain="' + p.id + '"><span>Explain it UPSC-style</span><span>→</span></button>' +
       '<button type="button" class="btn-line" data-save="' + p.id + '" aria-pressed="' + !!S.saved[p.id] + '">' + (S.saved[p.id] ? 'Saved' : 'Save to ' + p.gs) + '</button>' +
       '<p class="u-src">Sources: ' + p.src + '</p></div></section>';
   }
-  function upExtra() {
-    return '<section class="post u-post"><div class="u-top"><span class="flag" style="--gsc:var(--u-muted)">Good to know · GS1</span><span class="mono">1 min</span></div>' +
-      '<h2 class="u-head">' + EXTRA.head + '</h2><div class="u-body" style="cursor:default">' + EXTRA.body.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div>' +
-      '<div class="u-foot"><p class="u-src">Sources: ' + EXTRA.src + '</p></div></section>';
+  function revCard(r, i, n) {
+    var open = !!S.rev[r.id];
+    return '<section class="post u-post u-rev" data-post="' + r.id + '"><div class="u-top"><span class="flag rev-flag">Revision · due today</span><span class="mono">' + (i + 1) + ' / ' + n + '</span></div>' +
+      '<p class="rev-from mono">From ' + chTitle(r.ch) + '</p><h2 class="u-head rev-q">' + r.q + '</h2>' +
+      (open ? '<div class="rev-a"><p>' + r.a + '</p><p class="u-src">' + r.cite + '</p></div><div class="rev-grade"><button type="button" class="btn-line" data-grade="' + r.id + '">Again tomorrow</button><button type="button" class="btn-ink" data-grade="' + r.id + '"><span>Got it · next in 3 days</span></button></div>'
+        : '<button type="button" class="btn-ink rev-show" data-reveal="' + r.id + '"><span>Show answer</span><span>↓</span></button>') +
+      '<button type="button" class="linkbtn rev-ch" data-ch="' + r.ch + '" data-chfrom="u-today">Open the chapter →</button></section>';
   }
   function upEnd() {
     var c = { GS1: 0, GS2: 0, GS3: 0, GS4: 0 }; UP.forEach(function (p) { c[p.gs]++; });
     return '<section class="post u-end" id="u-end"><span class="mono">Sample day · 14 Nov</span><div class="stamp">Caught up<br><span class="hl">on today.</span></div>' +
       '<div class="tally">' + ['GS1', 'GS2', 'GS3', 'GS4'].map(function (g, i) { return '<div style="--gsc:var(--gs' + (i + 1) + ')"><b>' + c[g] + '</b>' + g + '</div>'; }).join('') + '</div>' +
-      '<ul class="rows"><li><button type="button" class="row" data-go="u-library"><b>Yesterday’s recall · 4 cards</b><small>About a minute</small></button></li>' +
-      '<li><button type="button" class="row" data-go="u-ask"><b>Ask about anything</b><small>Any topic, event or question, explained UPSC-style</small></button></li>' +
+      '<ul class="rows"><li><button type="button" class="row" data-go="u-learn"><b>Learning Zone</b><small>Next up: Polity · Governor, 8 cards + video</small></button></li>' +
+      '<li><button type="button" class="row" data-go="u-ask"><b>Ask about anything</b><small>Answered only from authentic sources, every line cited</small></button></li>' +
       '<li><div class="row"><b>Weekly quiz</b><small>Add-on, comes later</small><span class="soon">LATER</span></div></li></ul>' +
       '<p class="mono" style="margin:auto 0 0">Next edition: tomorrow, 9:00 AM IST</p></section>';
   }
@@ -763,9 +909,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     var gsbar = '<div class="gsbar" role="group" aria-label="Filter by GS paper">' + ['All', 'GS1', 'GS2', 'GS3', 'GS4'].map(function (g, i) {
       return '<button type="button" class="gsf" data-gs="' + g + '" aria-pressed="' + (S.gs === g) + '"' + (i ? ' style="--gsc:var(--gs' + i + ')"' : '') + '>' + (i ? '<i></i>' : '') + g + ' ' + (counts[g] || 0) + '</button>';
     }).join('') + '</div>';
+    var revs = S.gs === 'All' ? REV.map(function (r, i) { return revCard(r, i, REV.length); }).join('') : '';
     var body = list.length ? list.map(function (p, i) { return upPost(p, i, list.length); }).join('') : '<section class="post u-post"><p style="font-size:17px">Nothing tagged ' + S.gs + ' today. <button type="button" class="linkbtn" data-gs="All">Show all</button></p></section>';
-    return status() + header('upsc') + '<div class="dayline"><b>Today’s current affairs</b><span class="mono">Sample day · ~9 min</span></div>' + gsbar +
-      '<div class="main feed" id="feed">' + body + (S.gs === 'All' ? upExtra() : '') + upEnd() + '</div>' + tabs('upsc', 'u-today');
+    return status() + header('upsc') + '<div class="dayline"><b>National + international</b><span class="mono">Sample day · ~10 min</span></div>' + gsbar +
+      '<div class="main feed" id="feed">' + body + revs + upEnd() + '</div>' + tabs('upsc', 'u-today');
   }
   function explFromPost(p) {
     return { title: p.head, gs: p.gs + ' · ' + p.gsName, cached: false, one: p.bg, ctx: p.what, stat: null, facts: p.facts, pro: null, con: null, way: null, mains: null, why: p.why, srcs: [['Sources', p.src]] };
@@ -775,47 +922,114 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     var idx = [['ex-ctx', 'Context'], ['ex-stat', 'Static link'], ['ex-facts', 'Prelims facts'], ['ex-deb', 'Debate'], ['ex-way', 'Way forward'], ['ex-mains', 'Mains'], ['ex-src', 'Sources']].filter(function (x) {
       return !((x[0] === 'ex-stat' && !e.stat) || (x[0] === 'ex-deb' && !e.pro) || (x[0] === 'ex-way' && !e.way));
     });
-    var back = S.from === 'u-ask' ? '← Ask' : '← Today';
-    return status() + header('upsc') + '<div class="back"><button type="button" data-go="' + S.from + '">' + back + '</button></div>' +
+    var post = UP.filter(function (p) { return p.id === S.explain; })[0];
+    return status() + header('upsc') + '<div class="back"><button type="button" data-go="u-today">← Today</button></div>' +
       '<div class="main" id="explMain"><div class="exp-top"><span class="flag" style="--gsc:var(--gs' + e.gs.charAt(2) + ')">' + e.gs + '</span><h1>' + e.title + '</h1>' +
-      '<div class="exp-meta"><span class="mono">' + (e.cached ? 'Editor-checked · opened instantly' : 'AI-written · sources checked automatically') + '</span>' +
+      '<div class="exp-meta"><span class="mono">' + (e.cached ? 'Editor-checked · opened instantly' : 'AI-written from cited sources') + '</span>' +
       '<button type="button" class="btn-line" style="padding:5px 10px;font-size:13px" data-save="exp-' + S.explain + '" aria-pressed="' + !!S.saved['exp-' + S.explain] + '">' + (S.saved['exp-' + S.explain] ? 'Saved' : 'Save to ' + e.gs.slice(0, 3)) + '</button></div></div>' +
       '<nav class="exp-index" aria-label="Sections">' + idx.map(function (x) { return '<button type="button" data-jump="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</nav>' +
       '<div class="exp"><section><p class="oneline">' + e.one + '</p></section>' +
       '<section id="ex-ctx"><h3>Context</h3><p>' + e.ctx + '</p></section>' +
       (e.stat ? '<section id="ex-stat"><h3>Static linkage · constitutional basis</h3><p>' + e.stat + '</p></section>' : '') +
+      (post && post.ch ? '<section><button type="button" class="revise" data-ch="' + post.ch + '" data-chfrom="u-explain"><span class="kicker">Revise the basics</span><b>' + chTitle(post.ch) + '</b><span class="mono">' + DECKS[post.ch].book + ' →</span></button></section>' : '') +
       '<section id="ex-facts"><h3>Prelims facts</h3><ul class="facts">' + e.facts.map(function (f) { return '<li><span>' + f + '</span></li>'; }).join('') + '</ul></section>' +
       (e.pro ? '<section id="ex-deb"><h3>Arguments</h3><div class="debate"><div><b>For</b><p>' + e.pro + '</p></div><div><b>Against</b><p>' + e.con + '</p></div></div></section>' : '') +
       (e.way ? '<section id="ex-way"><h3>Way forward</h3><p>' + e.way + '</p></section>' : '') +
       '<section id="ex-mains"><h3>Mains angle · practice prompt</h3>' + (e.mains ? '<p class="mains">' + e.mains + '</p>' : '<p>' + e.why + '</p>') + '</section>' +
       '<section id="ex-src"><h3>Sources</h3><ul class="srcs">' + e.srcs.map(function (s) { return '<li><b>' + s[0] + '</b>' + s[1] + '</li>'; }).join('') + '</ul></section>' +
-      '</div></div>' + tabs('upsc', S.from);
+      '</div></div>' + tabs('upsc', 'u-today');
   }
-  function uAsk() {
-    if (S.building) {
-      return status() + header('upsc') + '<div class="main"><div class="building"><span class="kicker">Explaining</span><h1 class="h-screen" style="font-size:26px">' + esc(S.ask) + '</h1>' +
-        '<ul class="build-list" id="buildList">' + ['Context', 'Static linkage', 'Prelims facts', 'Arguments', 'Way forward', 'Mains angle', 'Sources'].map(function (x) { return '<li><b style="font-weight:500">' + x + '</b><span></span></li>'; }).join('') + '</ul>' +
-        '<p class="mono" style="margin:0">Usually ready in under 30 seconds. You can leave; it will be in your Library.</p></div></div>' + tabs('upsc', 'u-ask');
+
+  /* Learning Zone */
+  function meter(pct) { return '<span class="meter"><i style="width:' + pct + '%"></i></span>'; }
+  function bookPct(b) { var t = 0; b.chapters.forEach(function (c) { t += c[1]; }); return Math.round(t / b.chapters.length); }
+  function uLearn() {
+    var saved = Object.keys(S.saved).filter(function (k) { return S.saved[k]; }).length;
+    return status() + header('upsc') + '<div class="main"><div class="pad"><h1 class="h-screen">Learning Zone</h1>' +
+      '<button type="button" class="due" data-go="u-today-rev"><span><b>3 revision cards due</b><br><span class="mono">From Polity and Geography · about a minute</span></span><span class="due-go">Start</span></button>' +
+      ZONE.map(function (z) {
+        return '<div class="subject"><div class="subject-head"><span class="flag" style="--gsc:var(' + z.gsc + ')">' + z.gs + '</span><h2>' + z.name + '</h2></div>' +
+          (z.soon ? '<p class="mono" style="margin:0">Spectrum and NCERT decks are being written.</p>' :
+            '<ul class="rows">' + z.books.map(function (b) {
+              return '<li><button type="button" class="row" data-book="' + b.id + '"><b>' + b.title + '</b><small>' + b.author + ' · ' + b.chapters.length + ' chapters · ' + bookPct(b) + '% revised</small>' + meter(bookPct(b)) + '</button></li>';
+            }).join('') + '</ul>') + '</div>';
+      }).join('') +
+      '<ul class="rows"><li><button type="button" class="row"><b>Saved</b><small>' + (saved || 'No') + ' posts and explainers, by GS paper</small></button></li></ul>' +
+      '<p class="mono" style="margin:0">Cards are our own summaries that point to the book and chapter. Buy or borrow the book; this helps you revise it.</p></div></div>' + tabs('upsc', 'u-learn');
+  }
+  function findBook(id) { var out = null; ZONE.forEach(function (z) { z.books.forEach(function (b) { if (b.id === id) out = { z: z, b: b }; }); }); return out; }
+  function uBook() {
+    var f = findBook(S.book); var b = f.b, z = f.z;
+    return status() + header('upsc') + '<div class="back"><button type="button" data-go="u-learn">← Learning Zone</button></div><div class="main"><div class="pad">' +
+      '<div class="book-top"><span class="flag" style="--gsc:var(' + z.gsc + ')">' + z.gs + ' · ' + z.name + '</span><h1 class="h-screen">' + b.title + '</h1><span class="mono">' + b.author + ' · ' + bookPct(b) + '% revised</span></div>' +
+      '<ol class="chapters">' + b.chapters.map(function (c, i) {
+        var ready = !!c[2];
+        return '<li><button type="button" class="row ch-row' + (ready ? ' ch-ready' : '') + '"' + (ready ? ' data-ch="' + c[2] + '" data-chfrom="u-book"' : '') + '><span class="ch-n mono">' + (i + 1) + '</span><b>' + c[0] + '</b><small>' + (c[1] === 100 ? 'Revised · due again in 6 days' : c[1] ? c[1] + '% through the cards' : ready ? '8 cards + video · start here' : 'Deck in the prototype: Governor, Climate') + '</small>' + meter(c[1]) + '</button></li>';
+      }).join('') + '</ol></div></div>' + tabs('upsc', 'u-learn');
+  }
+  function uChapter() {
+    var d = DECKS[S.ch];
+    return status() + header('upsc') + '<div class="back"><button type="button" data-go="' + S.chFrom + '">← ' + (S.chFrom === 'u-today' || S.chFrom === 'u-explain' ? 'Today' : d.title === 'Governor' ? 'Indian Polity' : 'India: Physical Environment') + '</button></div><div class="main"><div class="pad">' +
+      '<div class="book-top"><span class="flag" style="--gsc:var(--gs' + d.gs.charAt(2) + ')">' + d.gs + ' · ' + d.subject + '</span><h1 class="h-screen">' + d.title + '</h1><span class="mono">' + d.book + '</span></div>' +
+      '<div class="video" role="img" aria-label="Explainer video slot"><span class="play" aria-hidden="true"></span><div><b>' + d.video + '</b><span class="mono">Explainer video · curated by an editor · credited to its creator</span></div></div>' +
+      '<details class="fallback"><summary>Can’t play video? Read the 60-second summary</summary><p>' + d.summary + '</p></details>' +
+      '<button type="button" class="btn-ink" data-deck="' + S.ch + '"><span>Revise ' + d.cards.length + ' highlight cards</span><span>→</span></button>' +
+      '<div><span class="kicker">In the news</span><ul class="rows">' + UP.filter(function (p) { return p.ch === S.ch; }).map(function (p) { return '<li><button type="button" class="row" data-explain="' + p.id + '"><b>' + p.head + '</b><small>Today · ' + p.gs + '</small></button></li>'; }).join('') + '</ul></div>' +
+      '</div></div>' + tabs('upsc', 'u-learn');
+  }
+  function uDeck() {
+    var d = DECKS[S.ch]; var k = S.deckIdx;
+    if (k >= d.cards.length) {
+      return status() + header('upsc') + '<div class="back"><button type="button" data-go="u-chapter">← ' + d.title + '</button></div><div class="main"><div class="pad deck-done">' +
+        '<div class="stamp">Chapter<br><span class="hl">revised.</span></div><p class="mono" style="margin:0">' + d.subject + ' · ' + d.title + ' · ' + d.cards.length + ' cards</p>' +
+        '<ul class="rows"><li><div class="row"><b>Comes back for revision</b><small>Tomorrow, then in 3, 7 and 21 days, as cards in your feed</small></div></li>' +
+        '<li><button type="button" class="row" data-go="u-learn"><b>Next chapter</b><small>' + (d.subject === 'Polity' ? 'Chief Minister' : 'Natural Vegetation') + '</small></button></li></ul></div></div>' + tabs('upsc', 'u-learn');
     }
-    var sugg = ['Explain the anti-defection law', 'Basic structure doctrine in 5 minutes', 'Why is the Kerala coast eroding?', 'What does the 16th Finance Commission do?'];
+    var c = d.cards[k];
+    var segs = d.cards.map(function (_, j) { return '<i class="' + (j <= k ? 'on' : '') + '"></i>'; }).join('');
+    return status() + header('upsc') + '<div class="back"><button type="button" data-go="u-chapter">← ' + d.title + '</button><span class="mono" style="margin-left:auto">' + (k + 1) + ' / ' + d.cards.length + '</span></div>' +
+      '<div class="deck-segs">' + segs + '</div>' +
+      '<div class="main deck" data-decktap="1"><span class="deck-type">' + c[0] + '</span><h2 class="u-head">' + c[1] + '</h2><p class="deck-body">' + c[2] + '</p>' +
+      '<p class="deck-cite">' + d.book + ' · ch. ' + d.title + (c[3].indexOf('Art') === 0 ? '<br>See also: Constitution of India, ' + c[3] : '') + '</p><span class="c-hint">Tap right for the next card, left to go back</span></div>' +
+      '<div class="deck-actions"><button type="button" class="btn-line" data-save="card-' + S.ch + '-' + k + '" aria-pressed="' + !!S.saved['card-' + S.ch + '-' + k] + '">' + (S.saved['card-' + S.ch + '-' + k] ? 'Marked' : 'Mark as tricky') + '</button><button type="button" class="btn-ink" data-decknext="1"><span>' + (k === d.cards.length - 1 ? 'Finish chapter' : 'Next card') + '</span><span>→</span></button></div>' +
+      tabs('upsc', 'u-learn');
+  }
+
+  /* Ask anything, grounded */
+  function uAsk() {
+    var sugg = ['Explain the anti-defection law', 'What powers does a Governor have over state bills?', 'Who is the best Polity teacher on YouTube?'];
     return status() + header('upsc') + '<div class="main"><div class="pad"><h1 class="h-screen">Ask about anything.</h1>' +
       '<form class="ask-box" id="askForm"><label class="visually-hidden" for="askInput">Topic, event or question</label><textarea id="askInput" rows="3" placeholder="A topic, a news event, or a question you saw in a paper">' + esc(S.ask) + '</textarea>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="mono">2 of 2 free this week</span><button type="submit" class="btn-ink"><span>Explain UPSC-style</span><span>→</span></button></div></form>' +
+      '<div class="allow"><span class="kicker">Answers only from</span><div class="allow-list">' + ALLOW.map(function (a) { return '<span>' + a + '</span>'; }).join('') + '</div><p class="mono" style="margin:0">Never from coaching notes, blogs, Telegram PDFs or other AI. Every sentence is cited; if nothing authentic is found, we say so.</p></div>' +
       '<div><span class="kicker">Try</span><ul class="rows" style="margin-top:8px">' + sugg.map(function (s) { return '<li><button type="button" class="row" data-ask="' + esc(s) + '"><b style="font-weight:500">' + s + '</b></button></li>'; }).join('') + '</ul></div>' +
-      '<p class="mono" style="margin:0">The prototype answers every question with the anti-defection sample.</p></div></div>' + tabs('upsc', 'u-ask');
+      '</div></div>' + tabs('upsc', 'u-ask');
   }
-  function uLibrary() {
-    var shelves = [['GS1', 'History, geography, society', 3, 1], ['GS2', 'Polity, governance, IR', 7, 2], ['GS3', 'Economy, environment, S&T', 5, 3], ['GS4', 'Ethics', 1, 4]];
-    return status() + header('upsc') + '<div class="main"><div class="pad"><h1 class="h-screen">Your GS shelves</h1>' +
-      '<ul class="rows">' + shelves.map(function (s) {
-        return '<li><button type="button" class="row"><b><span class="flag" style="--gsc:var(--gs' + s[3] + ');padding:0">' + s[0] + '</span> ' + s[1] + '</b><small>' + s[2] + ' saved</small></button></li>';
-      }).join('') + '<li><button type="button" class="row" data-explain-lib="tenth"><b>Explainers</b><small>4 saved · latest: The anti-defection law</small></button></li></ul>' +
-      '<div class="inline-note"><span><b style="color:var(--u-ink)">Yesterday’s recall</b><br>4 cards from 13 Nov · about a minute</span><button type="button" class="btn-line">Start</button></div>' +
-      '<p class="mono" style="margin:0">Monthly compilation PDF and Prelims practice come later as Plus add-ons.</p></div></div>' + tabs('upsc', 'u-library');
+  function uAnswer() {
+    var a = ANSWERS[S.ask];
+    if (S.ask === 'What powers does a Governor have over state bills?') a = null;
+    var top = status() + header('upsc') + '<div class="back"><button type="button" data-go="u-ask">← Ask</button></div><div class="main">';
+    if (S.ask === 'What powers does a Governor have over state bills?') {
+      return top + '<div class="pad"><span class="kicker">Already covered</span><h1 class="h-screen" style="font-size:26px">' + esc(S.ask) + '</h1><p style="margin:0;font-size:16px">An editor-checked explainer and a chapter deck already answer this, so we open those instead of writing a new answer.</p>' +
+        '<ul class="rows"><li><button type="button" class="row" data-explain="u-gov"><b>The Governor and state bills</b><small>Explainer · editor-checked</small></button></li><li><button type="button" class="row" data-ch="pol-gov" data-chfrom="u-ask"><b>Polity · Governor</b><small>Laxmikanth · 8 cards + video</small></button></li></ul></div></div>' + tabs('upsc', 'u-ask');
+    }
+    if (!a) {
+      return top + '<div class="pad"><span class="kicker">No authentic source found</span><h1 class="h-screen" style="font-size:26px">' + esc(S.ask) + '</h1>' +
+        '<p style="margin:0;font-size:16px">We couldn’t find this in the sources we trust (Constitution, NCERT, PIB, PRS, courts, official data), so we won’t guess. Opinions and recommendations aren’t something those sources answer.</p>' +
+        '<p class="mono" style="margin:0">Try asking about a topic, a law, an event or a concept.</p>' +
+        '<ul class="rows"><li><button type="button" class="row" data-ask="Explain the anti-defection law"><b>Explain the anti-defection law</b><small>Has authentic sources</small></button></li></ul></div></div>' + tabs('upsc', 'u-ask');
+    }
+    return top + '<div class="exp-top"><span class="flag" style="--gsc:var(--gs2)">' + a.gs + '</span><h1>' + a.title + '</h1><div class="exp-meta"><span class="mono">AI-written from ' + a.sources.length + ' authentic sources · every sentence cited</span></div></div>' +
+      '<div class="exp">' + a.sections.map(function (sec) {
+        return '<section><h3>' + sec[0] + '</h3>' + (sec[0] === 'Prelims facts' ? '<ul class="facts">' + sec[1].map(function (l) { return '<li><span>' + l[0] + cites(l[1]) + '</span></li>'; }).join('') + '</ul>' : '<p' + (sec[0] === 'In one line' ? ' class="oneline"' : '') + '>' + sec[1].map(function (l) { return l[0] + cites(l[1]); }).join(' ') + '</p>') + '</section>';
+      }).join('') +
+      '<section><h3>Sources · what each one says</h3><ol class="cited">' + a.sources.map(function (s, i) { return '<li id="src-' + (i + 1) + '"><span class="cn">' + (i + 1) + '</span><div><b>' + s[0] + '</b><span class="mono">' + s[1] + '</span><p>' + s[2] + '</p></div></li>'; }).join('') + '</ol></section>' +
+      '<p class="mono" style="margin:12px 0 0">' + a.dropped + ' sentence was left out because no source supported it.</p></div></div>' + tabs('upsc', 'u-ask');
   }
+  function cites(ns) { return ns.map(function (n) { return '<button type="button" class="cite" data-cite="src-' + n + '" aria-label="Source ' + n + '">' + n + '</button>'; }).join(''); }
 
   /* ---------------- render ---------------- */
-  var VIEWS = { 'onb-mode': onbMode, 'onb-curious': onbCurious, 'onb-upsc': onbUpsc, 'c-today': cToday, 'c-story': cStory, 'c-explore': cExplore, 'c-library': cLibrary, 'u-today': uToday, 'u-explain': uExplain, 'u-ask': uAsk, 'u-library': uLibrary };
+  var VIEWS = { 'onb-mode': onbMode, 'onb-curious': onbCurious, 'onb-upsc': onbUpsc, 'c-today': cToday, 'c-story': cStory, 'c-explore': cExplore, 'c-library': cLibrary, 'u-today': uToday, 'u-explain': uExplain, 'u-ask': uAsk, 'u-answer': uAnswer, 'u-learn': uLearn, 'u-book': uBook, 'u-chapter': uChapter, 'u-deck': uDeck };
   function render(keepScroll) {
     var feed = document.getElementById('feed'); var top = keepScroll && feed ? feed.scrollTop : 0;
     var m = modeOf(S.screen);
@@ -837,16 +1051,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     }
   }
   function go(scr) {
-    if (scr === 'c-end' || scr === 'u-end') {
+    if (scr === 'c-end' || scr === 'u-end' || scr === 'u-today-rev') {
       var base = scr === 'c-end' ? 'c-today' : 'u-today';
       if (base === 'u-today') S.gs = 'All';
       S.screen = base; render();
-      var end = document.getElementById(scr);
+      var end = scr === 'u-today-rev' ? document.querySelector('.u-rev') : document.getElementById(scr);
       var f = document.getElementById('feed');
       if (end && f) { f.style.scrollSnapType = 'none'; f.scrollTop = end.offsetTop - f.offsetTop; f.style.scrollSnapType = ''; }
       return;
     }
-    if (scr === 'u-explain') S.from = S.from === 'u-ask' ? 'u-ask' : 'u-today';
+    if (scr === 'u-deck') S.deckIdx = 0;
     S.screen = scr; S.building = false; render();
   }
 
@@ -862,7 +1076,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     swFill.style.background = toUp ? 'var(--hl)' : 'var(--mist)';
     swLabel.style.color = toUp ? 'var(--on-hl)' : 'var(--c-ink)';
     swTitle.textContent = toUp ? 'Study mode' : 'Curious mode';
-    swSub.textContent = toUp ? 'Sample day · 4 current-affairs items · ~9 min' : 'Today’s 5 · picks up where you left off';
+    swSub.textContent = toUp ? 'Sample day · 5 news items · 3 revision cards' : 'Today’s 5 · picks up where you left off';
     var narrow = "'wdth' 60, 'wght' 880", wide = "'wdth' 145, 'wght' 260";
     var anims = [];
     if (reduce || !swFill.animate) {
@@ -913,11 +1127,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* ---------------- events ---------------- */
   function tapSide(e, el) { var r = el.getBoundingClientRect(); return (e.clientX - r.left) < r.width * 0.35 ? -1 : 1; }
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('button, [data-tap], [data-utap]');
+    var t = e.target.closest('button, [data-tap], [data-utap], [data-decktap]');
     if (!t) return;
     var d = t.dataset;
     if (d.play) { switchTo(d.play); return; }
-    if (d.go) { if (d.go === 'u-today' || d.go === 'u-ask' || d.go === 'u-library') S.from = d.go === 'u-ask' ? 'u-ask' : 'u-today'; go(d.go); return; }
+    if (d.go) { go(d.go); return; }
+    if (d.ch) { S.ch = d.ch; S.chFrom = d.chfrom || 'u-book'; S.screen = 'u-chapter'; render(); return; }
+    if (d.book) { S.book = d.book; S.screen = 'u-book'; render(); return; }
+    if (d.deck) { S.ch = d.deck; S.deckIdx = 0; S.screen = 'u-deck'; render(); return; }
+    if (d.decknext) { S.deckIdx++; render(); return; }
+    if (d.decktap) { S.deckIdx = Math.max(0, S.deckIdx + tapSide(e, t)); render(); return; }
+    if (d.reveal) { S.rev[d.reveal] = true; render(true); return; }
+    if (d.grade) { var f0 = document.getElementById('feed'); if (f0) f0.scrollBy({ top: f0.clientHeight, behavior: reduce ? 'auto' : 'smooth' }); return; }
+    if (d.cite) { var ce = document.getElementById(d.cite); if (ce) { ce.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); ce.classList.add('flash'); setTimeout(function () { ce.classList.remove('flash'); }, 900); } return; }
     if (d.mode) { if (modeOf(S.screen) !== d.mode) switchTo(d.mode); return; }
     if (d.pick) { go(d.pick === 'upsc' ? 'onb-upsc' : 'onb-curious'); return; }
     if (d.int) { if (S.interests[d.int]) delete S.interests[d.int]; else S.interests[d.int] = 1; render(); return; }
@@ -933,27 +1155,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     if (d.knew) { t.setAttribute('aria-pressed', 'true'); t.textContent = 'Noted, fewer like this'; return; }
     if (d.deeper) { go('c-story'); return; }
     if (d.explain) { S.explain = d.explain; S.from = 'u-today'; S.screen = 'u-explain'; render(); return; }
-    if (d.explainLib) { S.explain = d.explainLib; S.from = 'u-library'; S.screen = 'u-explain'; render(); return; }
     if (d.gs) { S.gs = d.gs; render(); return; }
-    if (d.ask) { S.ask = d.ask; startBuild(); return; }
+    if (d.ask) { S.ask = d.ask; S.screen = 'u-answer'; render(); return; }
     if (d.jump) { var el = document.getElementById(d.jump); var m = document.getElementById('explMain'); if (el && m) m.scrollTo({ top: el.offsetTop - m.offsetTop - 40, behavior: reduce ? 'auto' : 'smooth' }); return; }
   });
   document.addEventListener('submit', function (e) {
     e.preventDefault();
-    if (e.target.id === 'askForm') { S.ask = document.getElementById('askInput').value.trim() || 'Explain the anti-defection law'; startBuild(); }
+    if (e.target.id === 'askForm') { S.ask = document.getElementById('askInput').value.trim() || 'Explain the anti-defection law'; S.screen = 'u-answer'; render(); }
     if (e.target.id === 'pathForm') { S.ask = document.getElementById('pathInput').value.trim() || 'How do semiconductors work?'; render(); }
   });
-  function startBuild() {
-    S.building = true; S.screen = 'u-ask'; render();
-    var items = document.querySelectorAll('#buildList li'); var i = 0;
-    function step() {
-      if (S.screen !== 'u-ask' || !S.building) return;
-      if (i > 0) { items[i - 1].className = 'ok'; }
-      if (i < items.length) { items[i].className = 'now'; i++; setTimeout(step, reduce ? 60 : 230); }
-      else setTimeout(function () { if (S.building) { S.building = false; S.explain = 'tenth'; S.from = 'u-ask'; S.screen = 'u-explain'; render(); } }, 250);
-    }
-    step();
-  }
   document.addEventListener('keydown', function (e) {
     if (e.target.closest('input, textarea')) return;
     if (S.screen !== 'c-today' && S.screen !== 'u-today') return;
