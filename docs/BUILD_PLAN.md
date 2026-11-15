@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Status** | Active. Milestone **M0 (Foundations)** is next |
-| **Last updated** | 2026-11-14 (aligned with PRD v2.0: Curious mode + UPSC mode) |
+| **Last updated** | 2026-11-15 (aligned with PRD v2.1: Curious mode + UPSC mode with Learning Zone) |
 | **Drives** | [`PRD.md`](PRD.md) (what and why) · [`ENGINEERING_REVIEW.md`](ENGINEERING_REVIEW.md) (technical findings) |
 
 > **How to use this plan**
@@ -295,11 +295,23 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
   - **Covers:** FR-UPSC-01, 02, 05 · **needs:** M1.4, M1.9, M1.11
   - **Work:** mode-aware feed (~80% today's current affairs, ~20% interesting cards), "caught up on today" state, past days and GS-paper filter, UPSC post renderer.
   - **Done when:** switching mode changes the feed, the mix rule is tested, and the last 30 days are browsable.
-- [ ] **M1.23 "Explain it UPSC-style" + Ask anything**
-  - **Covers:** FR-UPSC-03, 04, 06 · **needs:** M0.1 (quotas); M1.8 for background jobs
-  - **Work:** a UPSC explainer template and schema on the existing plan → research → write pipeline (`lib/`); entry points from every UPSC post and a typed question box; cache by normalized topic; AI-written label; save to a GS-wise Library.
-  - **Done when:** 30 golden UPSC topics pass the eval (sources, sections present, no factual errors on review), and a cached explainer opens instantly.
-  - **Note:** this can be prototyped early, right after M0.1, because the paths pipeline already exists.
+- [ ] **M1.23 Grounded Ask anything + "Explain it UPSC-style"**
+  - **Covers:** FR-UPSC-03, 04, 04a, 04b, 06; PRD §10.3a · **needs:** M0.1 (quotas); M1.8 for background jobs
+  - **Work:**
+    - Source allow-list (versioned in Studio) and a retrieval step restricted to it plus our reviewed content.
+    - UPSC distillation template; every factual sentence must cite a retrieved passage; uncited sentences dropped.
+    - "No authentic source found" path; URL check so only retrieved, resolving links are shown.
+    - Entry points from every UPSC post and a typed question box; cache by normalized topic; AI-written label; save to a GS-wise Library.
+  - **Done when:** on 50 golden questions (incl. 10 out-of-scope), 0 invented URLs/quotes/figures, 100% of factual sentences cited, "no source" returned where it should be, and a UPSC teacher finds no Prelims-costly error in 30 answers.
+  - **Note:** prototype right after M0.1, because the paths pipeline already exists.
+- [ ] **M1.24 Learning Zone**
+  - **Covers:** FR-UPSC-08..12 · **needs:** M1.4, M1.13, M1.15 · 🟡 D-BOOKS
+  - **Work:** subject → book → chapter browse (extends `src/zones/`); chapter highlight-deck renderer with book/chapter citations; explainer video per chapter (curated embed + fallback summary); finishing a deck schedules recall and drips due cards into the UPSC feed; CA posts link to chapters.
+  - **Done when:** 3 subjects are live with every chapter's deck and video, progress syncs, and due cards appear in both Recall and the feed.
+- [ ] **M1.25 Learning Zone content**
+  - **Covers:** PRD §7.2 content, §10.3a · **needs:** M1.2, M1.3 · 🟡 D-BOOKS, D-EDIT
+  - **Work:** Studio template for chapter decks (AI draft from the chapter + public sources → original wording → editor → teacher spot-check); pilot one subject in Phase 0, then 3 subjects.
+  - **Done when:** 3 subjects published and a teacher has reviewed at least 5 chapters per subject.
 
 ### M1-C · Growth hooks (PRD FR-GROW-*)
 
@@ -365,6 +377,7 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 | D-STACK | Confirm the §3 stack (Supabase, Upstash, Inngest, Sentry, PostHog) | As proposed | M0.1 / M0.2 start | Eng lead + owner | ⬜ open |
 | D-AUTH | Phone OTP at alpha, or Google-only first (cheaper, no DLT setup) | Google + email magic link at alpha, phone OTP by beta | M0.3 | Product | ⬜ open |
 | D-EXAM | First exam taxonomy | UPSC GS tags (our own mapping) | M0.2 (schema), M1.7 | Product | ✅ UPSC (PRD D-10) |
+| D-BOOKS | Learning Zone: first 3 subjects/books, and publisher permission for private books (PRD open question 9) | NCERT-first; teacher picks subjects; legal check before naming private books | M1.24 start | Owner + Legal | ⬜ open |
 | D-MODE | Launch order: both modes in alpha, or one first (PRD open question 7) | Shared engine; design partners in both; Phase 0 data picks the alpha lead | M1 start | Owner | ⬜ open |
 | D-EDIT | Editors: who reviews UPSC current affairs daily by 09:00, and who staffs corrections | 1 UPSC-background editor + 1 general editor (freelance at first) | M1.7 | Product/Content | ⬜ open |
 | D-NAME | Keep "Curiosity Feed"? Rename the repo `history_scroller`? | Trademark/domain check, then rename | Before alpha invites | Owner | ⬜ open |
@@ -382,6 +395,7 @@ Add one line per merged PR that ticks a box.
 | 2026-10-24 | Baseline: tests, CI, bug fixes, review | #17 | Engineering review findings 1–12 fixed |
 | 2026-10-24 | Baseline: PRD, cleanup, src/ restructure, this plan | #21 | See §1 |
 | 2026-11-14 | Plan aligned with PRD v2.0 (Curious + UPSC modes); added M1.21–M1.23, M2.7 | — | No tasks ticked |
+| 2026-11-15 | PRD v2.1: grounded Ask anything (M1.23), Learning Zone (M1.24–M1.25), D-BOOKS | — | No tasks ticked |
 
 ---
 
@@ -394,7 +408,8 @@ D-STACK ──▶ M0.2 DB ──▶ M0.3 Accounts ──▶ M0.4 Sync/import ─
    │            │             └──▶ M1.9 Onboarding ──▶ M1.11 Feed v2, M1.14 Push
    │            └──▶ M1.1 Studio ──▶ M1.3 Review ──▶ M1.5 Edition builder ──▶ M1.10 Today's 5 v2
    │                      └──▶ M1.21 CA intake ──▶ M1.22 UPSC feed
-M0.1 quotas ──▶ M1.23 UPSC explainer (prototype early) ──▶ M1.8 jobs + cache
+M0.1 quotas ──▶ M1.23 grounded Ask anything (prototype early) ──▶ M1.8 jobs + cache
+M1.4 + M1.13 + M1.15 ──▶ M1.24 Learning Zone ◀── M1.25 chapter content
    │                      └──▶ M1.2 ──▶ M1.13 Recall
    └──▶ M0.6 Analytics (any time; before alpha)
 M0.11 App split ──▶ M0.12 ──▶ (every M1-B task is easier after this)
