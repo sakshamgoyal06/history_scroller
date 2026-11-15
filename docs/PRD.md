@@ -51,12 +51,12 @@ It comes in **two modes on one engine**, picked at onboarding and switchable any
 |---|---|---|
 | **For** | Young adults who want to cut Instagram time and are curious about the world | UPSC (and State PSC) aspirants who scroll in their breaks and feel guilty about it |
 | **Feed** | Evergreen stories with hooks: history, science, economics, how things work | **Current affairs feed**: the important national and international news in UPSC format, made easy to digest, plus a few revision cards |
-| **Learning** | Zones (themed series) | **Learning Zone**: revision cards that highlight what matters in each chapter of the standard books aspirants use (NCERTs, Laxmikanth and others), subject → book → chapter, each chapter with an explainer video |
+| **Learning** | Zones (themed series) | **Learning Zone**: each important chapter of what aspirants study, distilled into our own UPSC-format highlight cards, organised subject → chapter, each chapter with an explainer video; no book names |
 | **Go deeper** | Story view and AI paths on any topic | **Ask anything**: any topic, event or question, distilled UPSC-style **only from authentic, cited sources**; no source, no answer |
 | **Add-ons** | Light recall | Recall, then quizzes and Prelims-style practice (add-ons, not the core) |
 
 - **Wedge, Curious mode:** *"Swap one scroll a day. Leave knowing something you didn't."*
-- **Wedge, UPSC mode:** *"Today's current affairs in UPSC format, chapter-by-chapter revision of your standard books, and
+- **Wedge, UPSC mode:** *"Today's current affairs in UPSC format, chapter-by-chapter revision of the core subjects, and
   answers you can trust, all in the scroll you were going to do anyway."*
 - **Differentiators:**
   1. A feed as easy to open as Instagram, but finite: you finish, you don't drift.
@@ -76,7 +76,7 @@ It comes in **two modes on one engine**, picked at onboarding and switchable any
 >
 > **v2.1, 2026-11-15 (D-11):** after Saksham spoke with a UPSC teacher, UPSC mode has three parts: the current-affairs
 > feed (national + international, UPSC format), a **Learning Zone** of chapter-wise revision cards with an explainer
-> video for the standard books, and **Ask anything** that answers only from authentic, cited sources.
+> video for every important chapter of the core subjects, and **Ask anything** that answers only from authentic, cited sources.
 
 ---
 
@@ -139,7 +139,7 @@ zones, and a calm visual identity. We can get it in front of real users in weeks
 | **Context** | Studies in long blocks, but picks up the phone in breaks, on commutes and before sleep, and often ends up on Instagram, then feels guilty. Already follows daily current affairs from newspapers, coaching sites and Telegram PDFs. |
 | **Jobs to be done** | "Keep up with current affairs without reading three sources." "Understand an issue well enough to write about it." "Look up any topic or event and get it the way UPSC wants it." "Make my breaks count." |
 | **Pains** | Too much to read, long and dull current-affairs PDFs, not knowing what matters for the exam, forgetting, low-trust sources, scroll guilt. |
-| **Gains we offer** | A current-affairs feed that's easy to digest, chapter-wise revision of the standard books in short highlight cards with a video, answers to any question from authentic sources only, recall, and later quizzes. |
+| **Gains we offer** | A current-affairs feed that's easy to digest, chapter-wise revision of the core subjects in short highlight cards with a video, answers to any question from authentic sources only, recall, and later quizzes. |
 | **Willingness to pay** | Low but real for clear exam value: already pays for test series and courses `[A5]`. |
 
 ### 3.3 Secondary persona: "The Curious Professional"
@@ -159,8 +159,8 @@ Not targeted at MVP.
 ### 3.5 Anti-personas: who we are *not* building for
 
 - **Test-only grinders** who want only MCQ drills and mock tests: quizzes are an add-on here, not a test series.
-- **Book replacers:** the Learning Zone helps people *revise* the standard books; it highlights and explains, it does
-  not reproduce or replace them, and it is not a full course.
+- **Book replacers:** the Learning Zone helps people *revise*; it distils and explains, it does not reproduce any book,
+  and it is not a full course.
 - **Children under 13:** this needs a separate safety and compliance model.
 - **People wanting deep study** (coursework, certifications): we link out; we don't replace it.
 
@@ -222,11 +222,11 @@ Use these to settle design arguments. They are ordered, so when two conflict, th
 | **P6 · Recall** *(new, light)* | "Remember the best things you saw" | — | 3 quick "remember this?" cards the next day; optional, never nagging |
 | **P7 · Library** | Everything you saved, liked, finished | Saved/liked/recent/paths | Synced across devices; "things I've learned" timeline |
 | **P8 · Swap tools** *(later)* | "Help me reach for this instead of Instagram" | — | Home-screen placement prompt, widget, Android app that offers a card when you open a chosen app |
-| **P9 · UPSC mode** *(new)* | "Current affairs made easy, revision of my books, and answers I can trust" | — | (a) daily current-affairs feed in UPSC format; (b) Learning Zone: chapter-wise highlight cards + explainer video per chapter of the standard books; (c) Ask anything, grounded only in authentic cited sources; GS tags; later quizzes |
+| **P9 · UPSC mode** *(new)* | "Current affairs made easy, quick revision of every important chapter, and answers I can trust" | — | (a) daily current-affairs feed in UPSC format; (b) Learning Zone: chapter-wise highlight cards in our own UPSC format + explainer video per chapter; (c) Ask anything, grounded only in authentic cited sources; GS tags; later quizzes |
 
 **How UPSC mode reuses the engine:** it is the same feed, story view, paths pipeline, recall and Library, with a
 different content pool and ranking weights (current affairs pinned and fresh first), a UPSC lesson template for paths,
-and GS tags on content. The Learning Zone is the Zones pillar (P5) organised as subject → book → chapter. It is not a
+and GS tags on content. The Learning Zone is the Zones pillar (P5) organised as subject → chapter. It is not a
 separate app.
 
 ### 6.2 Core loop
@@ -254,7 +254,7 @@ next day, a quick recall of yesterday's best stories.
         │                         ├──▶ "Revise the basics" ──▶ the linked Learning Zone chapter
         │                         └──▶ "You're caught up on today" (+ 2–3 revision cards due today)
         │
-        ├──▶ Learning Zone: Subject ─▶ Book ─▶ Chapter ─▶ highlight cards (swipe) + explainer video ─▶ chapter done
+        ├──▶ Learning Zone: Subject ─▶ Chapter ─▶ highlight cards (swipe) + explainer video ─▶ chapter done
         │
         └──▶ Ask anything: topic, event or question ──▶ answer built only from authentic sources, every claim cited
                                                          (or "I couldn't find an authentic source for this")
@@ -272,7 +272,7 @@ next day, a quick recall of yesterday's best stories.
 | **Path lesson** | Paths | AI-generated story with verified claims ↔ sources, misconceptions, uncertainties |
 | **Recall card** *(new)* | Recall | "Remember this?" question with a reveal, linked back to the story |
 | **Current-affairs post** *(UPSC mode)* | UPSC feed | 4–6 slides: what happened → background → key facts (Prelims) → why it matters / issues (Mains) → GS tag + sources |
-| **Chapter highlight deck** *(UPSC mode)* | Learning Zone | 8–20 swipeable cards per chapter of a standard book: key concepts, facts, dates, articles, diagrams/maps, common confusions, "this was asked like this" angles; each card cites book + chapter (+ page range) and a public source where possible; one explainer video per chapter |
+| **Chapter highlight deck** *(UPSC mode)* | Learning Zone | 8–20 swipeable cards per chapter in our own UPSC format: key concepts, facts, dates, articles, diagrams/maps, common confusions, Prelims facts and Mains angles; each card cites an authentic public source (§10.3a), never a book name; one explainer video per chapter |
 | **UPSC explainer** *(UPSC mode)* | Ask anything / go deeper | Context, static linkage, constitutional/legal basis where relevant, key facts and data, arguments for and against, way forward, likely Prelims facts and Mains question angles, sources |
 
 ### 6.4 Domains and taxonomy
@@ -300,8 +300,8 @@ Every content item also carries:
 > with Today's 5 and light next-day recall**, at least 25% of activated users will still use it in week 4 on ≥ 3 days a
 > week, and most design partners will report spending less time on Instagram.
 >
-> **UPSC mode:** if aspirants get **today's current affairs as an easy, sourced feed, chapter-wise revision of their
-> standard books, and trustworthy answers to any question**, at least 30% will use it on ≥ 4 days a week in week 4, and most will rate it as easier to keep up with
+> **UPSC mode:** if aspirants get **today's current affairs as an easy, sourced feed, chapter-wise revision of the
+> core subjects, and trustworthy answers to any question**, at least 30% will use it on ≥ 4 days a week in week 4, and most will rate it as easier to keep up with
 > than their current current-affairs source.
 
 ### 7.2 MVP scope
@@ -323,7 +323,7 @@ Every content item also carries:
 | 11 | Internal **Content Studio**: AI-drafted cards → editor review → publish | Ops | FR-CMS-01..06 |
 | 12 | Engineering P0 from `ENGINEERING_REVIEW.md` (spend controls, observability, persistence, safety, release hygiene) | Platform | NFR-01..12 |
 | 13 | **UPSC mode:** daily current-affairs feed (national + international, UPSC format), "Explain it UPSC-style" on posts, grounded Ask anything, GS tags | P9 | FR-UPSC-01..07 |
-| 15 | **UPSC Learning Zone:** subject → book → chapter, highlight decks with an explainer video, progress and revision | P9, P5 | FR-UPSC-08..12 |
+| 15 | **UPSC Learning Zone:** subject → chapter, highlight decks with an explainer video, progress and revision | P9, P5 | FR-UPSC-08..12 |
 | 14 | **Current-affairs pipeline** in Content Studio: pull from primary sources, AI-draft posts, review, publish by 09:00 IST | Ops | FR-CMS-07..08 |
 
 **Content at launch:**
@@ -331,8 +331,8 @@ Every content item also carries:
   Today's 5 before alpha, and never less than 7 days after.
 - UPSC mode: 30 consecutive days of current-affairs feeds (≥ 8 posts/day) published on time before alpha, so new users
   see a month of back-catalogue.
-- UPSC Learning Zone: 3 subjects fully covered at launch, chosen with design partners (proposal: Polity on Laxmikanth +
-  NCERT, Modern History on NCERT/Spectrum, Geography on NCERT 11–12), each chapter with a highlight deck and a video.
+- UPSC Learning Zone: 3 subjects fully covered at launch, chosen with design partners (proposal: Polity, Modern History,
+  Geography), chapters ordered the way aspirants study them, each with a highlight deck and a video.
 
 **Out of scope for MVP** (explicitly deferred):
 - Native iOS/Android apps and the app-intercept "swap" feature (we ship as a PWA; swap tools are Phase 2).
@@ -484,8 +484,8 @@ Priority: **M** = must (MVP), **S** = should (MVP if time allows), **L** = later
 | FR-UPSC-04b | M | **No fabrication:** if retrieval finds no authentic source, the answer says so and suggests related reviewed content; it never guesses. Cited URLs must be ones actually retrieved and must resolve | Golden-set eval: 0 invented URLs, quotes or figures; "no source" returned on out-of-scope questions |
 | FR-UPSC-05 | M | Browse past days and filter by GS paper | Last 30 days at launch |
 | FR-UPSC-06 | S | Save explainers and posts to a GS-wise Library | Synced |
-| FR-UPSC-08 | M | Learning Zone browse: Subject → Book → Chapter, with GS paper tags and progress per chapter and book | Works offline for downloaded chapters |
-| FR-UPSC-09 | M | Chapter highlight deck: 8–20 swipeable cards in original wording, each citing book + chapter (+ page range) and a public source where possible | Studio blocks publish without a citation; no verbatim passages beyond short quotes |
+| FR-UPSC-08 | M | Learning Zone browse: Subject → Chapter, with GS paper tags and progress per chapter and subject | Works offline for downloaded chapters |
+| FR-UPSC-09 | M | Chapter highlight deck: 8–20 swipeable cards distilling the chapter's information in our own UPSC format and wording; each card cites an authentic public source; no book or publisher names anywhere in the app | Studio blocks publish without a source; no verbatim passages |
 | FR-UPSC-10 | M | One explainer video per chapter (curated embeddable video at MVP, own AI-assisted short later) | Every published chapter has a video, a credit and a fallback summary if the embed fails |
 | FR-UPSC-11 | M | Chapter revision: finishing a deck schedules its cards into recall (1, 3, 7, 21 days) and drips due cards into the UPSC feed | Due cards appear in the feed and in Recall |
 | FR-UPSC-12 | S | Current-affairs posts link to the related chapter ("revise the basics") and chapters show recent news on that topic | ≥ 70% of CA posts carry a chapter link once 3 subjects are live |
@@ -531,7 +531,7 @@ Priority: **M** = must (MVP), **S** = should (MVP if time allows), **L** = later
 |------|--------------------|--------|--------|
 | Current affairs (last 1–7 days) | ~80% | AI draft from primary sources (PIB, PRS, RBI, ministries, Supreme Court/HC orders, Gazette, international bodies) and reporting | Editor review; second check for polity and anything contested |
 | Revision cards due today (from the Learning Zone) | ≤ 20%, after the news | Learning Zone decks | Already reviewed |
-| Learning Zone chapter decks | Separate tab | AI draft from the chapter + public sources, rewritten in original words, with book/chapter citations | Editor with UPSC background; teacher spot-check per subject |
+| Learning Zone chapter decks | Separate tab | AI draft from the chapter's information + authentic public sources, in our own words and UPSC format, citing public sources only | Editor with UPSC background; teacher spot-check per subject |
 | Ask-anything answers | Personal, on demand | Retrieval from the authentic-source allow-list only (§10.3a), UPSC template, inline citations | Automated grounding checks; labelled AI-written; popular ones promoted to reviewed content |
 
 **Daily current-affairs cadence:** pick 8–15 items a day that matter for the exam (not every headline), publish by
@@ -575,10 +575,9 @@ drafting, this is about 2 editors, one of whom knows UPSC well, plus a UPSC teac
 - Coaching notes, blogs, Telegram PDFs, social media and AI output are never sources. The list is versioned in Content
   Studio and changes need editor sign-off.
 
-**Standard books:** chapter decks are original summaries and explanations that *point to* a book and chapter; we don't
-copy passages, tables or figures. NCERTs are the default base because they're public; for private books (e.g.
-Laxmikanth, Spectrum) we cite by chapter and seek publisher permission before using their names in marketing (open
-question 9).
+**Learning Zone chapters (D-12):** we distil the information aspirants need from each important chapter into our own
+UPSC-format cards. We don't name any private book or publisher in the app, cards or marketing, and we don't copy
+passages, tables, figures or a book's exact structure. Every card cites authentic public sources from the list above.
 
 ### 10.4 Neutrality on politics
 
@@ -688,7 +687,7 @@ Instagram time.
 |---------|-------------|-------------|
 | Recovering Scroller | "Swap a scroll. Same swipe, but you leave knowing something." | Finite sessions, great hooks, "what you learned" summary |
 | Curious professional | "Understand how the world works, two minutes at a time." | Story Mode, Why it matters, AI paths |
-| Aspirant (UPSC mode) | "Today's current affairs in UPSC format, your standard books revised chapter by chapter, and answers you can trust, in the break you'd spend on reels." | Daily feed by 09:00, chapter decks + video, cited answers, teacher-reviewed |
+| Aspirant (UPSC mode) | "Today's current affairs in UPSC format, every important chapter revised in short cards, and answers you can trust, in the break you'd spend on reels." | Daily feed by 09:00, chapter decks + video, cited answers, teacher-reviewed |
 
 **UPSC mode beachhead:** UPSC CSE aspirants first (State PSC aspirants share most current affairs). They gather in dense
 Telegram channels, YouTube and Instagram pages, libraries and coaching hubs (e.g. Delhi's Old Rajinder Nagar and
@@ -886,7 +885,8 @@ Launch criteria per §7.3.
 | D-07 | 2026-11-14 | The product is a general "swap your scroll" curiosity app (Curious mode) | Matches the original goal: replace the Instagram habit |
 | D-08 | 2026-11-14 | North Star = Weekly Swappers (§14.1), reported per mode | Measures the replacement habit directly |
 | D-09 | 2026-11-14 | Curious mode has no daily news edition; Today's 5 is evergreen-first and scheduled a week ahead | No daily deadline for the general feed |
-| D-11 | 2026-11-15 | UPSC mode = CA feed in UPSC format + Learning Zone (chapter-wise highlight decks from standard books, with an explainer video) + Ask anything grounded only in authentic cited sources | From a UPSC teacher via Saksham: revision of standard books is what aspirants need alongside current affairs; trust needs no fabrication |
+| D-11 | 2026-11-15 | UPSC mode = CA feed in UPSC format + Learning Zone (chapter-wise highlight decks in our own UPSC format, with an explainer video) + Ask anything grounded only in authentic cited sources | From a UPSC teacher via Saksham: chapter-wise revision is what aspirants need alongside current affairs; trust needs no fabrication |
+| D-12 | 2026-11-15 | Learning Zone names no private books or publishers; it distils each chapter's information into our own UPSC-format cards citing public sources | Saksham: "We do not need to use the name"; avoids copyright and permission issues |
 | D-10 | 2026-11-14 | Add **UPSC mode** on the same engine: current-affairs-first feed (~80%) + "Explain it UPSC-style" on anything; quizzes and tests are add-ons | Aspirants need current affairs made easy and on-demand explanations; owner's call (Saksham) |
 
 ### 16.2 Assumptions to validate
@@ -905,7 +905,7 @@ Launch criteria per §7.3.
 | A10 | Enough aspirants are comfortable in English for an English-first UPSC mode | Design-partner recruiting; language question at onboarding | Phase 0 |
 | A11 | AI-drafted, editor-reviewed current affairs can match established CA sources on accuracy, by 09:00 every day | Blind accuracy review (§7.3) and 30/30 on-time days | Phase 0–1 |
 | A12 | Aspirants trust AI "UPSC-style" explainers when every claim is cited to an authentic source | Helpfulness ratings (M-12); grounding audits (M-15); error reports | Phase 1 |
-| A13 | Chapter-wise highlight decks + a video make revision of standard books easier than re-reading or notes | Design partners and teacher feedback; M-14 | Phase 0–1 |
+| A13 | Chapter-wise highlight decks + a video make revision of core subjects easier than re-reading or notes | Design partners and teacher feedback; M-14 | Phase 0–1 |
 
 ### 16.3 Open questions
 
@@ -918,9 +918,8 @@ Launch criteria per §7.3.
 7. **Launch order:** both modes in the alpha, or one first? Running both doubles content work. *Proposal: build the
    shared engine once, start design partners in both, and let the Phase 0 numbers decide which mode leads the alpha.*
 8. Who reviews current affairs daily: Saksham, a hired UPSC-background editor, or a freelance network? *Owner: Content.*
-9. Which books and subjects come first in the Learning Zone, and do we need publisher permission for private books
-   (Laxmikanth, Spectrum and others)? *Proposal: start NCERT-based; ask the teacher to pick 3 subjects; legal check
-   before naming private books.* *Owner: Product/Legal.*
+9. Which 3 subjects and which chapters come first in the Learning Zone? *Proposal: ask the UPSC teacher to pick them
+   and to spot-check chapters.* *Owner: Product.*
 10. Explainer videos: curated YouTube at MVP, or our own AI-narrated shorts from day one? *Proposal: curated at MVP;
     own videos once a chapter template exists (Phase 2).*
 
@@ -936,7 +935,7 @@ Launch criteria per §7.3.
 | Factual errors damage trust | Med | High | Sources required, editor review, fast corrections, AI content labelled (§10) |
 | AI cost runaway or abuse | Med | High | Quotas, shared rate limits, budget alarms, kill switch, caching (NFR-01) |
 | UPSC current affairs: an error or a missed day loses aspirants' trust fast | Med | High | Primary sources only, auto source check, editor review, 4 h correction SLA, a person accountable for 09:00 every day (M-13) |
-| Copyright: Learning Zone mirrors private books too closely | Med | High | Original wording, chapter references only, no copied tables/figures, NCERT-first, legal review, publisher permission where needed |
+| Copyright: Learning Zone mirrors a private book too closely | Low–Med | High | No book names (D-12), our own wording and UPSC format, no copied passages/tables/figures, public sources cited, light legal review before alpha |
 | Ask anything hallucinates or cites sources that don't say what it claims | Med | High | Retrieval from an allow-list only, sentence-level citations, drop uncited sentences, "no source" answers, audits (M-15) |
 | "Just another current-affairs app" next to Drishti, Vision, Insights and Telegram | High | Med | Lead with the format (easy, swipeable, in your break) and "explain anything UPSC-style", not with volume |
 | Two modes split a small team's focus | Med | High | One engine, shared evergreen pool, mode-specific content only where needed; open question 7 |
@@ -956,7 +955,7 @@ Launch criteria per §7.3.
 |--------|--------------|------------|
 | Feed | `src/feed/` (`LearningReel.jsx`, `rankFeedItems.js`, `feedRepository.js`, `prototypeFeedItems.js`) | Backend-served content, server-side ranking signals, "caught up" state |
 | Today's 5 | `src/edition/` | Editor-scheduled picks instead of selection from a static catalog |
-| UPSC mode | `src/learn/` (paths pipeline), `lib/openaiLesson.js`, `src/zones/` | New: mode switch, CA feed, grounded Ask anything with source allow-list, Learning Zone (subject → book → chapter), CA intake in Studio |
+| UPSC mode | `src/learn/` (paths pipeline), `lib/openaiLesson.js`, `src/zones/` | New: mode switch, CA feed, grounded Ask anything with source allow-list, Learning Zone (subject → chapter), CA intake in Studio |
 | Stories | `src/stories/`, story detail in `App.jsx` | Sources UI, story view for every card |
 | Paths | `api/*`, `lib/*`, `src/learn/` | Auth, quotas, background jobs, cache, moderation, server persistence |
 | Zones | `src/zones/*` | 15+ zones in the CMS, synced progress |
@@ -972,7 +971,7 @@ Launch criteria per §7.3.
 - **Story:** the long-form narrative view of a card.
 - **Today's 5:** the daily set of 5 editor-picked cards in Curious mode.
 - **Mode:** Curious (general) or UPSC; same engine, different content pool and ranking.
-- **Learning Zone:** UPSC mode's chapter-wise revision of standard books: highlight decks plus an explainer video.
+- **Learning Zone:** UPSC mode's chapter-wise revision of core subjects: highlight decks plus an explainer video.
 - **UPSC explainer:** an AI-generated, sourced answer to any topic or question in UPSC format.
 - **Path:** a user-requested, AI-generated sequence of 3–5 lessons (possibly multi-track).
 - **Zone:** an editor-curated sequence of cards.
@@ -991,4 +990,5 @@ Launch criteria per §7.3.
 | 2026-11-14 | 2.0 | New direction: general "swap your scroll" curiosity app plus UPSC mode (current-affairs-first feed, "Explain it UPSC-style"); exam mode and syllabus-first scope removed; North Star → Weekly Swappers; D-07..D-10 |
 | 2026-11-14 | 2.0.1 | Linked `DESIGN.md` (two-mode design system, flows, study-mode switch) and its clickable prototype; no requirement changes |
 | 2026-11-15 | 2.1 | UPSC mode reshaped after a UPSC teacher's input: CA feed (national + international, UPSC format), Learning Zone (FR-UPSC-08..12), Ask anything grounded only in authentic cited sources (FR-UPSC-04a/b, §10.3a); D-11, A13, M-14, M-15 |
-| 2026-11-15 | 2.1.1 | `DESIGN.md` and prototype updated for v2.1: Learning Zone screens, revision cards, cited Ask answers; no requirement changes |
+| 2026-11-15 | 2.1.1 | Learning Zone names no books or publishers; chapters distilled into our own UPSC-format cards citing public sources (D-12) |
+| 2026-11-15 | 2.1.2 | `DESIGN.md` and prototype updated for v2.1 and D-12: Learning Zone is Subject → Chapter with no book names, revision cards, cited Ask answers; no requirement changes |

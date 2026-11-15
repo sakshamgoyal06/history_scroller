@@ -306,7 +306,7 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
   - **Note:** prototype right after M0.1, because the paths pipeline already exists.
 - [ ] **M1.24 Learning Zone**
   - **Covers:** FR-UPSC-08..12 · **needs:** M1.4, M1.13, M1.15 · 🟡 D-BOOKS
-  - **Work:** subject → book → chapter browse (extends `src/zones/`); chapter highlight-deck renderer with book/chapter citations; explainer video per chapter (curated embed + fallback summary); finishing a deck schedules recall and drips due cards into the UPSC feed; CA posts link to chapters.
+  - **Work:** subject → chapter browse (extends `src/zones/`); chapter highlight-deck renderer with public-source citations (no book names, PRD D-12); explainer video per chapter (curated embed + fallback summary); finishing a deck schedules recall and drips due cards into the UPSC feed; CA posts link to chapters.
   - **Done when:** 3 subjects are live with every chapter's deck and video, progress syncs, and due cards appear in both Recall and the feed.
 - [ ] **M1.25 Learning Zone content**
   - **Covers:** PRD §7.2 content, §10.3a · **needs:** M1.2, M1.3 · 🟡 D-BOOKS, D-EDIT
@@ -377,7 +377,7 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 | D-STACK | Confirm the §3 stack (Supabase, Upstash, Inngest, Sentry, PostHog) | As proposed | M0.1 / M0.2 start | Eng lead + owner | ⬜ open |
 | D-AUTH | Phone OTP at alpha, or Google-only first (cheaper, no DLT setup) | Google + email magic link at alpha, phone OTP by beta | M0.3 | Product | ⬜ open |
 | D-EXAM | First exam taxonomy | UPSC GS tags (our own mapping) | M0.2 (schema), M1.7 | Product | ✅ UPSC (PRD D-10) |
-| D-BOOKS | Learning Zone: first 3 subjects/books, and publisher permission for private books (PRD open question 9) | NCERT-first; teacher picks subjects; legal check before naming private books | M1.24 start | Owner + Legal | ⬜ open |
+| D-BOOKS | Learning Zone: first 3 subjects and chapters (PRD open question 9); no book names (PRD D-12) | UPSC teacher picks and spot-checks | M1.24 start | Owner | ⬜ open |
 | D-MODE | Launch order: both modes in alpha, or one first (PRD open question 7) | Shared engine; design partners in both; Phase 0 data picks the alpha lead | M1 start | Owner | ⬜ open |
 | D-EDIT | Editors: who reviews UPSC current affairs daily by 09:00, and who staffs corrections | 1 UPSC-background editor + 1 general editor (freelance at first) | M1.7 | Product/Content | ⬜ open |
 | D-NAME | Keep "Curiosity Feed"? Rename the repo `history_scroller`? | Trademark/domain check, then rename | Before alpha invites | Owner | ⬜ open |
@@ -397,7 +397,8 @@ Add one line per merged PR that ticks a box.
 | 2026-11-14 | Plan aligned with PRD v2.0 (Curious + UPSC modes); added M1.21–M1.23, M2.7 | — | No tasks ticked |
 | 2026-11-14 | Two-mode UI on a sample edition: mode choice + switch (FR-ONB-01), UPSC Today/explainer/Ask/GS Library UI (M1.22, M1.23 front ends), Curious restyle per `docs/DESIGN.md` | — | No tasks ticked: M1.22 still needs the intake (M1.21) and 30-day archive; M1.23 needs live explainers |
 | 2026-11-15 | PRD v2.1: grounded Ask anything (M1.23), Learning Zone (M1.24–M1.25), D-BOOKS | — | No tasks ticked |
-| 2026-11-15 | v2.1 UI on samples: Learning Zone (subject → book → chapter, video slot + highlight deck, M1.24–M1.25 front ends), revision cards in the UPSC feed, Ask with source allow-list, citation chips and no-source state (M1.23 front end) | — | No tasks ticked: decks, retrieval and scheduling still need their backends |
+| 2026-11-15 | PRD v2.1.1: Learning Zone without book names (D-12) | — | No tasks ticked |
+| 2026-11-15 | v2.1 UI on samples: Learning Zone (subject → chapter, no book names, video slot + highlight deck, M1.24–M1.25 front ends), revision cards in the UPSC feed, Ask with source allow-list, citation chips and no-source state (M1.23 front end) | — | No tasks ticked: decks, retrieval and scheduling still need their backends |
 
 ---
 
