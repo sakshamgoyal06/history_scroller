@@ -7,6 +7,7 @@ describe('storage keys', () => {
     expect(STORAGE_KEYS).toMatchInlineSnapshot(`
       {
         "activePath": "curiosity-feed-active-path-v1",
+        "appMode": "curiosity-app-mode-v1",
         "completed": "curiosity-feed-completed-v1",
         "dailyEditionProgress": "history-feed-daily-edition-progress",
         "detailMode": "curiosity-feed-detail-mode-v1",
@@ -16,10 +17,15 @@ describe('storage keys', () => {
         "learningPaths": "curiosity-feed-learning-paths-v1",
         "liked": "curiosity-feed-liked-v1",
         "notInterested": "curiosity-feed-not-interested-v1",
+        "onboarding": "curiosity-onboarding-v1",
         "pathDrip": "curiosity-feed-path-drip-v1",
         "recentlyViewed": "curiosity-feed-recently-viewed-v1",
         "remoteFeedCache": "curiosity-feed-remote-cache-v1",
         "saved": "history-feed-saved",
+        "upscChapterProgress": "curiosity-upsc-chapter-progress-v1",
+        "upscProfile": "curiosity-upsc-profile-v1",
+        "upscRevision": "curiosity-upsc-revision-v1",
+        "upscSaved": "curiosity-upsc-saved-v1",
         "zoneDrip": "curiosity-feed-zone-drip-v1",
         "zoneProgress": "curiosity-feed-zone-progress-v1",
       }

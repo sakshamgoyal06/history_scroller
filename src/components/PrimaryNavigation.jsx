@@ -28,7 +28,7 @@ function NavIcon({ name }) {
 }
 
 const TABS = [
-  { id: 'feed', label: 'Feed' },
+  { id: 'feed', label: 'Today' },
   { id: 'zones', label: 'Zones' },
   { id: 'learn', label: 'Learn' },
   { id: 'library', label: 'Library' },

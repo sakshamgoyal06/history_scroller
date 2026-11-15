@@ -44,6 +44,7 @@ import { isNarrativeCard } from './stories/flagshipStories.js'
 import { RichStoryDetail } from './stories/RichStoryDetail.jsx'
 import { StoryArt, StoryVideo } from './stories/StoryPreviewCard.jsx'
 import { PrimaryNavigation } from './components/PrimaryNavigation.jsx'
+import { Wordmark } from './mode/ModeToggle.jsx'
 import { ExplorePanel } from './feed/ExplorePanel.jsx'
 import { LearningReel } from './feed/LearningReel.jsx'
 import { feedItemFromCatalogCard } from './feed/cardAdapter.js'
@@ -350,7 +351,7 @@ function resolveRouteFromLocation() {
   return route
 }
 
-function App() {
+function App({ modeToggle = null } = {}) {
   const [initialRoute] = useState(resolveRouteFromLocation)
   const [selectedDomain, setSelectedDomain] = useState(null)
   const [selectedTopics, setSelectedTopics] = useState(() => new Set())
@@ -1410,8 +1411,9 @@ function App() {
                       ? learnActivePathMeta.topic
                       : homePanel === 'learn'
                         ? 'Learn a Topic'
-                        : 'Curiosity Feed'}
+                        : <Wordmark mode="curious" />}
           </h1>
+          {!inDetail && modeToggle ? modeToggle : null}
           {!inDetail && showExploreChrome && (
             <div className="header-actions">
               <button

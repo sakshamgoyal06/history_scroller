@@ -395,8 +395,10 @@ Add one line per merged PR that ticks a box.
 | 2026-10-24 | Baseline: tests, CI, bug fixes, review | #17 | Engineering review findings 1–12 fixed |
 | 2026-10-24 | Baseline: PRD, cleanup, src/ restructure, this plan | #21 | See §1 |
 | 2026-11-14 | Plan aligned with PRD v2.0 (Curious + UPSC modes); added M1.21–M1.23, M2.7 | — | No tasks ticked |
+| 2026-11-14 | Two-mode UI on a sample edition: mode choice + switch (FR-ONB-01), UPSC Today/explainer/Ask/GS Library UI (M1.22, M1.23 front ends), Curious restyle per `docs/DESIGN.md` | — | No tasks ticked: M1.22 still needs the intake (M1.21) and 30-day archive; M1.23 needs live explainers |
 | 2026-11-15 | PRD v2.1: grounded Ask anything (M1.23), Learning Zone (M1.24–M1.25), D-BOOKS | — | No tasks ticked |
 | 2026-11-15 | PRD v2.1.1: Learning Zone without book names (D-12) | — | No tasks ticked |
+| 2026-11-15 | v2.1 UI on samples: Learning Zone (subject → chapter, no book names, video slot + highlight deck, M1.24–M1.25 front ends), revision cards in the UPSC feed, Ask with source allow-list, citation chips and no-source state (M1.23 front end) | — | No tasks ticked: decks, retrieval and scheduling still need their backends |
 
 ---
 
