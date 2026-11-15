@@ -1,6 +1,6 @@
 # Curiosity design: two modes
 
-Status: v1 draft, 2026-11-14. Implements the experience in PRD v2.0 (§6, §8.1, §8.11).
+Status: v1.1 draft, 2026-11-15. Implements the experience in PRD v2.1 (§6, §8.1, §8.11, §10.3a).
 Clickable prototype: [`docs/design/two-mode-prototype.html`](design/two-mode-prototype.html) (open in a browser).
 
 ## 1. The idea
@@ -8,8 +8,12 @@ Clickable prototype: [`docs/design/two-mode-prototype.html`](design/two-mode-pro
 One app, two moods on one engine.
 
 - **Curious mode** is what you open instead of Instagram: calm, light, five good stories (Today's 5), then it ends.
-- **UPSC mode** ("Study") is the same habit with the exam switched on: today's current affairs in four short steps,
-  and any topic explained UPSC-style.
+- **UPSC mode** ("Study") is the same habit with the exam switched on, in three parts (PRD v2.1, D-11):
+  1. **Today:** national and international current affairs in four short steps, ending with 2–3 revision cards due today.
+  2. **Learn (Learning Zone):** subject → standard book → chapter; each chapter is one explainer video plus a deck of
+     8–20 highlight cards that cite book and chapter.
+  3. **Ask:** any topic or question, answered only from authentic sources, every sentence cited, or "no authentic
+     source found".
 
 What changes between the modes is pace, density and tone. The switch between them is the one moment in the app that
 gets real animation, so entering study mode feels like a decision.
@@ -55,8 +59,10 @@ Hindi UPSC edition needs (`[A10]`).
 - Lists are rows separated by rules, not card grids. Only two things look like objects: the Curious story plate and
   the GS flag, because both carry meaning.
 - Curious corners are soft (22 px plates, pill buttons). Study corners are tight (4–6 px), like stationery.
-- Tabs are words, not icons: Curious = Today · Explore · Library; Study = Today · Ask · Library (down from four tabs;
-  Zones and Learn merge into Explore).
+- Tabs are words, not icons: Curious = Today · Explore · Library; Study = Today · Learn · Ask (down from four tabs;
+  in Curious, Zones and Learn merge into Explore; in Study, saved items live at the bottom of Learn).
+- Citations are visible objects: a small ink chip with the source number after each sentence; tapping it jumps to
+  that source and flashes it in highlighter yellow.
 
 ## 3. Flows
 
@@ -68,12 +74,22 @@ Curious · Today's 5 ──▶ post (hook → context → reveal → why it matt
    ├─▶ Go deeper ──▶ story page (sources, "Continue learning")
    └─▶ after 5: "That's today's 5" (what you learned, tomorrow's 3 recall cards) ──▶ Explore / Library
 
-UPSC · Today ──▶ GS filter (All · GS1–GS4) ──▶ CA post (What happened → Background → Key facts → Why it matters)
+UPSC · Today ──▶ GS filter (All · GS1–GS4) ──▶ CA post, national + international
+   │               (What happened → Background → Key facts → Why it matters)
+   ├─▶ "Revise the basics" (on Why it matters) ──▶ the linked Learning Zone chapter
    ├─▶ Explain it UPSC-style ──▶ explainer page (one line, context, static linkage, Prelims facts,
    │                              arguments, way forward, Mains prompt, sources)
-   ├─▶ "Good to know" card (~20% of the feed)
-   └─▶ "Caught up on today" (tally by GS paper, recall, Ask, later: weekly quiz)
-UPSC · Ask ──▶ type a topic/event/question ──▶ sections build in order ──▶ explainer ──▶ GS Library
+   ├─▶ 2–3 revision cards due today (question → Show answer → Again tomorrow / Got it)
+   └─▶ "Caught up on today" (tally by GS paper, Learning Zone, Ask, later: weekly quiz)
+UPSC · Learn ──▶ "N revision cards due" ──▶ Subject (GS flag) ──▶ Book (author, % revised)
+   └─▶ Chapter: explainer video (+ 60-second text fallback) ──▶ "Revise 8 highlight cards"
+         └─▶ deck: tap right/left; card types Concept · Article · Date · Term · Common confusion · Asked like this;
+             every card cites book + chapter (+ a public source) ──▶ "Chapter revised" ──▶ due again in 1, 3, 7, 21 days
+UPSC · Ask ──▶ question + visible source allow-list ──▶ one of:
+   ├─▶ cited answer: sections, a citation chip on every sentence, "Sources · what each one says", count of dropped
+   │   unsupported sentences
+   ├─▶ already covered: opens the reviewed explainer and chapter instead of writing a new answer
+   └─▶ "No authentic source found": says why, suggests a question that has sources
 ```
 
 Screen-to-requirement map:
@@ -84,10 +100,13 @@ Screen-to-requirement map:
 | Curious Today's 5 + end page | FR-ED-01..03, FR-FEED-03, FR-FEED-04 |
 | Story page | FR-STORY-01..03 |
 | Explore (path from a topic, series) | FR-PATH-01, FR-ZONE-01 |
-| UPSC Today, GS filter, caught up | FR-UPSC-01, FR-UPSC-02, FR-UPSC-05 |
+| UPSC Today, GS filter, revision cards, caught up | FR-UPSC-01, FR-UPSC-02, FR-UPSC-05, FR-UPSC-11 |
+| Revise the basics link | FR-UPSC-12 |
 | Explain it UPSC-style | FR-UPSC-03, FR-TRUST-03 |
-| Ask anything | FR-UPSC-04, FR-PATH-04 (quota line) |
-| GS Library | FR-UPSC-06, FR-RECALL-02 |
+| Learning Zone: subjects, books, chapters | FR-UPSC-08 |
+| Chapter: video + highlight deck | FR-UPSC-09, FR-UPSC-10, FR-UPSC-11 |
+| Ask anything (cited / covered / no source) | FR-UPSC-04, FR-UPSC-04a, FR-UPSC-04b, FR-PATH-04 (quota line) |
+| Saved (in Learn) | FR-UPSC-06 |
 
 ### No pop-ups
 - Mode is a segmented control in the header, never a modal.
@@ -109,7 +128,14 @@ Implementation notes: `clip-path` polygon/circle animations and `font-variation-
 render the target screen at the fill midpoint so there is no flash. Everything else in the app uses short
 (150–250 ms) ease-out transitions only.
 
-## 5. Open questions
+## 5. Content rules the design depends on
+- Highlight cards are our own wording and point to the book and chapter; no copied passages, tables or figures
+  (PRD §10.3a). The Learning Zone footer says so: "Buy or borrow the book; this helps you revise it."
+- The chapter video is curated and credited; the fallback summary is always there because embeds fail on patchy networks.
+- Ask shows its allow-list before you type, so the "no source found" state is expected rather than a failure.
+
+## 6. Open questions
 - Name of the mode in UI: "Study" in the toggle vs "UPSC mode" in onboarding. Prototype uses both; test with aspirants.
 - Hindi: Mukta covers it, but Study headlines in condensed Anybody need a Devanagari display pairing (candidate: Mukta 800).
 - Launch order (D-MODE) does not change the design; a single-mode launch hides the toggle.
+- Page ranges on cards (FR-UPSC-09 says "+ page range") depend on edition; show them only once editions are fixed per book.
