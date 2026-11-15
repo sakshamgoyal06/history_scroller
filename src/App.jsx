@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { decadeTimelinePercent, formatDecadeKeyLabel, uniqueDecadeKeysFromCards } from './cardTimeline.js'
+import { decadeTimelinePercent, formatDecadeKeyLabel, uniqueDecadeKeysFromCards } from './catalog/cardTimeline.js'
 import {
   CARD_BY_ID,
   HISTORY_CARDS,
@@ -7,19 +7,19 @@ import {
   TOPIC_LIST,
   normalizeCard,
   recommendNextCard,
-} from './catalog.js'
-import { LEARN_LEVELS, LEARN_SCOPES } from './generateMockLearningPath.js'
-import { LearnPathChapters } from './LearnPathChapters.jsx'
-import { LearnTopicPanel } from './LearnTopicPanel.jsx'
-import { LearningLessonPlaceholder } from './LearningLessonDetail.jsx'
-import { MyPathsSection } from './MyPathsSection.jsx'
-import { buildDemoPathRecord } from './mockLearningPathAdapter.js'
+} from './catalog/catalog.js'
+import { LEARN_LEVELS, LEARN_SCOPES } from './learn/learnOptions.js'
+import { LearnPathChapters } from './learn/LearnPathChapters.jsx'
+import { LearnTopicPanel } from './learn/LearnTopicPanel.jsx'
+import { LearningLessonPlaceholder } from './learn/LearningLessonDetail.jsx'
+import { MyPathsSection } from './learn/MyPathsSection.jsx'
+import { buildDemoPathRecord } from './learn/demo/mockLearningPathAdapter.js'
 import {
   generateLesson,
   isForceMockMode,
   isMissingConfigError,
   planLearningPath,
-} from './learningPathApi.js'
+} from './learn/learningPathApi.js'
 import {
   createPathRecordFromPlan,
   deletePath,
@@ -32,17 +32,17 @@ import {
   touchPathOpened,
   updateLessonInPath,
   upsertPath,
-} from './learningPathStorage.js'
-import { lessonToDisplayCard, plannedLessonsForActiveTrack } from './lessonToCard.js'
+} from './learn/learningPathStorage.js'
+import { lessonToDisplayCard, plannedLessonsForActiveTrack } from './learn/lessonToCard.js'
 import {
   getLocalDateKey,
   isDailyEditionVisible,
   markEditionCardExplored,
   selectDailyEdition,
-} from './dailyEdition.js'
-import { isNarrativeCard } from './flagshipStories.js'
-import { RichStoryDetail } from './RichStoryDetail.jsx'
-import { StoryArt, StoryVideo } from './StoryPreviewCard.jsx'
+} from './edition/dailyEdition.js'
+import { isNarrativeCard } from './stories/flagshipStories.js'
+import { RichStoryDetail } from './stories/RichStoryDetail.jsx'
+import { StoryArt, StoryVideo } from './stories/StoryPreviewCard.jsx'
 import { PrimaryNavigation } from './components/PrimaryNavigation.jsx'
 import { ExplorePanel } from './feed/ExplorePanel.jsx'
 import { LearningReel } from './feed/LearningReel.jsx'
@@ -84,18 +84,8 @@ import {
   zoneUrl,
   zonesUrl,
 } from './routing.js'
+import { STORAGE_KEYS, readJson, writeJson } from './storage/localStore.js'
 import './App.css'
-
-const STORAGE_SAVED = 'history-feed-saved'
-const STORAGE_KNOWN = 'history-feed-known'
-
-function saveJson(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    /* quota or private mode */
-  }
-}
 
 function detailFactBullets(card) {
   if (card.factBullets?.length) return card.factBullets
@@ -124,6 +114,31 @@ function StoryDetailHero({ card, badges }) {
         <h2 className="story-detail-title">{card.title}</h2>
         {badges}
       </div>
+    </div>
+  )
+}
+
+function StoryStatusBadges({ saved, known }) {
+  if (!saved && !known) return null
+  return (
+    <div className="story-card-tags">
+      {saved && <span className="meta-badge meta-badge--saved">Saved</span>}
+      {known && <span className="meta-badge">Known</span>}
+    </div>
+  )
+}
+
+function ContinueLearning({ card, onOpen }) {
+  return (
+    <div className="story-next">
+      <h3 className="story-section-label">Continue learning</h3>
+      <button type="button" className="story-next-card" onClick={() => onOpen(card.id)}>
+        <span className="story-next-title">{card.title}</span>
+        <span className="story-next-meta">
+          {card.domain}
+          {card.format ? ` · ${card.format}` : ''}
+        </span>
+      </button>
     </div>
   )
 }
@@ -270,17 +285,8 @@ function TimelineFilter({ decades, selectedDecades, onToggleDecade, onClear }) {
   )
 }
 
-function loadJson(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
-
-/** Resolve the URL the app was opened with into initial UI state (runs once). */
-function resolveInitialRoute() {
+/** Resolve the current URL into UI state (initial load and in-app #hash links). */
+function resolveRouteFromLocation() {
   const storyId = storyIdFromLocation()
   const feedItemId = feedItemIdFromLocation()
   const zoneId = zoneIdFromLocation()
@@ -345,7 +351,7 @@ function resolveInitialRoute() {
 }
 
 function App() {
-  const [initialRoute] = useState(resolveInitialRoute)
+  const [initialRoute] = useState(resolveRouteFromLocation)
   const [selectedDomain, setSelectedDomain] = useState(null)
   const [selectedTopics, setSelectedTopics] = useState(() => new Set())
   const [selectedDecades, setSelectedDecades] = useState(() => new Set())
@@ -380,14 +386,13 @@ function App() {
   const [feedRankKey, setFeedRankKey] = useState(0)
   const [deepLinkFeedItemId, setDeepLinkFeedItemId] = useState(initialRoute.feedItemId)
   const [slideIndexByFeedId, setSlideIndexByFeedId] = useState({})
-  const [_returnFeed, setReturnFeed] = useState(null)
   const [offline, setOffline] = useState(() => !navigator.onLine)
   const [detailMode, setDetailMode] = useState(() => loadDetailModePreference())
   const [pathDripIds, setPathDripIds] = useState(() => loadPathDripEnabled())
   const [savedCards, setSavedCards] = useState(() =>
-    loadJson(STORAGE_SAVED, []),
+    readJson(STORAGE_KEYS.saved, []),
   )
-  const [knownIds, setKnownIds] = useState(() => new Set(loadJson(STORAGE_KNOWN, [])))
+  const [knownIds, setKnownIds] = useState(() => new Set(readJson(STORAGE_KEYS.known, [])))
   const [activeStoryId, setActiveStoryId] = useState(initialRoute.storyId)
 
   const [storedPaths, setStoredPaths] = useState(() => loadAllPaths())
@@ -565,11 +570,11 @@ function App() {
   }, [])
 
   useEffect(() => {
-    saveJson(STORAGE_SAVED, savedCards)
+    writeJson(STORAGE_KEYS.saved, savedCards)
   }, [savedCards])
 
   useEffect(() => {
-    saveJson(STORAGE_KNOWN, [...knownIds])
+    writeJson(STORAGE_KEYS.known, [...knownIds])
   }, [knownIds])
 
   useEffect(() => {
@@ -579,7 +584,6 @@ function App() {
         if (state.returnFeed) {
           setHomePanel('feed')
           setFeedMode('forYou')
-          setReturnFeed(state.returnFeed)
           setDeepLinkFeedItemId(state.returnFeed.feedItemId)
           setSlideIndexByFeedId((prev) => ({
             ...prev,
@@ -599,7 +603,6 @@ function App() {
         setHomePanel('feed')
         setFeedMode(state.mode ?? 'forYou')
         if (state.feedItemId) setDeepLinkFeedItemId(state.feedItemId)
-        setReturnFeed(null)
         return
       }
       if (state?.view === 'learnPath' && state.pathId) {
@@ -640,32 +643,20 @@ function App() {
     if (initialRoute.pathRecord) setActivePathId(initialRoute.pathRecord.id)
 
     const onPopState = (event) => {
-      applyHistoryState(event.state)
+      if (event.state) {
+        applyHistoryState(event.state)
+      } else {
+        // A typed or tapped #hash link (fragment navigation) has no state: resolve it from the URL.
+        const route = resolveRouteFromLocation()
+        window.history.replaceState(route.historyState, '', route.url)
+        applyHistoryState(route.historyState)
+      }
       window.scrollTo(0, 0)
     }
 
-    const onHashChange = () => {
-      const feedId = feedItemIdFromLocation()
-      if (feedId) {
-        setHomePanel('feed')
-        setFeedMode('forYou')
-        setDeepLinkFeedItemId(feedId)
-        setActiveStoryId(null)
-        return
-      }
-      const zoneId = zoneIdFromLocation()
-      if (zoneId && getZoneById(zoneId)) {
-        setHomePanel('zones')
-        setActiveZoneViewId(zoneId)
-        setActiveStoryId(null)
-      }
-    }
-
     window.addEventListener('popstate', onPopState)
-    window.addEventListener('hashchange', onHashChange)
     return () => {
       window.removeEventListener('popstate', onPopState)
-      window.removeEventListener('hashchange', onHashChange)
     }
   }, [initialRoute])
 
@@ -770,7 +761,6 @@ function App() {
   const openStoryFromFeed = useCallback(
     (feedItem, slideIndex = 0) => {
       const ret = { feedItemId: feedItem.id, slideIndex }
-      setReturnFeed(ret)
       setSlideIndexByFeedId((prev) => ({ ...prev, [feedItem.id]: slideIndex }))
       setFilterListOpen(false)
       setActiveStoryId(feedItem.parentCardId)
@@ -799,7 +789,6 @@ function App() {
 
   const openStory = useCallback((id) => {
     setFilterListOpen(false)
-    setReturnFeed(null)
     setActiveStoryId(id)
     const pathCard = findLessonCardAcrossPaths(id, generatedPathCards, loadAllPaths())
     if (pathCard?.pathId) {
@@ -920,6 +909,11 @@ function App() {
       openStory(nextId)
     },
     [markActiveLessonComplete, openStory],
+  )
+
+  const openRecommendedNext = useCallback(
+    (id) => (isGeneratedStory ? openNextPathChapter(id) : openStory(id)),
+    [isGeneratedStory, openNextPathChapter, openStory],
   )
 
   const handleDetailBack = useCallback(() => {
@@ -1794,16 +1788,10 @@ function App() {
                     <RichStoryDetail
                       card={activeStory}
                       badges={
-                        (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
-                          <div className="story-card-tags">
-                            {savedIds.has(activeStory.id) && (
-                              <span className="meta-badge meta-badge--saved">Saved</span>
-                            )}
-                            {knownIds.has(activeStory.id) && (
-                              <span className="meta-badge">Known</span>
-                            )}
-                          </div>
-                        )
+                        <StoryStatusBadges
+                          saved={savedIds.has(activeStory.id)}
+                          known={knownIds.has(activeStory.id)}
+                        />
                       }
                       relatedCards={
                         narrativeRelated.length > 0 ? narrativeRelated : null
@@ -1817,40 +1805,17 @@ function App() {
                     <StoryDetailHero
                       card={activeStory}
                       badges={
-                        (savedIds.has(activeStory.id) || knownIds.has(activeStory.id)) && (
-                          <div className="story-card-tags">
-                            {savedIds.has(activeStory.id) && (
-                              <span className="meta-badge meta-badge--saved">Saved</span>
-                            )}
-                            {knownIds.has(activeStory.id) && (
-                              <span className="meta-badge">Known</span>
-                            )}
-                          </div>
-                        )
+                        <StoryStatusBadges
+                          saved={savedIds.has(activeStory.id)}
+                          known={knownIds.has(activeStory.id)}
+                        />
                       }
                     />
                     <div className="card-inner card-inner--detail">
                       <StoryDetailSections card={activeStory} />
                     </div>
                     {recommendedNext ? (
-                      <div className="story-next">
-                        <h3 className="story-section-label">Continue learning</h3>
-                        <button
-                          type="button"
-                          className="story-next-card"
-                          onClick={() =>
-                            isGeneratedStory
-                              ? openNextPathChapter(recommendedNext.id)
-                              : openStory(recommendedNext.id)
-                          }
-                        >
-                          <span className="story-next-title">{recommendedNext.title}</span>
-                          <span className="story-next-meta">
-                            {recommendedNext.domain}
-                            {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
-                          </span>
-                        </button>
-                      </div>
+                      <ContinueLearning card={recommendedNext} onOpen={openRecommendedNext} />
                     ) : null}
                   </>
                 )}
@@ -1860,24 +1825,7 @@ function App() {
             detailMode === 'story' &&
             !narrativeRelated.length &&
             recommendedNext ? (
-              <div className="story-next">
-                <h3 className="story-section-label">Continue learning</h3>
-                <button
-                  type="button"
-                  className="story-next-card"
-                  onClick={() =>
-                    isGeneratedStory
-                      ? openNextPathChapter(recommendedNext.id)
-                      : openStory(recommendedNext.id)
-                  }
-                >
-                  <span className="story-next-title">{recommendedNext.title}</span>
-                  <span className="story-next-meta">
-                    {recommendedNext.domain}
-                    {recommendedNext.format ? ` · ${recommendedNext.format}` : ''}
-                  </span>
-                </button>
-              </div>
+              <ContinueLearning card={recommendedNext} onOpen={openRecommendedNext} />
             ) : null}
             <div className="card-actions">
               {!isGeneratedStory ? (

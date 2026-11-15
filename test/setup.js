@@ -22,8 +22,13 @@ class MemoryStorage {
   }
 }
 
-globalThis.localStorage = new MemoryStorage()
+// Accessor properties (like browsers) so tests can simulate storage that throws on access.
+for (const name of ['localStorage', 'sessionStorage']) {
+  const store = new MemoryStorage()
+  Object.defineProperty(globalThis, name, { configurable: true, get: () => store })
+}
 
 beforeEach(() => {
   globalThis.localStorage.clear()
+  globalThis.sessionStorage.clear()
 })

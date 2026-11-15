@@ -1,38 +1,31 @@
-import { SESSION_KEYS, SESSION_STALE_MS } from './feedTypes.js'
-
-function safeParse(raw, fallback) {
-  try {
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
+import { SESSION_KEYS, readJson, readText, removeKey, writeJson, writeText } from '../storage/localStore.js'
+import { SESSION_STALE_MS } from './feedTypes.js'
 
 export function loadFeedSession() {
-  const started = Number(sessionStorage.getItem(SESSION_KEYS.sessionStartedAt) ?? 0)
+  const started = Number(readText(SESSION_KEYS.sessionStartedAt, 'session') ?? 0)
   const stale = !started || Date.now() - started > SESSION_STALE_MS
   if (stale) return { stale: true, order: [], activeId: null, summaryShown: false }
 
   return {
     stale: false,
-    order: safeParse(sessionStorage.getItem(SESSION_KEYS.feedOrder), []),
-    activeId: sessionStorage.getItem(SESSION_KEYS.activeFeedItemId),
-    summaryShown: sessionStorage.getItem(SESSION_KEYS.summaryShown) === '1',
+    order: readJson(SESSION_KEYS.feedOrder, [], 'session'),
+    activeId: readText(SESSION_KEYS.activeFeedItemId, 'session'),
+    summaryShown: readText(SESSION_KEYS.summaryShown, 'session') === '1',
   }
 }
 
 export function startFeedSession(order, activeId) {
-  sessionStorage.setItem(SESSION_KEYS.sessionStartedAt, String(Date.now()))
-  sessionStorage.setItem(SESSION_KEYS.feedOrder, JSON.stringify(order))
-  if (activeId) sessionStorage.setItem(SESSION_KEYS.activeFeedItemId, activeId)
-  sessionStorage.removeItem(SESSION_KEYS.summaryShown)
+  writeText(SESSION_KEYS.sessionStartedAt, String(Date.now()), 'session')
+  writeJson(SESSION_KEYS.feedOrder, order, 'session')
+  if (activeId) writeText(SESSION_KEYS.activeFeedItemId, activeId, 'session')
+  removeKey(SESSION_KEYS.summaryShown, 'session')
 }
 
 export function updateFeedSession(order, activeId) {
-  sessionStorage.setItem(SESSION_KEYS.feedOrder, JSON.stringify(order))
-  if (activeId) sessionStorage.setItem(SESSION_KEYS.activeFeedItemId, activeId)
+  writeJson(SESSION_KEYS.feedOrder, order, 'session')
+  if (activeId) writeText(SESSION_KEYS.activeFeedItemId, activeId, 'session')
 }
 
 export function markSessionSummaryShown() {
-  sessionStorage.setItem(SESSION_KEYS.summaryShown, '1')
+  writeText(SESSION_KEYS.summaryShown, '1', 'session')
 }

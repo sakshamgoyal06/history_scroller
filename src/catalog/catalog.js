@@ -1,8 +1,8 @@
-import { ADDITIONAL_LEARNING_CARDS } from './additionalLearningCards.js'
+import { ADDITIONAL_LEARNING_CARDS } from './data/additionalCards.js'
 import { timelineFieldsForCard } from './cardTimeline.js'
 import { CORE_CARDS } from './data/coreCards.js'
-import { allFlagshipCatalogEntries } from './flagshipStories.js'
-import { STORY_YOUTUBE } from './feed/storyYoutube.js'
+import { allFlagshipCatalogEntries } from '../stories/flagshipStories.js'
+import { STORY_YOUTUBE } from './data/storyYoutube.js'
 
 export const LEARNING_DOMAINS = [
   'History',

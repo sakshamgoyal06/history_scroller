@@ -1,18 +1,9 @@
-const STORAGE_PATHS = 'curiosity-feed-learning-paths-v1'
-const STORAGE_ACTIVE = 'curiosity-feed-active-path-v1'
+import { STORAGE_KEYS, readJson, removeKey, writeJson } from '../storage/localStore.js'
 
 export const PATH_SCHEMA_VERSION = 1
 
-function safeParse(raw, fallback) {
-  try {
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
-
 export function loadAllPaths() {
-  const data = safeParse(localStorage.getItem(STORAGE_PATHS), { version: PATH_SCHEMA_VERSION, paths: [] })
+  const data = readJson(STORAGE_KEYS.learningPaths, { version: PATH_SCHEMA_VERSION, paths: [] })
   if (!data || data.version !== PATH_SCHEMA_VERSION || !Array.isArray(data.paths)) {
     return []
   }
@@ -20,35 +11,22 @@ export function loadAllPaths() {
 }
 
 function saveAllPaths(paths) {
-  try {
-    localStorage.setItem(STORAGE_PATHS, JSON.stringify({ version: PATH_SCHEMA_VERSION, paths }))
-  } catch (e) {
+  if (!writeJson(STORAGE_KEYS.learningPaths, { version: PATH_SCHEMA_VERSION, paths })) {
     // Quota exceeded (generated lessons are large) or storage disabled; keep the in-memory copy.
-    console.warn('[learning-paths] could not persist paths', e)
+    console.warn('[learning-paths] could not persist paths')
   }
 }
 
 export function loadActivePathId() {
-  try {
-    const raw = localStorage.getItem(STORAGE_ACTIVE)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.pathId ?? null
-  } catch {
-    return null
-  }
+  return readJson(STORAGE_KEYS.activePath, null)?.pathId ?? null
 }
 
 export function setActivePathId(pathId) {
   if (!pathId) {
-    localStorage.removeItem(STORAGE_ACTIVE)
+    removeKey(STORAGE_KEYS.activePath)
     return
   }
-  try {
-    localStorage.setItem(STORAGE_ACTIVE, JSON.stringify({ pathId, updatedAt: Date.now() }))
-  } catch {
-    /* quota or private mode */
-  }
+  writeJson(STORAGE_KEYS.activePath, { pathId, updatedAt: Date.now() })
 }
 
 export function touchPathOpened(pathId) {
@@ -152,15 +130,6 @@ export function updateLessonInPath(pathRecord, trackId, lessonId, patch) {
     }
   })
   return upsertPath({ ...pathRecord, course: { ...pathRecord.course, tracks } })
-}
-
-export function getTrack(pathRecord, trackId) {
-  return pathRecord?.course?.tracks?.find((t) => t.id === trackId) ?? null
-}
-
-export function getLesson(pathRecord, trackId, lessonId) {
-  const track = getTrack(pathRecord, trackId)
-  return track?.lessons?.find((l) => l.id === lessonId) ?? null
 }
 
 export function pathProgress(pathRecord) {

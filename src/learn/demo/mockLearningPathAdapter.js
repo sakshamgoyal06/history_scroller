@@ -1,5 +1,5 @@
 import { generateMockLearningPath } from './generateMockLearningPath.js'
-import { createPathRecordFromPlan } from './learningPathStorage.js'
+import { createPathRecordFromPlan } from '../learningPathStorage.js'
 
 /**
  * Explicit demo fallback — never masquerades as live AI output.

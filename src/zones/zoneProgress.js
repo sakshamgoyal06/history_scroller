@@ -1,30 +1,12 @@
-const ZONE_PROGRESS_KEY = 'curiosity-feed-zone-progress-v1'
-const ZONE_DRIP_KEY = 'curiosity-feed-zone-drip-v1'
-const PATH_DRIP_KEY = 'curiosity-feed-path-drip-v1'
-
-function writeStore(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    /* quota or private mode */
-  }
-}
-
-function safeParse(raw, fallback) {
-  try {
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
+import { STORAGE_KEYS, readJson, writeJson } from '../storage/localStore.js'
 
 export function loadZoneProgress() {
-  const data = safeParse(localStorage.getItem(ZONE_PROGRESS_KEY), { zones: {} })
+  const data = readJson(STORAGE_KEYS.zoneProgress, { zones: {} })
   return data?.zones && typeof data.zones === 'object' ? data.zones : {}
 }
 
 export function saveZoneProgress(zones) {
-  writeStore(ZONE_PROGRESS_KEY, { version: 1, zones, updatedAt: Date.now() })
+  writeJson(STORAGE_KEYS.zoneProgress, { version: 1, zones, updatedAt: Date.now() })
 }
 
 export function markZoneStepComplete(zoneId, stepOrder) {
@@ -54,7 +36,7 @@ export function nextIncompleteZoneStep(zone, progress) {
 }
 
 export function loadZoneDripEnabled() {
-  const data = safeParse(localStorage.getItem(ZONE_DRIP_KEY), { enabled: {} })
+  const data = readJson(STORAGE_KEYS.zoneDrip, { enabled: {} })
   return data?.enabled && typeof data.enabled === 'object' ? data.enabled : {}
 }
 
@@ -62,11 +44,11 @@ export function setZoneDripEnabled(zoneId, enabled) {
   const enabledMap = loadZoneDripEnabled()
   if (enabled) enabledMap[zoneId] = true
   else delete enabledMap[zoneId]
-  writeStore(ZONE_DRIP_KEY, { version: 1, enabled: enabledMap })
+  writeJson(STORAGE_KEYS.zoneDrip, { version: 1, enabled: enabledMap })
 }
 
 export function loadPathDripEnabled() {
-  const data = safeParse(localStorage.getItem(PATH_DRIP_KEY), { pathIds: [] })
+  const data = readJson(STORAGE_KEYS.pathDrip, { pathIds: [] })
   return Array.isArray(data?.pathIds) ? data.pathIds.filter((id) => typeof id === 'string') : []
 }
 
@@ -74,5 +56,5 @@ export function setPathDripEnabled(pathId, enabled) {
   const ids = new Set(loadPathDripEnabled())
   if (enabled) ids.add(pathId)
   else ids.delete(pathId)
-  writeStore(PATH_DRIP_KEY, { version: 1, pathIds: [...ids] })
+  writeJson(STORAGE_KEYS.pathDrip, { version: 1, pathIds: [...ids] })
 }

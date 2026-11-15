@@ -1,3 +1,5 @@
+import { STORAGE_KEYS, readJson, writeJson } from '../storage/localStore.js'
+
 /** @typedef {'bigIdea' | 'fromHistory' | 'sciTech' | 'surprise'} EditionSlot */
 
 export const EDITION_SLOT_LABELS = {
@@ -7,7 +9,6 @@ export const EDITION_SLOT_LABELS = {
   surprise: 'Surprise me',
 }
 
-const STORAGE_DAILY_PROGRESS = 'history-feed-daily-edition-progress'
 
 const BIG_IDEA_DOMAINS = new Set(['Economics', 'Civics', 'Geography', 'Current Affairs'])
 const HISTORY_DOMAIN = 'History'
@@ -118,23 +119,13 @@ export function selectDailyEdition(catalog, dateKey = getLocalDateKey()) {
 
 /** @returns {Record<string, string[]>} */
 function loadProgressStore() {
-  try {
-    const raw = localStorage.getItem(STORAGE_DAILY_PROGRESS)
-    if (!raw) return {}
-    const parsed = JSON.parse(raw)
-    return parsed && typeof parsed === 'object' ? parsed : {}
-  } catch {
-    return {}
-  }
+  const parsed = readJson(STORAGE_KEYS.dailyEditionProgress, {})
+  return parsed && typeof parsed === 'object' ? parsed : {}
 }
 
 /** @param {Record<string, string[]>} store */
 function saveProgressStore(store) {
-  try {
-    localStorage.setItem(STORAGE_DAILY_PROGRESS, JSON.stringify(store))
-  } catch {
-    /* quota or private mode */
-  }
+  writeJson(STORAGE_KEYS.dailyEditionProgress, store)
 }
 
 /** @param {string} dateKey */

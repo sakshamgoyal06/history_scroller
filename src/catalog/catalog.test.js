@@ -2,12 +2,12 @@ import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { CARD_BY_ID, HISTORY_CARDS, LEARNING_DOMAINS, recommendNextCard } from './catalog.js'
-import { feedItemFromCatalogCard } from './feed/cardAdapter.js'
-import { isValidFeedItem } from './feed/feedTypes.js'
-import { PROTOTYPE_FEED_ITEMS } from './feed/prototypeFeedItems.js'
-import { LEARNING_ZONES } from './zones/zoneData.js'
+import { feedItemFromCatalogCard } from '../feed/cardAdapter.js'
+import { isValidFeedItem } from '../feed/feedTypes.js'
+import { PROTOTYPE_FEED_ITEMS } from '../feed/prototypeFeedItems.js'
+import { LEARNING_ZONES } from '../zones/zoneData.js'
 
-const publicDir = fileURLToPath(new URL('../public', import.meta.url))
+const publicDir = fileURLToPath(new URL('../../public', import.meta.url))
 
 describe('catalog', () => {
   it('has unique card IDs', () => {

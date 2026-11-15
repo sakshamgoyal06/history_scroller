@@ -67,26 +67,6 @@
  * @property {number} [pathDripStepTotal]
  */
 
-export const FEED_STORAGE_KEYS = {
-  liked: 'curiosity-feed-liked-v1',
-  notInterested: 'curiosity-feed-not-interested-v1',
-  domainPreferences: 'curiosity-feed-domain-preferences-v1',
-  recentlyViewed: 'curiosity-feed-recently-viewed-v1',
-  explored: 'curiosity-feed-explored-v1',
-  completed: 'curiosity-feed-completed-v1',
-  zoneProgress: 'curiosity-feed-zone-progress-v1',
-  zoneDrip: 'curiosity-feed-zone-drip-v1',
-  pathDrip: 'curiosity-feed-path-drip-v1',
-  detailMode: 'curiosity-feed-detail-mode-v1',
-}
-
-export const SESSION_KEYS = {
-  feedOrder: 'curiosity-feed-session-order-v1',
-  activeFeedItemId: 'curiosity-feed-session-active-v1',
-  sessionStartedAt: 'curiosity-feed-session-started-v1',
-  summaryShown: 'curiosity-feed-session-summary-v1',
-}
-
 /** Session stale after 4 hours */
 export const SESSION_STALE_MS = 4 * 60 * 60 * 1000
 
