@@ -2,7 +2,7 @@
  * UPSC Learning Zone (PRD v2.1 P9b, FR-UPSC-08..11, D-12): Subject → Chapter. Each chapter is distilled
  * into our own UPSC-format highlight cards that cite public sources. No book or publisher is named.
  *
- * Two SAMPLE chapters are fully written so the deck UI can be built before the Studio pipeline (M1.25).
+ * Five chapters are fully written so the deck UI can be built before the Studio pipeline (M1.25).
  * Facts come from the cited public sources; no video IDs or URLs are invented (PRD §5): a chapter's
  * video slot stays empty until an editor picks a credited, embeddable video (FR-UPSC-10).
  */
@@ -27,9 +27,57 @@ export const SUBJECTS = [
     name: 'Polity',
     gs: 'GS2',
     chapters: [
-      { id: 'polity-preamble', title: 'Preamble' },
-      { id: 'polity-fundamental-rights', title: 'Fundamental Rights' },
-      { id: 'polity-parliament', title: 'Parliament' },
+      {
+        id: 'polity-preamble',
+        title: 'Preamble',
+        video: null,
+        summary:
+          'The Preamble says where the Constitution’s authority comes from (the people of India), what kind of state India is (sovereign, socialist, secular, democratic republic) and what it aims for (justice, liberty, equality, fraternity). It was amended once, in 1976.',
+        cards: [
+          { type: 'Concept', title: 'Authority from the people', body: 'The Preamble opens with ==“We, the people of India”==: the Constitution’s authority comes from the people, who adopt it and give it to themselves.', cite: 'Constitution of India, Preamble' },
+          { type: 'Concept', title: 'Five words for the state', body: 'India is declared a ==sovereign, socialist, secular, democratic republic==. “Socialist” and “secular” were inserted in 1976.', cite: 'Constitution of India, Preamble; Constitution (Forty-second Amendment) Act, 1976' },
+          { type: 'Concept', title: 'Four objectives', body: 'Justice (social, economic and political), liberty (of thought, expression, belief, faith and worship), equality (of status and opportunity) and ==fraternity==, assuring the dignity of the individual and the unity and integrity of the nation.', cite: 'Constitution of India, Preamble' },
+          { type: 'Date', title: 'Adopted, then in force', body: 'The Constituent Assembly adopted the Constitution on ==26 November 1949==. Most of it came into force on ==26 January 1950==; some provisions applied at once.', cite: 'Constitution of India, Preamble and Art 394' },
+          { type: 'Common confusion', title: 'Is the Preamble part of the Constitution?', body: 'In the Berubari reference (1960) the Supreme Court said it was not. In ==Kesavananda Bharati (1973)== it held that the Preamble is part of the Constitution.', cite: 'Supreme Court of India: In re Berubari Union (1960); Kesavananda Bharati v. State of Kerala (1973)' },
+          { type: 'Article', title: 'Can it be amended?', body: 'Yes, under Art 368, but not so as to destroy the ==basic structure==. It has been amended once, by the 42nd Amendment, 1976.', cite: 'Kesavananda Bharati v. State of Kerala (1973); Constitution (Forty-second Amendment) Act, 1976' },
+          { type: 'Term', title: 'Republic', body: 'The head of state is ==elected, not hereditary==: the President is chosen by an electoral college of elected members of Parliament and the state assemblies.', cite: 'Constitution of India, Arts 54–55' },
+          { type: 'Asked like this', title: 'How Prelims tests it', body: 'Expect “which words were added by the 42nd Amendment”: ==socialist, secular and integrity== (“unity of the nation” became “unity and integrity of the nation”).', cite: 'Constitution (Forty-second Amendment) Act, 1976' },
+        ],
+      },
+      {
+        id: 'polity-fundamental-rights',
+        title: 'Fundamental Rights',
+        video: null,
+        summary:
+          'Part III (Articles 12 to 35) lists rights that courts enforce against the state. They fall into six groups, from equality to constitutional remedies. Some belong only to citizens, and Articles 20 and 21 stay enforceable even during an emergency.',
+        cards: [
+          { type: 'Concept', title: 'Part III, enforceable', body: 'Fundamental Rights are in ==Part III, Articles 12–35==. Laws that take them away are void to that extent (Art 13), and Art 32 lets anyone go straight to the Supreme Court to enforce them.', cite: 'Constitution of India, Arts 12–13, 32' },
+          { type: 'Concept', title: 'Six groups', body: 'Equality (Arts 14–18), freedom (19–22), against exploitation (23–24), freedom of religion (25–28), cultural and educational (29–30), and ==constitutional remedies (32)==. Property stopped being a Fundamental Right in 1978 and is now Art 300A.', cite: 'Constitution of India, Part III; Constitution (Forty-fourth Amendment) Act, 1978' },
+          { type: 'Article', title: 'Six freedoms in Art 19', body: 'Speech and expression; assembling peacefully without arms; forming associations or unions; moving freely and residing anywhere in India; any profession or trade. The state can impose ==reasonable restrictions== on each.', cite: 'Constitution of India, Art 19' },
+          { type: 'Article', title: 'Life and personal liberty', body: 'Art 21: no person shall be deprived of life or personal liberty except by procedure established by law. In ==Maneka Gandhi (1978)== the Court held that procedure must be fair, just and reasonable.', cite: 'Constitution of India, Art 21; Maneka Gandhi v. Union of India (1978)' },
+          { type: 'Article', title: 'Five writs', body: 'To enforce rights, courts issue ==habeas corpus, mandamus, prohibition, certiorari and quo warranto==. The Supreme Court does so under Art 32; High Courts under Art 226, which also covers other legal rights.', cite: 'Constitution of India, Arts 32, 226' },
+          { type: 'Common confusion', title: 'Citizens only, or everyone?', body: 'Arts ==15, 16, 19, 29 and 30== are for citizens only. Rights such as equality before law (Art 14) and life and liberty (Art 21) are available to any person, including foreigners.', cite: 'Constitution of India, Arts 14–16, 19, 21, 29–30' },
+          { type: 'Article', title: 'During an emergency', body: 'Art 19 is suspended automatically when an emergency is declared on grounds of war or external aggression (Art 358). Since the 44th Amendment, ==Arts 20 and 21 cannot be suspended== (Art 359).', cite: 'Constitution of India, Arts 358–359' },
+          { type: 'Date', title: 'Right to education', body: 'Art 21A, inserted by the ==86th Amendment (2002)==, makes free and compulsory education for children aged 6 to 14 a Fundamental Right.', cite: 'Constitution of India, Art 21A; Constitution (Eighty-sixth Amendment) Act, 2002' },
+        ],
+      },
+      {
+        id: 'polity-parliament',
+        title: 'Parliament',
+        video: null,
+        summary:
+          'Parliament is the President plus two Houses: the Rajya Sabha, a permanent body, and the Lok Sabha, elected for five years. The Lok Sabha controls money bills, deadlocks on ordinary bills go to a joint sitting, and constitutional amendments need each House separately.',
+        cards: [
+          { type: 'Article', title: 'Three parts', body: 'Art 79: Parliament consists of the ==President== and two Houses, the Council of States (Rajya Sabha) and the House of the People (Lok Sabha).', cite: 'Constitution of India, Art 79' },
+          { type: 'Article', title: 'Rajya Sabha', body: 'At most ==250 members==: up to 238 representatives of states and union territories, and 12 nominated by the President. It is not dissolved; one-third of members retire every second year.', cite: 'Constitution of India, Arts 80, 83(1)' },
+          { type: 'Article', title: 'Lok Sabha', body: 'Up to ==530 members from states and 20 from union territories==, directly elected. Its term is five years unless dissolved earlier; during an emergency Parliament can extend it by law, one year at a time.', cite: 'Constitution of India, Arts 81, 83(2)' },
+          { type: 'Qualifications', title: 'Minimum age', body: 'A citizen of India, at least ==25 years== old for the Lok Sabha and ==30 years== for the Rajya Sabha, with other qualifications Parliament may set by law.', cite: 'Constitution of India, Art 84' },
+          { type: 'Article', title: 'Money bills', body: 'A money bill can be introduced ==only in the Lok Sabha==. The Rajya Sabha can only recommend changes and must return it within 14 days. The Speaker’s certificate decides whether a bill is a money bill.', cite: 'Constitution of India, Arts 109–110' },
+          { type: 'Article', title: 'Joint sitting', body: 'If the Houses disagree on an ordinary bill, the President can call a joint sitting, presided over by the Speaker. There is ==no joint sitting for a money bill or a constitutional amendment==.', cite: 'Constitution of India, Arts 108, 368' },
+          { type: 'Article', title: 'Six-month rule', body: 'The President must summon each House so that ==no more than six months== pass between the last sitting of one session and the first sitting of the next.', cite: 'Constitution of India, Art 85' },
+          { type: 'Common confusion', title: 'Who presides?', body: 'The Lok Sabha ==elects its Speaker== (Art 93). The Rajya Sabha’s Chairman is the ==Vice-President==, ex officio (Arts 64, 89), who is not a member of the House.', cite: 'Constitution of India, Arts 64, 89, 93' },
+        ],
+      },
       {
         id: 'polity-governor',
         title: 'Governor',

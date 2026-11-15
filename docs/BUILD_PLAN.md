@@ -399,6 +399,7 @@ Add one line per merged PR that ticks a box.
 | 2026-11-15 | PRD v2.1: grounded Ask anything (M1.23), Learning Zone (M1.24–M1.25), D-BOOKS | — | No tasks ticked |
 | 2026-11-15 | PRD v2.1.1: Learning Zone without book names (D-12) | — | No tasks ticked |
 | 2026-11-15 | v2.1 UI on samples: Learning Zone (subject → chapter, no book names, video slot + highlight deck, M1.24–M1.25 front ends), revision cards in the UPSC feed, Ask with source allow-list, citation chips and no-source state (M1.23 front end) | — | No tasks ticked: decks, retrieval and scheduling still need their backends |
+| 2026-11-15 | Polity decks for Preamble, Fundamental Rights and Parliament (8 cards each, cited to the Constitution and Supreme Court judgments, no book names); M1.25 content groundwork | — | No tasks ticked: needs Studio template and teacher spot-check |
 
 ---
 
