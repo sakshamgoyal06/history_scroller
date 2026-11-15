@@ -20,6 +20,14 @@ Schema v1 for BUILD_PLAN M0.2 (PRD §11.2, NFR-03). Stack decided in D-STACK (20
   editable only by their owner. Users can edit their profile preferences but not `plan`.
 - A profile row is created for every new account by a trigger on `auth.users`.
 
+## Live project
+- Supabase project `curiosity` (ref `ijjtwurgkmxwwakkvfep`, Mumbai `ap-south-1`), created 2026-11-15 in the owner's
+  org. API URL: `https://ijjtwurgkmxwwakkvfep.supabase.co`.
+- Both migrations applied. Seeded so far: Learning Zone subjects, chapters and the cited chapter decks (the only
+  rows that publish). Catalog cards, reel posts and the UPSC sample edition (all `review`) load with the full seed.
+- Supabase security advisor: no findings after the second migration. Checked as `anon`: sees only published
+  content and chapters, no access to saves; users can't write content or change `plan`.
+
 ## Setting up a project
 1. Create a Supabase project (region: Mumbai, `ap-south-1`, for Indian users).
 2. `npx supabase link --project-ref <ref>` then `npm run db:migrate` (applies the migrations).
