@@ -32,6 +32,8 @@ export const STORAGE_KEYS = {
   onboarding: 'curiosity-onboarding-v1',
   upscProfile: 'curiosity-upsc-profile-v1',
   upscSaved: 'curiosity-upsc-saved-v1',
+  upscChapterProgress: 'curiosity-upsc-chapter-progress-v1',
+  upscRevision: 'curiosity-upsc-revision-v1',
 }
 
 /** sessionStorage keys (per-tab feed session). */

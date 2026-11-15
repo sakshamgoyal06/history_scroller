@@ -5,8 +5,8 @@
 export const GS_PAPERS = /** @type {const} */ (['GS1', 'GS2', 'GS3', 'GS4'])
 export const POST_STEPS = /** @type {const} */ (['What happened', 'Background', 'Key facts', 'Why it matters'])
 
-/** At most one "interesting" card per this many current-affairs posts (~80/20 mix). */
-export const CA_PER_INTERESTING = 4
+/** Revision cards due today come after the news and never outnumber it (FR-UPSC-01). */
+export const MAX_REVISION_CARDS = 3
 
 /**
  * Fields a current-affairs post must have before it can publish (FR-UPSC-02).
@@ -18,10 +18,6 @@ export function missingUpscFields(post) {
   if (!post?.head?.trim()) missing.push('head')
   if (!GS_PAPERS.includes(/** @type {any} */ (post?.gs))) missing.push('gs')
   if (!post?.sources?.length) missing.push('sources')
-  if (post?.kind === 'interesting') {
-    if (!post.body?.length) missing.push('body')
-    return missing
-  }
   if (!post?.what?.trim()) missing.push('what')
   if (!post?.background?.trim()) missing.push('background')
   if (!post?.facts?.length) missing.push('facts')
@@ -40,28 +36,27 @@ export function latestEditionDate(posts, dateKey) {
 }
 
 /**
- * Builds one day's UPSC feed: publishable current-affairs posts first, with interesting cards
- * slotted in after every CA_PER_INTERESTING posts (never more than that ratio allows).
- * A GS filter narrows current affairs to that paper and keeps interesting cards of that paper.
+ * Builds one day's UPSC feed: that day's publishable national and international current-affairs posts,
+ * narrowed by GS paper when a filter is set (FR-UPSC-01, FR-UPSC-05).
  * @param {import('./upscContent.js').UpscPost[]} posts
  * @param {{ dateKey: string, gs?: string }} options
  */
 export function buildUpscFeed(posts, { dateKey, gs = 'All' }) {
-  const day = posts.filter((p) => p.dateKey === dateKey && missingUpscFields(p).length === 0)
-  const byPaper = (p) => gs === 'All' || p.gs === gs
-  const ca = day.filter((p) => p.kind === 'current-affairs' && byPaper(p))
-  const interesting = day.filter((p) => p.kind === 'interesting' && byPaper(p))
-  const allowed = Math.max(ca.length ? Math.ceil(ca.length / CA_PER_INTERESTING) : 0, 0)
-  const extras = interesting.slice(0, allowed)
+  return posts.filter(
+    (p) => p.dateKey === dateKey && p.kind === 'current-affairs' && missingUpscFields(p).length === 0 && (gs === 'All' || p.gs === gs),
+  )
+}
 
-  const out = []
-  let extraIdx = 0
-  ca.forEach((post, i) => {
-    out.push(post)
-    if ((i + 1) % CA_PER_INTERESTING === 0 && extraIdx < extras.length) out.push(extras[extraIdx++])
-  })
-  while (extraIdx < extras.length) out.push(extras[extraIdx++])
-  return out
+/**
+ * How many due revision cards to show after the news: at most MAX_REVISION_CARDS and never more than
+ * the number of news posts (FR-UPSC-01). None when a GS filter is on or there is no news.
+ * @param {number} newsCount
+ * @param {number} dueCount
+ * @param {string} gs
+ */
+export function revisionSlots(newsCount, dueCount, gs = 'All') {
+  if (gs !== 'All' || newsCount === 0) return 0
+  return Math.min(MAX_REVISION_CARDS, newsCount, dueCount)
 }
 
 /**

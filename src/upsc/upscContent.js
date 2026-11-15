@@ -12,7 +12,7 @@
 /**
  * @typedef {object} UpscPost
  * @property {string} id
- * @property {'current-affairs' | 'interesting'} kind
+ * @property {'current-affairs'} kind
  * @property {string} dateKey      local date the item belongs to (YYYY-MM-DD)
  * @property {GsPaper} gs
  * @property {string} gsArea       e.g. "Polity"
@@ -21,7 +21,7 @@
  * @property {string} [background]
  * @property {string[]} [facts]    Prelims facts; `==x==` marks a highlighted phrase
  * @property {string} [why]        Mains angle
- * @property {string[]} [body]     interesting cards: 2–4 short paragraphs
+ * @property {string} [chapterId]  Learning Zone chapter for "Revise the basics" (FR-UPSC-12)
  * @property {UpscSource[]} sources
  * @property {number} minutes
  * @property {boolean} [sample]
@@ -48,6 +48,7 @@ export const UPSC_SAMPLE_POSTS = [
       'If the House passes a returned bill again, the Governor shall not withhold assent',
       '2023, State of Punjab case: the Supreme Court said a Governor cannot keep a bill pending indefinitely',
     ],
+    chapterId: 'polity-governor',
     why: 'Centre–state relations, the Governor’s discretion versus the elected government, and whether the Constitution needs time limits. Use it in GS2 answers on federalism.',
     sources: [
       { publisher: 'Constitution of India', title: 'Articles 163, 200, 201' },
@@ -123,28 +124,37 @@ export const UPSC_SAMPLE_POSTS = [
       'Snowfall in the western Himalayas',
       'Helps rabi crops, especially ==wheat==',
     ],
+    chapterId: 'geography-climate',
     why: 'Links climatology in GS1 with agriculture in GS3. Mains angle: changing patterns of western disturbances and what that means for farming and Himalayan snow.',
     sources: [
       { publisher: 'India Meteorological Department', title: 'Glossary' },
-      { publisher: 'NCERT Class XI', title: 'India: Physical Environment, ch. 4 Climate' },
     ],
     minutes: 2,
     sample: true,
   },
   {
-    id: 'upsc-ist-longitude',
-    kind: 'interesting',
+    id: 'upsc-wto-appellate-body',
+    kind: 'current-affairs',
     dateKey: SAMPLE_EDITION_DATE,
-    gs: 'GS1',
-    gsArea: 'Geography',
-    head: 'Why India’s clocks are 5 hours 30 minutes ahead',
-    body: [
-      'Indian Standard Time is set by the 82.5°E line of longitude, which passes near Mirzapur in Uttar Pradesh.',
-      'The Earth turns 15° an hour, so 82.5° ÷ 15 = 5.5 hours ahead of Greenwich.',
-      'That’s why the North-east sees sunrise long before its clocks say so, and why some states have asked for a second time zone.',
+    gs: 'GS2',
+    gsArea: 'International relations',
+    head: 'Why the WTO’s top trade court has been empty since 2019',
+    what: 'Trade disputes keep piling up at the WTO with no final court to hear appeals, and its reform comes up at every ministerial meeting.',
+    background:
+      'WTO disputes go to a panel first, and either side can appeal to the Appellate Body. Since December 2019 it has had too few members to hear any appeal, because new appointments have been blocked.',
+    facts: [
+      'WTO set up in ==1995== by the Marrakesh Agreement; headquarters in Geneva',
+      'Appellate Body: 7 members, 3 hear each appeal',
+      'Non-functional since ==December 2019==',
+      'An appeal “into the void” leaves a panel ruling unenforced',
+      'Some members use an interim appeal arbitration arrangement (MPIA); India has not joined it',
     ],
-    sources: [{ publisher: 'NCERT Class XI', title: 'India: Physical Environment, ch. 1 India: Location' }],
-    minutes: 1,
+    why: 'Rules-based trade, India’s own disputes, and reform of global institutions. Use it in GS2 answers on international institutions and GS3 answers on trade.',
+    sources: [
+      { publisher: 'World Trade Organization', title: 'Dispute settlement: Appellate Body' },
+      { publisher: 'World Trade Organization', title: 'Understanding on Rules and Procedures Governing the Settlement of Disputes' },
+    ],
+    minutes: 2,
     sample: true,
   },
 ]
@@ -217,7 +227,3 @@ export const UPSC_EXPLAINERS = {
   },
 }
 
-export const ASK_SUGGESTIONS = [
-  { label: 'Explain the anti-defection law', explainerId: 'anti-defection-law' },
-  { label: 'Can a Governor delay a state bill?', explainerId: 'upsc-governor-assent' },
-]
