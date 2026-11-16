@@ -34,6 +34,8 @@ export const STORAGE_KEYS = {
   upscSaved: 'curiosity-upsc-saved-v1',
   upscChapterProgress: 'curiosity-upsc-chapter-progress-v1',
   upscRevision: 'curiosity-upsc-revision-v1',
+  // Supabase Auth session (M0.3); written by supabase-js through authStorage in src/account/auth.js.
+  auth: 'curiosity-auth-v1',
 }
 
 /** sessionStorage keys (per-tab feed session). */

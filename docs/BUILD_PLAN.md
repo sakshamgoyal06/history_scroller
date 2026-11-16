@@ -375,7 +375,7 @@ Chosen to be serverless, cheap at low scale, and quick to build on the current V
 | ID | Decision | Proposal | Needed by | Owner | Status |
 |----|----------|----------|-----------|-------|--------|
 | D-STACK | Confirm the §3 stack (Supabase, Upstash, Inngest, Sentry, PostHog) | As proposed | M0.1 / M0.2 start | Eng lead + owner | ✅ as proposed (2026-11-15) |
-| D-AUTH | Phone OTP at alpha, or Google-only first (cheaper, no DLT setup) | Google + email magic link at alpha, phone OTP by beta | M0.3 | Product | ⬜ open |
+| D-AUTH | Phone OTP at alpha, or Google-only first (cheaper, no DLT setup) | Google + email magic link at alpha, phone OTP by beta | M0.3 | Product | ✅ email link only first (2026-11-15); Google and phone later |
 | D-EXAM | First exam taxonomy | UPSC GS tags (our own mapping) | M0.2 (schema), M1.7 | Product | ✅ UPSC (PRD D-10) |
 | D-BOOKS | Learning Zone: first 3 subjects and chapters (PRD open question 9); no book names (PRD D-12) | UPSC teacher picks and spot-checks | M1.24 start | Owner | ⬜ open |
 | D-MODE | Launch order: both modes in alpha, or one first (PRD open question 7) | Shared engine; design partners in both; Phase 0 data picks the alpha lead | M1 start | Owner | ⬜ open |
@@ -400,6 +400,7 @@ Add one line per merged PR that ticks a box.
 | 2026-11-15 | PRD v2.1.1: Learning Zone without book names (D-12) | — | No tasks ticked |
 | 2026-11-15 | v2.1 UI on samples: Learning Zone (subject → chapter, no book names, video slot + highlight deck, M1.24–M1.25 front ends), revision cards in the UPSC feed, Ask with source allow-list, citation chips and no-source state (M1.23 front end) | — | No tasks ticked: decks, retrieval and scheduling still need their backends |
 | 2026-11-15 | D-STACK confirmed as proposed. M0.2 schema v1: Supabase migrations with RLS, generated seed, PGlite tests (`docs/DATABASE.md`) | — | M0.2 not ticked: needs a Supabase project to run `db:migrate` + seed against |
+| 2026-11-16 | M0.3 part 1: email-link sign-in (D-AUTH), guest by default, inline account section in Library and Learn; session stored via localStore | — | M0.3 not ticked: needs the E2E test (guest → save → sign in → data kept) and sync (M0.4) |
 
 ---
 

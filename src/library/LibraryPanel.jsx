@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { loadLikedIds, toggleLikedId, clearRecentlyViewed, loadRecentlyViewed } from '../feed/feedStorage.js'
 import { listPathSummaries } from '../learn/learningPathStorage.js'
 import { getFeedItemById } from '../feed/feedRepository.js'
+import { AccountSection } from '../account/AccountSection.jsx'
 
 export function LibraryPanel({
   feedItems,
@@ -167,6 +168,8 @@ export function LibraryPanel({
           </ul>
         )}
       </section>
+
+      <AccountSection variant="curious" />
     </div>
   )
 }

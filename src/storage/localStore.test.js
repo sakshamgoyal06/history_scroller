@@ -8,6 +8,7 @@ describe('storage keys', () => {
       {
         "activePath": "curiosity-feed-active-path-v1",
         "appMode": "curiosity-app-mode-v1",
+        "auth": "curiosity-auth-v1",
         "completed": "curiosity-feed-completed-v1",
         "dailyEditionProgress": "history-feed-daily-edition-progress",
         "detailMode": "curiosity-feed-detail-mode-v1",
