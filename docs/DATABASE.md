@@ -34,3 +34,15 @@ Schema v1 for BUILD_PLAN M0.2 (PRD §11.2, NFR-03). Stack decided in D-STACK (20
 3. Load content: `npx supabase db reset --linked` on a fresh project, or run `supabase/seed.sql` in the SQL editor.
 4. Put the project URL and anon key in Vercel as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (public by design;
    RLS protects the data). The service-role key is server-only and never goes in a `VITE_*` variable.
+
+## Sign-in (M0.3)
+- Email link only for now (D-AUTH). Code: `src/account/` (`auth.js`, `useAccount.js`, `AccountSection.jsx`).
+- The app ships the project URL and the **publishable** key (public by design); `VITE_SUPABASE_URL` and
+  `VITE_SUPABASE_PUBLISHABLE_KEY` override them.
+- supabase-js loads only when someone asks for a link or already has a session, so guests don't download it.
+- Links return with tokens in the URL hash; `captureSignInFromUrl()` in `src/main.jsx` removes them before the
+  app's hash routing runs and finishes sign-in.
+- **Owner setup in the Supabase dashboard (Authentication → URL Configuration):** set Site URL to the production
+  address, and add redirect URLs for production, `/upsc`, and Vercel previews
+  (`https://history-scroller-*-captain-planet1.vercel.app/**`). Without this, links open the default Site URL.
+- Supabase's built-in email sender allows only a few emails an hour; add custom SMTP before alpha.

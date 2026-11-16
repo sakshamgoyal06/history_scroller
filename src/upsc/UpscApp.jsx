@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { STORAGE_KEYS, readJson, writeJson } from '../storage/localStore.js'
 import { Wordmark } from '../mode/ModeToggle.jsx'
+import { AccountSection } from '../account/AccountSection.jsx'
 import { ASK_SUGGESTIONS, SOURCE_ALLOW_LIST, answerQuestion } from './groundedAnswer.js'
 import { SUBJECTS, dueCards, findChapter, gradeCard, isChapterReady, sampleRevisionState, scheduleChapter } from './learningZone.js'
 import { SAMPLE_EDITION_DATE, UPSC_EXPLAINERS, UPSC_SAMPLE_POSTS } from './upscContent.js'
@@ -433,6 +434,7 @@ function LearnHome({ dueCount, progress, savedCount, onDue, onChapter }) {
         </li>
       </ul>
       <p className="u-mono">Each chapter is distilled into our own UPSC-format cards. Every card cites a public source.</p>
+      <AccountSection variant="upsc" />
     </div>
   )
 }
